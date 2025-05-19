@@ -1,0 +1,45 @@
+{
+	"text-embedding-ada-002": {
+		"platforms": [
+			"azure",
+			"openai"
+		],
+		"dimensions": 1536
+	},
+	"text-embedding-3-small": {
+		"platforms": [
+			"openai"
+		],
+		"dimensions": 1536
+	},
+	"text-embedding-3-large": {
+		"platforms": [
+			"openai"
+		],
+		"dimensions": 3072
+	},
+	"text-embedding-005": {
+		"platforms": [
+			"vertexai"
+		],
+		"dimensions": 768
+	},
+	"text-embedding-004": {
+		"platforms": [
+			"vertexai"
+		],
+		"dimensions": 768
+	},
+	"text-multilingual-embedding-002": {
+		"platforms": [
+			"vertexai"
+		],
+		"dimensions": 768
+	},
+	"text-embedding-large-exp-03-07": {
+		"platforms": [
+			"vertexai"
+		],
+		"dimensions": 3072
+	}
+}

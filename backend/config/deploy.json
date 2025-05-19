@@ -1,0 +1,28 @@
+{
+	"dev": {
+		"region": "europe-west1",
+		"project": "monks-copydesk",
+		"serviceAccount": "copy-desk",
+		"env": [
+			"OPENAI_API_KEY",
+			"AZURE_TENANT_ID",
+			"AZURE_CLIENT_ID",
+			"AZURE_CLIENT_SECRET"
+		],
+		"apiBaseUrl": "/api",
+		"functions": [
+			{
+				"name": "api",
+				"minInstances": 1,
+				"cpus": 1,
+				"memory": "1GiB",
+				"entryPoint": "api"
+			}
+		],
+		"apiGateway": {
+			"api": "copydesk-dev",
+			"gateway": "copydesk-dev-gateway",
+			"config": "copydesk-dev-config"
+		}
+	}
+}

@@ -1,0 +1,26 @@
+{
+	"beach": {
+		"id": "beach",
+		"label": "Beach"
+	},
+	"park": {
+		"id": "park",
+		"label": "Park"
+	},
+	"pool": {
+		"id": "pool",
+		"label": "Pool"
+	},
+	"amusement-park": {
+		"id": "amusement-park",
+		"label": "Amusement Park"
+	},
+	"lake": {
+		"id": "lake",
+		"label": "Lake"
+	},
+	"block-party": {
+		"id": "block-party",
+		"label": "Block Party"
+	}
+}

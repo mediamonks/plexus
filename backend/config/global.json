@@ -1,0 +1,14 @@
+{
+	"projectId": "monks-copydesk",
+	"location": "europe-west1",
+	"platform": "google",
+	"embeddingPlatform": "google",
+	"strategy": "serial",
+	"forceCopyBasedVectorSearch": true,
+	"ignoreFixedAgentOrder": false,
+	"examplesTopN": 3,
+	"simpleChannelContext": true,
+	"brandContextTopN": 3,
+	"disableBrandContext": false,
+	"waitForThreadUpdate": false
+}
