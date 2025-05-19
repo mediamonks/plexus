@@ -1,0 +1,527 @@
+swagger: "2.0"
+info:
+  title: copydesk-api
+  description: CopyDesk API
+  version: 1.1.0
+schemes:
+  - https
+produces:
+  - application/json
+x-google-backend:
+  address: https://europe-west4-puig-creative-studio.cloudfunctions.net/api
+  path_translation: APPEND_PATH_TO_ADDRESS
+  protocol: h2
+  deadline: 300
+  jwt_audience: https://europe-west4-puig-creative-studio.cloudfunctions.net/api
+paths:
+  /api/generate-copy:
+    post:
+      summary: Generate Copy
+      description: Starts or continues a copy generation thread
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            required:
+              - presetId
+              - brandId
+            properties:
+              presetId:
+                type: string
+                description: The preset to use, determines the channel, character limit and
+                  target length
+              brandId:
+                type: string
+                description: The ID of the brand to generate copy for
+              prompt:
+                type: string
+                description: The prompt for the copy generation
+              productId:
+                type: string
+                description: The ID of the product to generate copy about
+              toneOfVoiceId:
+                type: string
+                description: The ID of the tone of voice to use
+              targetAudienceId:
+                type: string
+                description: The ID of the target audience to generate the copy for
+              languageId:
+                type: string
+                description: The ID of the language to use
+                enum:
+                  - en-us
+                  - fr-fr
+                default: en-us
+              temperature:
+                type: number
+                description: The temperature value for the copy generation
+                minimum: 0
+                maximum: 1
+                default: 0.5
+              maxCharacters:
+                type: integer
+                description: The maximum number of characters for the copy generation
+              targetLength:
+                type: integer
+                description: The target length of the copy, in number of characters
+              threadId:
+                type: string
+                description: The ID of the conversation thread to continue
+              options:
+                type: object
+                description: A set of internal options that can be set to control strategy,
+                  platform, model etc.
+                properties:
+                  platform:
+                    type: string
+                    description: Which platform to use for copy generation.
+                    enum:
+                      - google
+                      - openai
+                      - azure
+                    default: google
+                  embeddingPlatform:
+                    type: string
+                    description: Which platform to use for generating embeddings.
+                    enum:
+                      - google
+                      - openai
+                      - azure
+                    default: google
+                  model:
+                    type: string
+                    description: Which model to use for copy generation. Valid values include all
+                      models available on the selected platform. Note that for
+                      Azure OpenAI this refers to deployment names instead.
+                  embeddingModel:
+                    type: string
+                    description: Which model to use for generating embeddings. Valid values include
+                      all embedding models available on the selected embedding
+                      platform.
+                  strategy:
+                    type: string
+                    description: Which strategy to use, determining the mode of agent cooperation.
+                      Parallel scales better, Serial may improve quality. Auto
+                      selects the best strategy based on context.
+                    enum:
+                      - auto
+                      - serial
+                      - parallel
+                    default: auto
+                  forceCopyBasedVectorSearch:
+                    type: boolean
+                    description: When enabled, initial run vector searches will wait for the Draft
+                      agent to complete. May improve quality at the cost of a
+                      slower first response. Has no effect on follow-up runs.
+                    default: true
+                  ignoreFixedAgentOrder:
+                    type: boolean
+                    description: When enabled, the standard order for Serial generation (Brand >
+                      Product > Tone of Voice > Target Audience > Channel) will
+                      be ignored to improve performance. Might reduce quality.
+                      Has no effect in Parallel mode.
+                    default: false
+                  channelContextTopN:
+                    type: integer
+                    description: Sets the amount of results that will be included in the Channel
+                      Context.
+                    default: 3
+                    minimum: 0
+                  simpleChannelContext:
+                    type: boolean
+                    description: Disables the vector search for Channel Context, relying only on
+                      channel type and engagement rate to surface relevant
+                      context. Greatly increases speed, but might reduce
+                      quality.
+                    default: false
+                  brandContextTopN:
+                    type: integer
+                    description: Sets the amount of results that will be included in the Brand
+                      Context.
+                    default: 3
+                    minimum: 0
+                  disableBrandContext:
+                    type: boolean
+                    description: Disables the vector search for Brand Context, relying only on the
+                      static Brand Guidelines. Greatly increases speed, but
+                      might reduce quality.
+                    default: false
+                  waitForThreadUpdate:
+                    type: boolean
+                    description: Waits for the thread to be updated in the database before returning
+                      a response. Significantly slows down responses, but
+                      eliminates the risk of an Invalid threadId error or
+                      missing context when immediately sending a follow-up
+                      request.
+                    default: false
+      responses:
+        "200":
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                description: Error message if applicable, otherwise null.
+              copy:
+                type: string
+                description: The generated copy.
+              textResponse:
+                type: string
+                description: Text response if applicable, otherwise null.
+              threadId:
+                type: string
+                format: uuid
+                description: Unique identifier for the thread.
+              history:
+                type: object
+                description: The conversation history.
+              meta:
+                type: object
+                properties:
+                  characterCount:
+                    type: integer
+                    description: Number of characters in the generated copy.
+                  wordCount:
+                    type: integer
+                    description: Number of words in the generated copy.
+                  generationInfo:
+                    type: object
+                    properties:
+                      prompt:
+                        type: string
+                        description: The provided user prompt.
+                      brandId:
+                        type: string
+                        description: The provided brand ID.
+                      productId:
+                        type: string
+                        description: The provided product ID.
+                      toneOfVoiceId:
+                        type: string
+                        description: The provided tone of voice ID.
+                      targetAudienceId:
+                        type: string
+                        description: The provided target audience ID.
+                      temperature:
+                        type: number
+                        format: float
+                        description: The provided temperature setting.
+                      languageId:
+                        type: string
+                        description: The provided language ID.
+                      presetId:
+                        type: string
+                        description: The provided preset ID.
+                      maxCharacters:
+                        type: integer
+                        description: The provided character limit.
+                      options:
+                        type: object
+                        description: The provided options.
+                      effectiveOptions:
+                        type: object
+                        description: The effective options used.
+              debugInfo:
+                type: object
+                properties:
+                  revisionNotes:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties:
+                        type: string
+                    description: List of revision notes detailing changes made to the copy by the
+                      active agents.
+                  debug:
+                    type: array
+                    items:
+                      type: string
+                    description: Debugging-related information, including agent inputs and outputs.
+                  performance:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties:
+                        type: number
+                    description: Performance metrics.
+      operationId: POST /generate-copy
+    options:
+      summary: CORS preflight for /generate-copy
+      responses:
+        "204":
+          $ref: "#/responses/corsPreflightResponse"
+      operationId: OPTIONS /generate-copy
+  /api/options/{option}:
+    parameters:
+      - name: option
+        description: The name of the option type
+        type: string
+        enum:
+          - brands
+          - languages
+          - target-audiences
+          - tones-of-voice
+        in: path
+        required: true
+    get:
+      summary: Retrieve Setting Options
+      description: Returns available options for a given setting
+      responses:
+        "200":
+          description: Successful response
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: Option ID
+                label:
+                  type: string
+                  description: Option label
+                description:
+                  type: string
+                  description: Option description
+      operationId: GET /options/{option}
+    options:
+      summary: CORS preflight for /options/{option}
+      responses:
+        "204":
+          $ref: "#/responses/corsPreflightResponse"
+      operationId: OPTIONS /options/{option}
+  /api/options/brands/{brandId}/products:
+    parameters:
+      - name: brandId
+        description: The ID of the brand
+        type: string
+        in: path
+        required: true
+    get:
+      summary: Retrieve Brand Products
+      description: Returns available products for a given brand
+      responses:
+        "200":
+          description: Successful response
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: Product ID
+                label:
+                  type: string
+                  description: Product label
+                brandId:
+                  type: string
+                  description: Product Brand ID
+      operationId: GET /options/brands/{brandId}/products
+    options:
+      summary: CORS preflight for /options/brands/{brandId}/products
+      responses:
+        "204":
+          $ref: "#/responses/corsPreflightResponse"
+      operationId: OPTIONS /options/brands/{brandId}/products
+  /api/presets:
+    get:
+      summary: Retrieve Presets
+      description: Returns available presets (templates)
+      responses:
+        "200":
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              id:
+                type: string
+                description: Unique identifier for the preset.
+              label:
+                type: string
+                description: User-friendly label describing the preset.
+              type:
+                type: string
+                description: Type of preset (category).
+              description:
+                type: string
+                description: Description of the preset.
+              icon:
+                type: string
+                description: Icon for the preset.
+              channel:
+                type: string
+                description: The channel value of the preset.
+              maxCharacters:
+                type: integer
+                description: Maximum characters value of the preset.
+              targetLength:
+                type: integer
+                description: Target length value of the preset.
+      operationId: GET /presets
+    options:
+      summary: CORS preflight for /presets
+      responses:
+        "204":
+          $ref: "#/responses/corsPreflightResponse"
+      operationId: OPTIONS /presets
+  /api/thread/{threadId}:
+    parameters:
+      - name: threadId
+        description: The ID of the thread to retrieve
+        type: string
+        in: path
+        required: true
+    get:
+      summary: Retrieve Conversation Thread
+      description: Retrieves a thread containing its conversation history and input
+        and output of the last interaction
+      responses:
+        "200":
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              history:
+                type: array
+                description: The conversation history.
+              context:
+                type: object
+                description: Context used for last generation.
+              copy:
+                type: string
+                description: Output copy of last generation.
+      operationId: GET /thread/{threadId}
+    options:
+      summary: CORS preflight for /thread/{threadId}
+      responses:
+        "204":
+          $ref: "#/responses/corsPreflightResponse"
+      operationId: OPTIONS /thread/{threadId}
+  /api/create-vectordb/{brandId}:
+    parameters:
+      - name: brandId
+        description: The ID of the brand
+        type: string
+        in: path
+        required: true
+    post:
+      summary: Create Vector Database
+      description: Creates the vector database for a given brand
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              platform:
+                type: string
+                description: Specifies the platform to use for generating embeddings.
+                enum:
+                  - google
+                  - openai
+                  - azure
+                default: google
+              model:
+                type: string
+                description: Specifies the embedding model to use. Any embedding model available
+                  on the selected platform is valid.
+      responses:
+        "200":
+          description: Successful response
+      operationId: POST /create-vectordb/{brandId}
+    options:
+      summary: CORS preflight for /create-vectordb/{brandId}
+      responses:
+        "204":
+          $ref: "#/responses/corsPreflightResponse"
+      operationId: OPTIONS /create-vectordb/{brandId}
+  /api/defaults:
+    get:
+      summary: Retrieve Advanced Settings Defaults
+      description: Returns default values for the advanced settings
+      responses:
+        "200":
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              platform:
+                type: string
+                description: Default value for platform
+              embeddingPlatform:
+                type: string
+                description: Default value for embeddingPlatform
+              strategy:
+                type: string
+                description: Default value for strategy
+              forceCopyBasedVectorSearch:
+                type: boolean
+                description: Default value for forceCopyBasedVectorSearch
+              ignoreFixedAgentOrder:
+                type: boolean
+                description: Default value for ignoreFixedAgentOrder
+              channelContextTopN:
+                type: integer
+                description: Default value for channelContextTopN
+              simpleChannelContext:
+                type: boolean
+                description: Default value for simpleChannelContext
+              brandContextTopN:
+                type: integer
+                description: Default value for brandContextTopN
+              disableBrandContext:
+                type: boolean
+                description: Default value for disableBrandContext
+              waitForThreadUpdate:
+                type: boolean
+                description: Default value for waitForThreadUpdate
+      operationId: GET /defaults
+    options:
+      summary: CORS preflight for /defaults
+      responses:
+        "204":
+          $ref: "#/responses/corsPreflightResponse"
+      operationId: OPTIONS /defaults
+  /api:
+    get:
+      summary: The API definition
+      responses:
+        "200":
+          description: Successful response
+      operationId: "GET "
+    options:
+      summary: "CORS preflight for "
+      responses:
+        "204":
+          $ref: "#/responses/corsPreflightResponse"
+      operationId: "OPTIONS "
+responses:
+  corsPreflightResponse:
+    description: CORS preflight response
+    headers:
+      Access-Control-Allow-Origin:
+        type: string
+        description: Allowed origin for CORS
+      Access-Control-Allow-Methods:
+        type: string
+        description: Allowed methods for CORS
+      Access-Control-Allow-Headers:
+        type: string
+        description: Allowed headers for CORS
+      Access-Control-Allow-Credentials:
+        type: boolean
+        description: Whether to allow credentials for CORS
+      Access-Control-Max-Age:
+        type: integer
+        description: Max age for caching the preflight response in seconds
+securityDefinitions:
+  api_key:
+    type: apiKey
+    name: x-api-key
+    in: header
+

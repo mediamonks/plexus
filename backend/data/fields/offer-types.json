@@ -1,0 +1,18 @@
+{
+	"bogo": {
+		"id": "bogo",
+		"label": "BOGO"
+	},
+	"free-item": {
+		"id": "free-item",
+		"label": "Free Item"
+	},
+	"percent-off": {
+		"id": "percent-off",
+		"label": "% Off"
+	},
+	"dollar-off": {
+		"id": "dollar-off",
+		"label": "$ Off"
+	}
+}

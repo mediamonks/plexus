@@ -1,0 +1,10 @@
+{
+  "en-us": {
+      "id": "en-us",
+      "label": "English (United States)"
+  },
+  "fr-fr": {
+      "id": "fr-fr",
+      "label": "French (France)"
+  }
+}

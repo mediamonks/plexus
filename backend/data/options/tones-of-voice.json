@@ -1,0 +1,22 @@
+{
+    "bold": {
+        "id": "bold",
+        "label": "Bold and Confident",
+        "description": "Bold and Confident (glamorous, confident, beautiful, dramatic)"
+    },
+    "elegant": {
+        "id": "elegant",
+        "label": "Elegant and Refined",
+        "description": "Elegant and Refined (elegant, perceptive, graceful, intelligent)"
+    },
+    "joyful": {
+        "id": "joyful",
+        "label": "Joyful and Spontaneous",
+        "description": "Joyful and Spontaneous (optimistic, charismatic, ingenious, spontaneous)"
+    },
+    "modern": {
+        "id": "modern",
+        "label": "Modern and Cosmopolitan",
+        "description": "Modern and Cosmopolitan (global, cultured, curious, social)"
+    }
+}

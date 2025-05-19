@@ -1,0 +1,4 @@
+{
+	"databaseUri": "gs://monks-copydesk/lancedb",
+	"rateLimitDelayMs": 1000
+}

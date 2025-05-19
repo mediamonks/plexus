@@ -1,0 +1,5 @@
+{
+	"model": "gpt-4o-mini",
+	"apiVersion": "2024-11-20",
+	"embeddingModel": "text-embedding-3-small"
+}

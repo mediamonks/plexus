@@ -1,0 +1,44 @@
+{
+	"name": "copydesk-api",
+	"version": "1.1.0",
+	"description": "CopyDesk API",
+	"main": "index.js",
+	"scripts": {
+		"auth": "gcloud auth application-default login; gcloud auth application-default set-quota-project monks-copydesk",
+		"generate-openapi": "node tools/generate-openapi.js $npm_config_env gateway > config/openapi.yaml; node tools/generate-openapi.js $npm_config_env > public/openapi.yaml",
+		"deploy": "npm run generate-openapi --env=$npm_config_env; node tools/deploy.js --env=$npm_config_env",
+		"deploy:functions": "node tools/deploy.js --env=$npm_config_env --functions",
+		"deploy:dev": "npm run deploy --env=dev",
+		"deploy:functions:dev": "npm run deploy:functions --env=dev",
+		"deploy:stg": "npm run deploy --env=stg",
+		"deploy:functions:stg": "npm run deploy:functions --env=stg"
+	},
+	"author": "",
+	"license": "ISC",
+	"engines": {
+		"node": "20"
+	},
+	"dependencies": {
+		"@azure/msal-node": "^2.6.0",
+		"@google-cloud/aiplatform": "^3.34.0",
+		"@google-cloud/firestore": "^7.11.0",
+		"@google-cloud/functions-framework": "^3.4.5",
+		"@google-cloud/storage": "^7.15.2",
+		"@google-cloud/tasks": "^5.5.2",
+		"@google-cloud/vertexai": "^1.9.3",
+		"@lancedb/lancedb": "^0.16.0",
+		"dotenv": "^16.4.7",
+		"langchain": "^0.3.19",
+		"mime-types": "^2.1.35",
+		"openai": "^4.82.0",
+		"pdf-parse": "^1.1.1",
+		"swagger-jsdoc": "^6.2.8",
+		"uuid": "^11.1.0"
+	},
+	"devDependencies": {
+		"@google-cloud/secret-manager": "^6.0.1",
+		"express": "^4.21.2",
+		"minimist": "^1.2.8",
+		"yaml": "^2.7.0"
+	}
+}

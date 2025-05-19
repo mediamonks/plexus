@@ -1,0 +1,10 @@
+{
+  "us": {
+      "id": "us",
+      "label": "United States"
+  },
+  "ca": {
+      "id": "ca",
+      "label": "Canada"
+  }
+}
