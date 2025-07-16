@@ -1,8 +1,6 @@
 {
-	"project": "puig-creative-studio",
-	"location": "europe-west1",
-	"model": "gemini-1.5-flash-002",
-	"embeddingModel": "text-embedding-005",
+	"model": "gemini-2.0-flash-lite",
+	"embeddingModel": "gemini-embedding-001",
 	"embeddingLocation": "europe-west1",
 	"quotaDelayMs": 500,
 	"safetySettings": [

@@ -1,7 +1,8 @@
 const { CloudTasksClient } = require('@google-cloud/tasks').v2;
 const config = require('../utils/config');
 
-const { projectId, location } = config.get();
+// const { projectId, location } = config.get();
+const { projectId, location } = config.get('tasks');
 
 const client = new CloudTasksClient();
 

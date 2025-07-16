@@ -1,9 +1,10 @@
 const { randomUUID } = require('node:crypto');
 const { Firestore } = require('@google-cloud/firestore');
+const config = require('../utils/config');
+// const firestoreConfig = { projectId: config.get('projectId'), ...require('../../config/firestore.json') };
+const firestoreConfig = config.get('firestore');
 
-const config = require('../../config/firestore.json');
-
-const firestore = new Firestore(config);
+const firestore = new Firestore(firestoreConfig);
 
 function getDocRef(collection, id) {
 	return firestore.collection(collection).doc(String(id));

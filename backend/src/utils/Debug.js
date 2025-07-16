@@ -2,9 +2,7 @@ const requestContext = require('./request-context');
 
 module.exports = class Debug {
 	static get _messages() {
-		const rc = requestContext.get();
-		if (!rc) return [];
-		return rc._debug ??= [];
+		return requestContext.get()._debug ??= [];
 	}
 	
 	static log(message) {

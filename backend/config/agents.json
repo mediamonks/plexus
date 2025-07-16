@@ -1,0 +1,131 @@
+{
+	"draft": {
+		"context": [
+			"userRequest",
+			"brandContext",
+			"targetLength",
+			"maxCharacters",
+			"language"
+		],
+		"temperature": 0.5,
+		"useHistory": true
+	},
+	"brand": {
+		"context": [
+			"draftCopy",
+			"brandGuidelines",
+			"language"
+		]
+	},
+	"channel": {
+		"context": [
+			"draftCopy",
+			"channel",
+			"channelContext",
+			"language"
+		]
+	},
+	"product": {
+		"context": [
+			"draftCopy",
+			"productData",
+			"language"
+		],
+		"required": ["product"]
+	},
+	"target-audience": {
+		"context": [
+			"draftCopy",
+			"targetAudience",
+			"language"
+		],
+		"required": ["targetAudience"]
+	},
+	"tone-of-voice": {
+		"context": [
+			"draftCopy",
+			"toneOfVoice",
+			"language"
+		],
+		"required": ["toneOfVoice"]
+	},
+	"consolidation": {
+		"context": [
+			"brandCopy",
+			"channelCopy",
+			"productCopy",
+			"targetAudienceCopy",
+			"toneOfVoiceCopy",
+			"brandRevisionNotes",
+			"channelRevisionNotes",
+			"productRevisionNotes",
+			"targetAudienceRevisionNotes",
+			"toneOfVoiceRevisionNotes",
+			"targetLength",
+			"maxCharacters",
+			"language"
+		]
+	},
+	"gap-identification": {
+		"context": [
+			"brief",
+			"additionalInfo"
+		]
+	},
+	"gap-validation": {
+		"context": [
+			"criticalProductionBlockers",
+			"importantClarifications",
+			"briefInconsistencies",
+			"brief",
+			"additionalInfo"
+		]
+	},
+	"follow-up-generation": {
+		"context": [
+			"validatedCriticalProductionBlockers",
+			"validatedImportantClarifications",
+			"validatedBriefInconsistencies"
+		]
+	},
+	"info-extraction": {
+		"context": [
+			"brief",
+			"additionalInfo"
+		]
+	},
+	"deliverables-normalization": {
+		"context": [
+			"rateCard",
+			"inputDeliverables"
+		]
+	},
+	"complexity-estimation": {
+		"context": [
+			"deliverables",
+			"inputGaps"
+		]
+	},
+	"quote-generation": {
+		"context": [
+			"rateCard",
+			"normalizedDeliverables",
+			"complexity",
+			"additionalInfo"
+		]
+	},
+	"timeline-generation": {
+		"context": [
+			"complexity",
+			"additionalInfo",
+			"historicalTimelines"
+		]
+	},
+	"final-quote-generation": {
+		"context": [
+			"inputQuote",
+			"inputTimeline",
+			"additionalInfo"
+		]
+	}
+}

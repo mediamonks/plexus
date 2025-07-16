@@ -1,4 +1,4 @@
-module.exports = async function delegate({}, { fn, args = [] }) {
+module.exports = async ({}, { fn, args = [] }) => {
 	if (!fn.match(/^[\w/]+(\.\w+)?$/)) {
 		throw new Error(`Invalid delegate function format: "${fn}". Must be either [module name] or [module name].[function name]. Module name may contain forward slashes for pathing.`);
 	}

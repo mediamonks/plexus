@@ -1,0 +1,63 @@
+{
+	"whitelabel-brandinfo": {
+		"namespace": "whitelabel",
+		"platform": "gcs",
+		"source": "brandinfo",
+		"type": "text:vector"
+	},
+	"whitelabel-styleguide": {
+		"namespace": "whitelabel",
+		"platform": "gcs",
+		"source": "styleguide",
+		"type": "text:digest",
+		"instructions": "styleguide-digest"
+	},
+	"whitelabel-examples": {
+		"namespace": "whitelabel",
+		"platform": "gcs",
+		"source": "examples",
+		"type": "data:raw"
+	},
+	"whitelabel-products": {
+		"namespace": "whitelabel",
+		"platform": "gcs",
+		"source": "products",
+		"type": "data:raw"
+	},
+	"mantra-brief": {
+		"namespace": "mantra",
+		"platform": "drive",
+		"source": ":briefFolderId",
+		"type": "text:raw"
+	},
+	"mantra-ratecard": {
+		"namespace": "mantra",
+		"platform": "drive",
+		"source": ":ratecardId",
+		"type": "text:raw"
+	},
+	"mantra-deliverables": {
+		"namespace": "mantra",
+		"platform": "drive",
+		"source": ":deliverablesId",
+		"type": "text:raw"
+	},
+	"mantra-historical-timelines": {
+		"namespace": "mantra",
+		"platform": "drive",
+		"source": ":historicalTimelinesFolderId",
+		"type": "text:raw"
+	},
+	"mantra-quote": {
+		"namespace": "mantra",
+		"platform": "drive",
+		"source": ":quoteId",
+		"type": "text:raw"
+	},
+	"mantra-timeline": {
+		"namespace": "mantra",
+		"platform": "drive",
+		"source": ":timelineId",
+		"type": "text:raw"
+	}
+}

@@ -13,18 +13,3 @@ Responsibilities:
 
 Goal:
 Your goal is to **tailor the copy to be highly appealing and relevant** to the specified target audience.
-
----
-
-### **Input Format (JSON)**
-{
-  "copy": "The draft copy that needs review.",
-  "targetAudience": "A description of the target audience.",
-	"language": "The language of the copy."
-}
-
-### **Output Format (JSON)**
-{
-  "copy": "The refined copy adjusted to be most appealing to the target audience.",
-  "revisionNotes": "Summary of changes made to tailor the copy for the target audience, always in English."
-}

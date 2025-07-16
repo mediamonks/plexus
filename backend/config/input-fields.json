@@ -1,0 +1,466 @@
+{
+	"channel": {
+		"instagram": {
+			"id": "instagram",
+			"label": "Instagram"
+		},
+		"facebook": {
+			"id": "facebook",
+			"label": "Facebook"
+		},
+		"tiktok": {
+			"id": "tiktok",
+			"label": "TikTok"
+		},
+		"x": {
+			"id": "x",
+			"label": "X (Twitter)"
+		}
+	},
+	"product": {
+		"212-nyc-eau-de-toilette": {
+			"id": "212-nyc-eau-de-toilette",
+			"label": "212 NYC Eau de Toilette",
+			"brandId": "ch"
+		},
+		"212-heroes-eau-de-parfum-for-her": {
+			"id": "212-heroes-eau-de-parfum-for-her",
+			"label": "212 Heroes Eau de Parfum For Her",
+			"brandId": "ch"
+		},
+		"212-men-heroes-eau-de-toilette": {
+			"id": "212-men-heroes-eau-de-toilette",
+			"label": "212 Men Heroes Eau de Toilette",
+			"brandId": "ch"
+		},
+		"212-men-nyc-eau-de-toilette": {
+			"id": "212-men-nyc-eau-de-toilette",
+			"label": "212 Men NYC Eau de Toilette",
+			"brandId": "ch"
+		},
+		"212-sexy-eau-de-parfum": {
+			"id": "212-sexy-eau-de-parfum",
+			"label": "212 Sexy Eau de Parfum",
+			"brandId": "ch"
+		},
+		"212-s--y-men-eau-de-toilette": {
+			"id": "212-s--y-men-eau-de-toilette",
+			"label": "212 S..y Men Eau de Toilette",
+			"brandId": "ch"
+		},
+		"212-vip-eau-de-parfum": {
+			"id": "212-vip-eau-de-parfum",
+			"label": "212 VIP Eau de Parfum",
+			"brandId": "ch"
+		},
+		"212-vip-black-elixir-eau-de-parfum-elixir": {
+			"id": "212-vip-black-elixir-eau-de-parfum-elixir",
+			"label": "212 VIP Black Elixir Eau de Parfum Elixir",
+			"brandId": "ch"
+		},
+		"212-vip-men-eau-de-toilette": {
+			"id": "212-vip-men-eau-de-toilette",
+			"label": "212 VIP Men Eau de Toilette",
+			"brandId": "ch"
+		},
+		"212-vip-black-eau-de-parfum": {
+			"id": "212-vip-black-eau-de-parfum",
+			"label": "212 VIP Black Eau de Parfum",
+			"brandId": "ch"
+		},
+		"212-vip-ros--eau-de-parfum": {
+			"id": "212-vip-ros--eau-de-parfum",
+			"label": "212 VIP Rosé Eau de Parfum",
+			"brandId": "ch"
+		},
+		"212-vip-ros--elixir-eau-de-parfum-elixir": {
+			"id": "212-vip-ros--elixir-eau-de-parfum-elixir",
+			"label": "212 VIP Rosé Elixir Eau de Parfum Elixir",
+			"brandId": "ch"
+		},
+		"vetiver-paradise-eau-de-toilette": {
+			"id": "vetiver-paradise-eau-de-toilette",
+			"label": "Vetiver Paradise Eau de Toilette",
+			"brandId": "ch"
+		},
+		"bergamot-bloom-eau-de-toilette": {
+			"id": "bergamot-bloom-eau-de-toilette",
+			"label": "Bergamot Bloom Eau de Toilette",
+			"brandId": "ch"
+		},
+		"citrus-elixir-parfum-oil": {
+			"id": "citrus-elixir-parfum-oil",
+			"label": "Citrus Elixir Parfum Oil",
+			"brandId": "ch"
+		},
+		"blond-jasmine-eau-de-toilette": {
+			"id": "blond-jasmine-eau-de-toilette",
+			"label": "Blond Jasmine Eau de Toilette",
+			"brandId": "ch"
+		},
+		"blossom-elixir-parfum-oil": {
+			"id": "blossom-elixir-parfum-oil",
+			"label": "Blossom Elixir Parfum Oil",
+			"brandId": "ch"
+		},
+		"virgin-mint-eau-de-toilette": {
+			"id": "virgin-mint-eau-de-toilette",
+			"label": "Virgin Mint Eau de Toilette",
+			"brandId": "ch"
+		},
+		"orange-affair-eau-de-toilette": {
+			"id": "orange-affair-eau-de-toilette",
+			"label": "Orange Affair Eau de Toilette",
+			"brandId": "ch"
+		},
+		"rose-cruise-eau-de-toilette": {
+			"id": "rose-cruise-eau-de-toilette",
+			"label": "Rose Cruise Eau de Toilette",
+			"brandId": "ch"
+		},
+		"bad-boy-eau-de-toilette": {
+			"id": "bad-boy-eau-de-toilette",
+			"label": "Bad Boy Eau de Toilette",
+			"brandId": "ch"
+		},
+		"bad-boy-cobalt-eau-de-parfum--lectrique": {
+			"id": "bad-boy-cobalt-eau-de-parfum--lectrique",
+			"label": "Bad Boy Cobalt Eau de Parfum Électrique",
+			"brandId": "ch"
+		},
+		"bad-boy-extreme-eau-de-parfum-extreme": {
+			"id": "bad-boy-extreme-eau-de-parfum-extreme",
+			"label": "Bad Boy Extreme Eau de Parfum Extreme",
+			"brandId": "ch"
+		},
+		"bad-boy-eau-de-parfum": {
+			"id": "bad-boy-eau-de-parfum",
+			"label": "Bad Boy Eau de Parfum",
+			"brandId": "ch"
+		},
+		"bad-boy-cobalt-elixir-eau-de-parfum-elixir": {
+			"id": "bad-boy-cobalt-elixir-eau-de-parfum-elixir",
+			"label": "Bad Boy Cobalt Elixir Eau de Parfum Elixir",
+			"brandId": "ch"
+		},
+		"bad-boy-elixir-eau-de-parfum-elixir": {
+			"id": "bad-boy-elixir-eau-de-parfum-elixir",
+			"label": "Bad Boy Elixir Eau de Parfum Elixir",
+			"brandId": "ch"
+		},
+		"carolina-herrera-eau-de-toilette": {
+			"id": "carolina-herrera-eau-de-toilette",
+			"label": "Carolina Herrera Eau de Toilette",
+			"brandId": "ch"
+		},
+		"carolina-herrera-eau-de-parfum": {
+			"id": "carolina-herrera-eau-de-parfum",
+			"label": "Carolina Herrera Eau de Parfum",
+			"brandId": "ch"
+		},
+		"carolina-herrera-body-lotion": {
+			"id": "carolina-herrera-body-lotion",
+			"label": "Carolina Herrera Body Lotion",
+			"brandId": "ch"
+		},
+		"good-girl-eau-de-parfum": {
+			"id": "good-girl-eau-de-parfum",
+			"label": "Good Girl Eau de Parfum",
+			"brandId": "ch"
+		},
+		"ch-l-eau-de-toilette": {
+			"id": "ch-l-eau-de-toilette",
+			"label": "CH L'Eau de Toilette",
+			"brandId": "ch"
+		},
+		"ch-men-eau-de-toilette": {
+			"id": "ch-men-eau-de-toilette",
+			"label": "CH Men Eau de Toilette",
+			"brandId": "ch"
+		},
+		"ch-men-priv--eau-de-toilette": {
+			"id": "ch-men-priv--eau-de-toilette",
+			"label": "CH Men Privé Eau de Toilette",
+			"brandId": "ch"
+		},
+		"la-bomba-eau-de-parfum": {
+			"id": "la-bomba-eau-de-parfum",
+			"label": "La Bomba Eau de Parfum",
+			"brandId": "ch"
+		},
+		"ch-priv-e-eau-de-parfum": {
+			"id": "ch-priv-e-eau-de-parfum",
+			"label": "CH Privée Eau de Parfum",
+			"brandId": "ch"
+		},
+		"chic-for-men-eau-de-toilette": {
+			"id": "chic-for-men-eau-de-toilette",
+			"label": "CHic for Men Eau de Toilette",
+			"brandId": "ch"
+		},
+		"ch-eau-de-toilette": {
+			"id": "ch-eau-de-toilette",
+			"label": "CH Eau de Toilette",
+			"brandId": "ch"
+		},
+		"good-girl-eau-de-parfum-supr-me": {
+			"id": "good-girl-eau-de-parfum-supr-me",
+			"label": "Good Girl Eau de Parfum Suprême",
+			"brandId": "ch"
+		},
+		"good-girl-blush-elixir-eau-de-parfum": {
+			"id": "good-girl-blush-elixir-eau-de-parfum",
+			"label": "Good Girl Blush Elixir Eau de Parfum",
+			"brandId": "ch"
+		},
+		"good-girl-blush-eau-de-parfum": {
+			"id": "good-girl-blush-eau-de-parfum",
+			"label": "Good Girl Blush Eau de Parfum",
+			"brandId": "ch"
+		},
+		"good-girl-eau-de-parfum-l-g-re": {
+			"id": "good-girl-eau-de-parfum-l-g-re",
+			"label": "Good Girl Eau de Parfum Légère",
+			"brandId": "ch"
+		},
+		"gold-incense-eau-de-parfum": {
+			"id": "gold-incense-eau-de-parfum",
+			"label": "Gold Incense Eau de Parfum",
+			"brandId": "ch"
+		},
+		"saffron-lazuli-eau-de-parfum": {
+			"id": "saffron-lazuli-eau-de-parfum",
+			"label": "Saffron Lazuli Eau de Parfum",
+			"brandId": "ch"
+		},
+		"amazonian-rose-eau-de-parfum": {
+			"id": "amazonian-rose-eau-de-parfum",
+			"label": "Amazonian Rose Eau de Parfum",
+			"brandId": "ch"
+		},
+		"pure-oil-of-oud-parfum": {
+			"id": "pure-oil-of-oud-parfum",
+			"label": "Pure Oil of Oud Parfum",
+			"brandId": "ch"
+		},
+		"emerald-musk-eau-de-parfum": {
+			"id": "emerald-musk-eau-de-parfum",
+			"label": "Emerald Musk Eau de Parfum",
+			"brandId": "ch"
+		},
+		"true-oud-eau-de-parfum": {
+			"id": "true-oud-eau-de-parfum",
+			"label": "True Oud Eau de Parfum",
+			"brandId": "ch"
+		},
+		"nightfall-patchouli-eau-de-parfum": {
+			"id": "nightfall-patchouli-eau-de-parfum",
+			"label": "Nightfall Patchouli Eau de Parfum",
+			"brandId": "ch"
+		},
+		"bronze-tonka-eau-de-parfum": {
+			"id": "bronze-tonka-eau-de-parfum",
+			"label": "Bronze Tonka Eau de Parfum",
+			"brandId": "ch"
+		},
+		"stallion-leather-eau-de-parfum": {
+			"id": "stallion-leather-eau-de-parfum",
+			"label": "Stallion Leather Eau de Parfum",
+			"brandId": "ch"
+		},
+		"herrera-tuberose-eau-de-parfum": {
+			"id": "herrera-tuberose-eau-de-parfum",
+			"label": "Herrera Tuberose Eau de Parfum",
+			"brandId": "ch"
+		},
+		"burning-rose-eau-de-parfum": {
+			"id": "burning-rose-eau-de-parfum",
+			"label": "Burning Rose Eau de Parfum",
+			"brandId": "ch"
+		},
+		"iris-empire-eau-de-parfum": {
+			"id": "iris-empire-eau-de-parfum",
+			"label": "Iris Empire Eau de Parfum",
+			"brandId": "ch"
+		},
+		"mystery-tobacco-eau-de-parfum": {
+			"id": "mystery-tobacco-eau-de-parfum",
+			"label": "Mystery Tobacco Eau de Parfum",
+			"brandId": "ch"
+		},
+		"amethyst-haze-eau-de-parfum": {
+			"id": "amethyst-haze-eau-de-parfum",
+			"label": "Amethyst Haze Eau de Parfum",
+			"brandId": "ch"
+		},
+		"pure-oil-of-musk-parfum": {
+			"id": "pure-oil-of-musk-parfum",
+			"label": "Pure Oil of Musk Parfum",
+			"brandId": "ch"
+		},
+		"amber-desire-eau-de-parfum": {
+			"id": "amber-desire-eau-de-parfum",
+			"label": "Amber Desire Eau de Parfum",
+			"brandId": "ch"
+		},
+		"stallion-leather-suede-eau-de-parfum": {
+			"id": "stallion-leather-suede-eau-de-parfum",
+			"label": "Stallion Leather Suede Eau de Parfum",
+			"brandId": "ch"
+		},
+		"sandal-ruby-eau-de-parfum": {
+			"id": "sandal-ruby-eau-de-parfum",
+			"label": "Sandal Ruby Eau de Parfum",
+			"brandId": "ch"
+		},
+		"gold-myrrh-absolute-eau-de-parfum": {
+			"id": "gold-myrrh-absolute-eau-de-parfum",
+			"label": "Gold Myrrh Absolute Eau de Parfum",
+			"brandId": "ch"
+		},
+		"oud-couture-eau-de-parfum": {
+			"id": "oud-couture-eau-de-parfum",
+			"label": "Oud Couture Eau de Parfum",
+			"brandId": "ch"
+		},
+		"platinum-leather-eau-de-parfum": {
+			"id": "platinum-leather-eau-de-parfum",
+			"label": "Platinum Leather Eau de Parfum",
+			"brandId": "ch"
+		},
+		"pure-oil-of-rose-parfum": {
+			"id": "pure-oil-of-rose-parfum",
+			"label": "Pure Oil of Rose Parfum",
+			"brandId": "ch"
+		},
+		"hconfi-diffuser-burning-rose": {
+			"id": "hconfi-diffuser-burning-rose",
+			"label": "Hconfi Diffuser Burning Rose",
+			"brandId": "ch"
+		},
+		"cedar-chic-eau-de-parfum": {
+			"id": "cedar-chic-eau-de-parfum",
+			"label": "Cedar Chic Eau de Parfum",
+			"brandId": "ch"
+		},
+		"herrera-for-men-eau-de-toilette": {
+			"id": "herrera-for-men-eau-de-toilette",
+			"label": "Herrera for Men Eau de Toilette",
+			"brandId": "ch"
+		},
+		"call-me-darling-eau-de-parfum": {
+			"id": "call-me-darling-eau-de-parfum",
+			"label": "Call Me Darling Eau de Parfum",
+			"brandId": "ch"
+		},
+		"me-first-eau-de-parfum": {
+			"id": "me-first-eau-de-parfum",
+			"label": "Me First Eau de Parfum",
+			"brandId": "ch"
+		},
+		"mad-world-eau-de-parfum": {
+			"id": "mad-world-eau-de-parfum",
+			"label": "Mad World Eau de Parfum",
+			"brandId": "ch"
+		},
+		"fearless-fabulous-eau-de-parfum": {
+			"id": "fearless-fabulous-eau-de-parfum",
+			"label": "Fearless Fabulous Eau de Parfum",
+			"brandId": "ch"
+		},
+		"lucky-charm-eau-de-parfum": {
+			"id": "lucky-charm-eau-de-parfum",
+			"label": "Lucky Charm Eau de Parfum",
+			"brandId": "ch"
+		},
+		"alegria-de-vivir-eau-de-parfum": {
+			"id": "alegria-de-vivir-eau-de-parfum",
+			"label": "Alegria de Vivir Eau de Parfum",
+			"brandId": "ch"
+		},
+		"cute-chaos-eau-de-parfum": {
+			"id": "cute-chaos-eau-de-parfum",
+			"label": "Cute Chaos Eau de Parfum",
+			"brandId": "ch"
+		},
+		"very-good-girl-eau-de-parfum": {
+			"id": "very-good-girl-eau-de-parfum",
+			"label": "Very Good Girl Eau de Parfum",
+			"brandId": "ch"
+		},
+		"very-good-girl-glam-parfum": {
+			"id": "very-good-girl-glam-parfum",
+			"label": "Very Good Girl Glam Parfum",
+			"brandId": "ch"
+		},
+		"very-good-girl-elixir-eau-de-parfum-elixir": {
+			"id": "very-good-girl-elixir-eau-de-parfum-elixir",
+			"label": "Very Good Girl Elixir Eau de Parfum Elixir",
+			"brandId": "ch"
+		}
+	},
+	"targetAudience": {
+		"women-35-55": {
+			"id": "women-35-55",
+			"label": "Women (Ages 35-55)",
+			"description": "Women (Ages 35-55) - Fashion-conscious women who value sophistication and elegance in their style."
+		},
+		"men-35-55": {
+			"id": "men-35-55",
+			"label": "Men (Ages 35-55)",
+			"description": "Men (Ages 25-55) - Classic and modern style enthusiasts who appreciate quality materials and craftsmanship."
+		},
+		"women-25-35": {
+			"id": "women-25-35",
+			"label": "Women (Ages 25-35)",
+			"description": "Women (Ages 25-35) - Trend-driven women balancing social lives and career aspirations, often influenced by contemporary fashion."
+		},
+		"men-25-35": {
+			"id": "men-25-35",
+			"label": "Men (Ages 25-35)",
+			"description": "Men (Ages 25-35) - Style-savvy men who are influenced by current trends and seek to express their individuality through fashion."
+		},
+		"unisex-all": {
+			"id": "unisex-all",
+			"label": "Unisex Customers (All Ages)",
+			"description": "Unisex Customers (All Ages) - Individuals with a premium interest in high perfumery, seeking unique and quality fragrances that transcend gender norms."
+		},
+		"feminine-all": {
+			"id": "feminine-all",
+			"label": "Feminine Customers (All Ages)",
+			"description": "Feminine Customers (All Ages) - Women drawn to modern niche collections, desiring individuality and uniqueness in their fashion choices."
+		},
+		"young-adults-20-25": {
+			"id": "young-adults-20-25",
+			"label": "Young Adults (Ages 20-25)",
+			"description": "Young Adults (Ages 20-25) - Individuals exploring personal style, often influenced by social media trends and peer recommendations."
+		},
+		"adults-25-40": {
+			"id": "adults-25-40",
+			"label": "Adults (Ages 25-40)",
+			"description": "Adults (Ages 25-40) - Fashion-aware adults balancing personal and professional life, interested in versatile fashion for various occasions."
+		}
+	},
+	"toneOfVoice": {
+		"bold": {
+			"id": "bold",
+			"label": "Bold and Confident",
+			"description": "Bold and Confident (glamorous, confident, beautiful, dramatic)"
+		},
+		"elegant": {
+			"id": "elegant",
+			"label": "Elegant and Refined",
+			"description": "Elegant and Refined (elegant, perceptive, graceful, intelligent)"
+		},
+		"joyful": {
+			"id": "joyful",
+			"label": "Joyful and Spontaneous",
+			"description": "Joyful and Spontaneous (optimistic, charismatic, ingenious, spontaneous)"
+		},
+		"modern": {
+			"id": "modern",
+			"label": "Modern and Cosmopolitan",
+			"description": "Modern and Cosmopolitan (global, cultured, curious, social)"
+		}
+	}
+}

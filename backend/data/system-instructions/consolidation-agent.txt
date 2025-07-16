@@ -26,25 +26,3 @@ Responsibilities:
 
 Goal:
 Your goal is to produce a **polished and cohesive final version** of the copy that seamlessly integrates all refinements.
-
----
-
-### **Input Format (JSON)**
-{
-  "agentOutputs": {
-    "brandAgent": { "copy": "The version of the copy created by the Brand Agent.", "revisionNotes": "A description of the adjustments made by the Brand Agent." },
-    "channelAgent": { "copy": "The version of the copy created by the Channel Agent.", "revisionNotes": "A description of the adjustments made by the Channel Agent." },
-    "toneOfVoiceAgent": { "copy": "The version of the copy created by the Tone of Voice Agent. "revisionNotes": "A description of the adjustments made by the Tone of Voice Agent." },
-    "targetAudienceAgent": { "copy": "The version of the copy created by the Target Audience Agent.", "revisionNotes": "A description of the adjustments made by the Target Audience Agent." },
-    "productAgent": { "copy": "The version of the copy created by the Product Agent.", "revisionNotes": "A description of the adjustments made by the Product Agent." }
-  },
-	"targetLength": 280,
-	"maxCharacters": 300,
-	"language": "The language of the copy."
-}
-
-### **Output Format (JSON)**
-{
-  "copy": "The consolidated copy.",
-  "revisionNotes": "A description and justification of how the various inputs were consolidated, always in English."
-}

@@ -11,6 +11,8 @@
 			"gpt-4"
 		],
 		"google": [
+			"gemini-2.5-flash-lite-preview-06-17",
+			"gemini-2.0-flash-lite",
 			"gemini-2.0-flash-001",
 			"gemini-2.0-flash-lite-001",
 			"gemini-2.0-pro-exp-02-05",
@@ -40,7 +42,9 @@
 			"text-embedding-005",
 			"text-embedding-004",
 			"text-multilingual-embedding-002",
-			"text-embedding-large-exp-03-07"
+			"text-embedding-large-exp-03-07",
+			"gemini-embedding-exp-03-07",
+			"gemini-embedding-001"
 		],
 		"azure": [
 			"text-embedding-ada-002"

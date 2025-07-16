@@ -8,10 +8,10 @@ const embeddingModels = require('../../data/embedding-models.json');
 
 const _embeddings = {};
 
-async function generateEmbeddings(text, { platform, model, forDocument = false } = {}) {
+async function generateEmbeddings(text, { forDocument = false } = {}) {
 	if (!text) throw new Error('Error: No text provided when generating embeddings');
 	
-	platform ??= getEmbeddingPlatform();
+	const platform = getEmbeddingPlatform();
 	
 	const cachedEmbeddings = _embeddings?.[platform]?.[text];
 	
@@ -20,7 +20,7 @@ async function generateEmbeddings(text, { platform, model, forDocument = false }
 	const embeddings = Profiler.run(forDocument
 			? embeddingPlatforms[platform].generateDocumentEmbeddings
 			: embeddingPlatforms[platform].generateQueryEmbeddings,
-		[text, model]);
+		[text]);
 	
 	_embeddings[platform] ??= {};
 	_embeddings[platform][text] ??= embeddings;
@@ -28,7 +28,11 @@ async function generateEmbeddings(text, { platform, model, forDocument = false }
 	return embeddings;
 }
 
-async function append(tableName, source, searchField = 'text', { platform, model, schema } = {}) {
+async function generateDocumentEmbeddings(text) {
+	return await generateEmbeddings(text, { forDocument: true });
+}
+
+async function append(tableName, source, searchField = 'text', { schema } = {}) {
 	const promises = [];
 	let internalTableName;
 	
@@ -37,7 +41,7 @@ async function append(tableName, source, searchField = 'text', { platform, model
 		
 		promises.push((async () => {
 			try {
-				const vector = await generateEmbeddings(data[searchField], { platform, model, forDocument: true });
+				const vector = await generateEmbeddings(data[searchField], { forDocument: true });
 				const record = { ...data, vector };
 				
 				internalTableName ??= getTableName(tableName, vector.length);
@@ -55,27 +59,23 @@ async function append(tableName, source, searchField = 'text', { platform, model
 	await Promise.all(promises);
 }
 
-async function create(tableName, source, searchField = 'text', { platform, model, schema } = {}) {
+async function create(tableName, source, { schema } = {}) {
 	const promises = [];
 	let dimensions, tableCreated, internalTableName;
 	
 	for await (const data of source) {
-		if (!data[searchField]) continue;
-		
 		promises.push((async () => {
-			const vector = await generateEmbeddings(data[searchField], { platform, model, forDocument: true });
-			const records = [{ ...data, vector }];
-			
 			if (dimensions) {
 				await tableCreated;
-				return lancedb.append(internalTableName, records);
+				return lancedb.append(internalTableName, [data]);
 			}
 			
-			dimensions = vector.length;
+			dimensions = data.vector.length;
 			internalTableName = getTableName(tableName, dimensions);
 			tableCreated = schema
-				? createEmpty(internalTableName, schema).then(() => lancedb.append(internalTableName, records))
-				: lancedb.createTable(internalTableName, records, schema);
+				? createEmpty(internalTableName, schema).then(() => lancedb.append(internalTableName, [data]))
+				: lancedb.createTable(internalTableName, [data], schema);
+			
 			return tableCreated;
 		})());
 	}
@@ -95,7 +95,7 @@ async function search(tableName, embeddings, { limit, filter, fields } = {}) {
 function getEmbeddingPlatform() {
 	const embeddingPlatform = config.get('embeddingPlatform');
 	
-	if (!embeddingPlatforms[embeddingPlatform]) throw new Error(`Invalid embedding platform selection: "${embeddingPlatform}". Must be either "google", "azure" or "openai".`);
+	if (!embeddingPlatforms[embeddingPlatform]) throw new Error(`Invalid embedding platform selection: "${embeddingPlatform}". Must be one of: ${Object.keys(embeddingPlatforms).join(', ')}`);
 	
 	return embeddingPlatform;
 }
@@ -115,7 +115,7 @@ async function ensureTableExists(tableName, schema) {
 	return lancedb.ensureTableExists(getTableName(tableName), schema);
 }
 
-async function ingest(tableName, source, searchField = 'text', { platform, model, schema, excludeSearchField } = {}) {
+async function ingest(tableName, source, searchField = 'text', { schema, excludeSearchField } = {}) {
 	const promises = [];
 	let dimensions;
 	
@@ -123,7 +123,7 @@ async function ingest(tableName, source, searchField = 'text', { platform, model
 		if (!data[searchField]) continue;
 		
 		promises.push((async () => {
-			const vector = await generateEmbeddings(data[searchField], { platform, model, forDocument: true });
+			const vector = await generateEmbeddings(data[searchField], { forDocument: true });
 			
 			if (excludeSearchField) delete data[searchField];
 			
@@ -143,6 +143,7 @@ async function drop(tableName) {
 
 module.exports = {
 	generateQueryEmbeddings: generateEmbeddings,
+	generateDocumentEmbeddings,
 	create,
 	search,
 	append,
