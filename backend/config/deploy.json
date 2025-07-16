@@ -2,7 +2,7 @@
 	"dev": {
 		"region": "europe-west1",
 		"project": "monks-copydesk",
-		"serviceAccount": "copy-desk",
+		"serviceAccount": "copydesk",
 		"env": [
 			"OPENAI_API_KEY",
 			"AZURE_TENANT_ID",
@@ -20,9 +20,9 @@
 			}
 		],
 		"apiGateway": {
-			"api": "copydesk-dev",
-			"gateway": "copydesk-dev-gateway",
-			"config": "copydesk-dev-config"
+			"api": "copydesk-api",
+			"gateway": "copydesk-gateway",
+			"config": "copydesk-config"
 		}
 	}
 }

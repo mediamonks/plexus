@@ -1,10 +1,9 @@
 {
-	"/generate-copy": {
+	"/invoke": {
 		"methods": {
 			"post": {
-				"summary": "Generate Copy",
-				"description": "Starts or continues a copy generation thread",
-				"handler": "generate-copy",
+				"summary": "Invokes the agent pipeline",
+				"handler": "invoke",
 				"payload": {
 					"presetId": {
 						"type": "string",
@@ -274,61 +273,19 @@
 			}
 		}
 	},
-	"/options/{option}": {
+	"/fields/{field}": {
 		"parameters": [
 			{
-				"name": "option",
-				"description": "The name of the option type",
-				"type": "string",
-				"enum": [
-					"brands",
-					"languages",
-					"target-audiences",
-					"tones-of-voice"
-				]
-			}
-		],
-		"methods": {
-			"get": {
-				"summary": "Retrieve Setting Options",
-				"description": "Returns available options for a given setting",
-				"handler": "options",
-				"response": {
-					"type": "array",
-					"items": {
-						"type": "object",
-						"properties": {
-							"id": {
-								"type": "string",
-								"description": "Option ID"
-							},
-							"label": {
-								"type": "string",
-								"description": "Option label"
-							},
-							"description": {
-								"type": "string",
-								"description": "Option description"
-							}
-						}
-					}
-				}
-			}
-		}
-	},
-	"/options/brands/{brandId}/products": {
-		"parameters": [
-			{
-				"name": "brandId",
-				"description": "The ID of the brand",
+				"name": "field",
+				"description": "The name of the field",
 				"type": "string"
 			}
 		],
 		"methods": {
 			"get": {
-				"summary": "Retrieve Brand Products",
-				"description": "Returns available products for a given brand",
-				"handler": "products",
+				"summary": "Retrieve Field Options",
+				"description": "Returns available options for a given field",
+				"handler": "fields",
 				"response": {
 					"type": "array",
 					"items": {
@@ -336,62 +293,16 @@
 						"properties": {
 							"id": {
 								"type": "string",
-								"description": "Product ID"
+								"description": "Field ID"
 							},
 							"label": {
 								"type": "string",
-								"description": "Product label"
+								"description": "Field label"
 							},
-							"brandId": {
+							"description": {
 								"type": "string",
-								"description": "Product Brand ID"
+								"description": "Field description"
 							}
-						}
-					}
-				}
-			}
-		}
-	},
-	"/presets": {
-		"methods": {
-			"get": {
-				"summary": "Retrieve Presets",
-				"description": "Returns available presets (templates)",
-				"handler": "presets",
-				"response": {
-					"type": "object",
-					"properties": {
-						"id": {
-							"type": "string",
-							"description": "Unique identifier for the preset."
-						},
-						"label": {
-							"type": "string",
-							"description": "User-friendly label describing the preset."
-						},
-						"type": {
-							"type": "string",
-							"description": "Type of preset (category)."
-						},
-						"description": {
-							"type": "string",
-							"description": "Description of the preset."
-						},
-						"icon": {
-							"type": "string",
-							"description": "Icon for the preset."
-						},
-						"channel": {
-							"type": "string",
-							"description": "The channel value of the preset."
-						},
-						"maxCharacters": {
-							"type": "integer",
-							"description": "Maximum characters value of the preset."
-						},
-						"targetLength": {
-							"type": "integer",
-							"description": "Target length value of the preset."
 						}
 					}
 				}
@@ -431,11 +342,11 @@
 			}
 		}
 	},
-	"/brand-setup/{brandId}": {
+	"/ingest/{namespace}": {
 		"parameters": [
 			{
-				"name": "brandId",
-				"description": "The ID of the brand",
+				"name": "namespace",
+				"description": "The namespace for which to ingest data",
 				"type": "string"
 			}
 		],
@@ -491,12 +402,12 @@
 			}
 		}
 	},
-	"/defaults": {
+	"/config": {
 		"methods": {
 			"get": {
-				"summary": "Retrieve Advanced Settings Defaults",
-				"description": "Returns default values for the advanced settings",
-				"handler": "defaults",
+				"summary": "Retrieve Default Config",
+				"description": "Returns default configuration",
+				"handler": "config",
 				"response": {
 					"type": "object",
 					"properties": {

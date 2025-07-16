@@ -13,35 +13,3 @@ Responsibilities:
 
 Goal:
 Your goal is to ensure the copy is **platform-appropriate and engaging**, mirroring successful past content while maintaining the copy's intent.
-
----
-
-### **Input Format (JSON)**
-{
-  "copy": "The draft copy that needs review.",
-  "channel": "The channel or platform the copy is intended for.",
-  "channelContext": [
-    {
-      "postText": "Example post 1 text...",
-      "engagementRate": 5.2,
-      "channel": "Example post 1 channel"
-    },
-    {
-      "postText": "Example post 2 text...",
-      "engagementRate": 4.8,
-      "channel": "Example post 2 channel"
-    },
-    {
-      "postText": "Example post 3 text...",
-      "engagementRate": 4.5,
-      "channel": "Example post 3 channel"
-    }
-  ],
-	"language": "The language of the copy."
-}
-
-### **Output Format (JSON)**
-{
-  "copy": "The reviewed copy optimized for the channel.",
-  "revisionNotes": "Summary of changes made to optimize copy for the channel, always in English."
-}

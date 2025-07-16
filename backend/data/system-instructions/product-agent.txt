@@ -14,23 +14,3 @@ Responsibilities:
 
 Goal:
 Your goal is to ensure the copy **accurately and effectively reflects product details** while preserving its readability and effectiveness.
-
----
-
-Input Format:
-{
-  "copy": "The draft copy that needs review.",
-  "productData": {
-    "productName": "The name of the product",
-    "productDescription": "A description of the product.",
-    "productDetails": "A detailed description of the product's features.",
-    ...
-  },
-  "language": "The language the copy should be in."
-}
-
-### **Output Format (JSON)**
-{
-  "copy": "The reviewed copy with integrated product details.",
-  "revisionNotes": "Summary of changes made to integrate product details, always in English."
-}

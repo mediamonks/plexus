@@ -4,11 +4,11 @@ process.env.NODE_ENV = 'dev';
 
 const router = require('./src/modules/router');
 
-async function generate(body) {
+async function invoke(body) {
 	let response;
 	await router({
 		method: 'POST',
-		path: '/generate-copy',
+		path: '/invoke',
 		body,
 		get: () => '',
 	}, {
@@ -24,22 +24,29 @@ async function generate(body) {
 }
 
 (async function () {
-	// await require('./src/modules/brand').setup('uber-eats');
-	//
+	// await require('./src/modules/ingest').ingestAll('whitelabel');
+	// await require('./src/modules/ingest').ingest('whitelabel-examples');
 	// process.exit();
 	
-	await generate({
-		'prompt': 'write some copy for our 2025 summer deals',
-		'brandId': 'uber-eats',
-		'campaignId': 'summer',
-		'subThemeId': 'beach',
-		'merchant': 'Big Sammy\'s Burger Shack',
-		'product': 'Big Sammy\'s Double-greasy Gorillaburger',
-		'offerTypeId': 'bogo',
-		'offerAmount': 0,
-		'isMemberExclusive': false,
-		'languageId': 'en-us',
-		'temperature': 0.5,
-		'presetId': 'uber-eats'
+	// await invoke({
+	// 	'prompt': 'Write me something that rhymes',
+	// 	'channel': 'instagram',
+	// 	'product': 'sandal-ruby-eau-de-parfum',
+	// 	'targetAudience': 'women-35-55',
+	// 	'toneOfVoice': 'modern',
+	// 	'targetLength': 100,
+	// 	'maxCharacters': 200,
+	// 	'language': 'fr-fr',
+	// });
+	
+	await invoke({
+		briefFolderId: '1rSiyIwSQMBCVfr4U4r_3O-ouCxDf-w9Y',
+		outputFolderId: '1qoqqlQX29E4_za4JTdRX5P5uPZRQuPx4',
+		config: {
+			output: [
+				'followUp',
+				'outputDeliverables',
+			]
+		}
 	});
 }());

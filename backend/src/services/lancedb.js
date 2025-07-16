@@ -1,7 +1,9 @@
 const { performance } = require('node:perf_hooks');
 const lancedb = require('@lancedb/lancedb');
+const config = require('../utils/config');
 
-const lancedbConfig = require('../../config/lancedb.json');
+// const lancedbConfig = require('../../config/lancedb.json');
+const lancedbConfig = config.get('lancedb');
 
 let _db;
 const db = async () => _db ??= await lancedb.connect(lancedbConfig.databaseUri);

@@ -1,12 +1,15 @@
 const fs = require('node:fs');
 const aiplatform = require('@google-cloud/aiplatform');
+// TODO refactor to use genAI lib
 const { VertexAI } = require('@google-cloud/vertexai');
 const mimeTypes = require('mime-types');
 const History = require('../utils/History');
 const vertexaiConfig = require('../../config/vertexai.json');
 const config = require('../utils/config');
 
-const { project, location } = vertexaiConfig;
+// const project = vertexaiConfig.project ?? config.get('projectId');
+// const location = vertexaiConfig.location ?? config.get('location');
+const { projectId: project, location } = config.get('vertexai');
 const delay = vertexaiConfig.quotaDelayMs ?? 0;
 let last;
 

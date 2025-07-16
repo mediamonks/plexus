@@ -1,7 +1,9 @@
+const fs = require('node:fs/promises');
 const path = require('node:path');
 const { Storage } = require('@google-cloud/storage');
-const storageConfig = require('../../config/storage.json');
-const fs = require('node:fs/promises');
+const config = require('../utils/config');
+const Profiler = require('../utils/Profiler');
+const storageConfig = config.get('storage');
 
 const TEMP_PATH = './temp/';
 
@@ -42,6 +44,7 @@ async function downloadAll(prefix, destination) {
 
 async function cache(file) {
 	const filePath = path.join(TEMP_PATH, file);
+	await fs.mkdir(path.dirname(filePath), { recursive: true });
 	try {
 		await fs.access(filePath);
 	} catch (error) {
@@ -55,6 +58,22 @@ async function cacheAll(prefix) {
 	return Promise.all(files.map(file => cache(file.name)));
 }
 
+async function isFolder(path) {
+	return Profiler.run(async () => {
+		const normalizedPath = path.endsWith('/') ? path : `${path}/`;
+		
+		const [exists] = await storage.bucket(storageConfig.bucket).file(normalizedPath).exists();
+		if (exists) return true;
+		
+		const [files] = await storage.bucket(storageConfig.bucket).getFiles({
+			prefix: normalizedPath,
+			maxResults: 1
+		});
+		
+		return files.length > 0;
+	}, 'storage.isFolder');
+}
+
 module.exports = {
 	read,
 	write,
@@ -64,4 +83,5 @@ module.exports = {
 	downloadAll,
 	cache,
 	cacheAll,
+	isFolder,
 };

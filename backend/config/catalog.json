@@ -1,0 +1,415 @@
+{
+	"userRequest": {
+		"type": "input",
+		"field": "prompt",
+		"example": "The original task description or copywriting request.",
+		"required": true
+	},
+	"channel": {
+		"type": "input",
+		"field": "channel",
+		"example": "The channel or platform the copy is intended for."
+	},
+	"product": {
+		"type": "input",
+		"field": "product",
+		"example": "The product or service the copy is about."
+	},
+	"targetAudience": {
+		"type": "input",
+		"field": "targetAudience",
+		"example": "A description of the target audience."
+	},
+	"toneOfVoice": {
+		"type": "input",
+		"field": "toneOfVoice",
+		"example": "A description of the desired tone of voice."
+	},
+	"brandContext": {
+		"type": "search",
+		"input": "userRequest",
+		"dataSource": "whitelabel-brandinfo",
+		"example": [
+			"Relevant excerpts from brand documents.",
+			"Other supporting brand-specific information."
+		]
+	},
+	"brandGuidelines": {
+		"type": "text",
+		"dataSource": "whitelabel-styleguide",
+		"example": "Summary of key brand voice and style rules."
+	},
+	"channelContext": {
+		"type": "query",
+		"dataSource": "whitelabel-examples",
+		"limit": 3,
+		"filter": {
+			"channel": "channel"
+		},
+		"fields": ["text", "engagement_rate"],
+		"example": [
+			{
+				"text": "Example post 1 text...",
+				"engagement_rate": 5.2
+			},
+			{
+				"text": "Example post 2 text...",
+				"engagement_rate": 4.8
+			},
+			{
+				"text": "Example post 3 text...",
+				"engagement_rate": 4.5
+			}
+		]
+	},
+	"productData": {
+		"type": "query",
+		"dataSource": "whitelabel-products",
+		"limit": 1,
+		"filter": {
+			"product_name": "product"
+		},
+		"example": {
+			"product_name": "The name of the product",
+			"product_description": "A description of the product.",
+			"product_details": "A detailed description of the product's features."
+		}
+	},
+	"targetLength": {
+		"type": "input",
+		"field": "targetLength",
+		"example": 280
+	},
+	"maxCharacters": {
+		"type": "input",
+		"field": "maxCharacters",
+		"example": 300
+	},
+	"language": {
+		"type": "input",
+		"field": "language",
+		"example": "The language the copy should be in."
+	},
+	"draftCopy": {
+		"type": "output",
+		"agent": "draft",
+		"field": "copy",
+		"example": "The generated initial draft of the copy."
+	},
+	"draftRevisionNotes": {
+		"type": "output",
+		"agent": "draft",
+		"field": "revisionNotes",
+		"example": "A justification for the choices made while generating the draft, always in English."
+	},
+	"consolidationCopy": {
+		"type": "output",
+		"agent": "consolidation",
+		"field": "copy",
+		"example": "The consolidated copy."
+	},
+	"consolidationRevisionNotes": {
+		"type": "output",
+		"agent": "consolidation",
+		"field": "revisionNotes",
+		"example": "A description and justification of how the various inputs were consolidated, always in English."
+	},
+	"brandCopy": {
+		"type": "output",
+		"agent": "brand",
+		"field": "copy",
+		"example": "The reviewed and brand-aligned copy."
+	},
+	"brandRevisionNotes": {
+		"type": "output",
+		"agent": "brand",
+		"field": "revisionNotes",
+		"example": "Summary of changes made to align the copy with brand guidelines, always in English."
+	},
+	"channelCopy": {
+		"type": "output",
+		"agent": "channel",
+		"field": "copy",
+		"example": "The reviewed copy optimized for the channel."
+	},
+	"channelRevisionNotes": {
+		"type": "output",
+		"agent": "channel",
+		"field": "revisionNotes",
+		"example": "Summary of changes made to optimize copy for the channel, always in English."
+	},
+	"productCopy": {
+		"type": "output",
+		"agent": "product",
+		"field": "copy",
+		"example": "The reviewed copy with integrated product details."
+	},
+	"productRevisionNotes": {
+		"type": "output",
+		"agent": "product",
+		"field": "revisionNotes",
+		"example": "Summary of changes made to integrate product details, always in English."
+	},
+	"targetAudienceCopy": {
+		"type": "output",
+		"agent": "target-audience",
+		"field": "copy",
+		"example": "The refined copy adjusted to be most appealing to the target audience."
+	},
+	"targetAudienceRevisionNotes": {
+		"type": "output",
+		"agent": "target-audience",
+		"field": "revisionNotes",
+		"example": "Summary of changes made to tailor the copy for the target audience, always in English."
+	},
+	"toneOfVoiceCopy": {
+		"type": "output",
+		"agent": "tone-of-voice",
+		"field": "copy",
+		"example": "The refined copy adjusted to match the requested tone of voice."
+	},
+	"toneOfVoiceRevisionNotes": {
+		"type": "output",
+		"agent": "tone-of-voice",
+		"field": "revisionNotes",
+		"example": "Summary of changes made to match the requested tone of voice, always in English."
+	},
+	"brief": {
+		"type": "text",
+		"dataSource": "mantra-brief",
+		"example": "The text of the project brief."
+	},
+	"briefFolderId": {
+		"type": "input",
+		"field": "briefFolderId",
+		"example": "The ID of the Google Drive folder containing the project brief.",
+		"required": true
+	},
+	"additionalInfo": {
+		"type": "input",
+		"field": "additionalInfo",
+		"example": "Optional additional information about the brief and the project in general."
+	},
+	"criticalProductionBlockers": {
+		"type": "output",
+		"agent": "gap-identification",
+		"field": "critical_production_blockers",
+		"example": [
+			{
+				"gap": "Specific missing information",
+				"relevance": "Why this matters for the specific deliverables requested",
+				"production_impact": "Specific explanation of how this blocks production"
+			}
+		]
+	},
+	"importantClarifications": {
+		"type": "output",
+		"agent": "gap-identification",
+		"field": "important_clarifications",
+		"example": [
+			{
+				"gap": "Specific missing information",
+				"relevance": "Why this matters for the specific deliverables requested",
+				"production_impact": "How this affects quality or efficiency"
+			}
+		]
+	},
+	"briefInconsistencies": {
+		"type": "output",
+		"agent": "gap-identification",
+		"field": "brief_inconsistencies",
+		"example": [
+			{
+				"inconsistency": "Conflicting information in brief",
+				"conflicting_elements": "Specific sections that contradict",
+				"production_impact": "How this creates confusion"
+			}
+		]
+	},
+	"validatedCriticalProductionBlockers": {
+		"type": "output",
+		"agent": "gap-validation",
+		"field": "critical_production_blockers",
+		"example": [
+			{
+				"gap": "Specific missing information",
+				"relevance": "Why this matters for the specific deliverables requested",
+				"production_impact": "Specific explanation of how this blocks production"
+			}
+		]
+	},
+	"validatedImportantClarifications": {
+		"type": "output",
+		"agent": "gap-validation",
+		"field": "important_clarifications",
+		"example": [
+			{
+				"gap": "Specific missing information",
+				"relevance": "Why this matters for the specific deliverables requested",
+				"production_impact": "How this affects quality or efficiency"
+			}
+		]
+	},
+	"validatedBriefInconsistencies": {
+		"type": "output",
+		"agent": "gap-validation",
+		"field": "brief_inconsistencies",
+		"example": [
+			{
+				"inconsistency": "Conflicting information in brief",
+				"conflicting_elements": "Specific sections that contradict",
+				"production_impact": "How this creates confusion"
+			}
+		]
+	},
+	"rateCard": {
+		"type": "text",
+		"dataSource": "mantra-ratecard",
+		"example": "The full rate card (asset types, tier definitions, rates)."
+	},
+	"ratecardId": {
+		"type": "input",
+		"field": "ratecardId",
+		"example": "The ID of the Google Drive file containing the rate card.",
+		"required": true
+	},
+	"gaps": {
+		"type": "input",
+		"field": "gaps",
+		"example": "The list of gaps in the brief.",
+		"required": true
+	},
+	"followUp": {
+		"type": "output",
+		"agent": "follow-up-generation",
+		"field": "followUp",
+		"example": "The generated email."
+	},
+	"outputDeliverables": {
+		"type": "output",
+		"agent": "info-extraction",
+		"field": "deliverables",
+		"example": [
+			{
+				"deliverable": "<number>x <asset type or description>",
+				"client_name": "<client name>",
+				"asset_name": "<provided asset name or label>",
+				"asset_type": "<One of the following values: 'TV Spot' (may also appear as 'spot', 'OLV', 'Social Video', or 'TVC'), 'Static Banner', 'Social Static – In Feed', 'Social Static – Story', 'HTML Banner', 'Print', 'Retouching' (use when brief says 'image update' or 'print update' and refers to changes like color correction, cleanup, or part replacement), 'Radio Spot', 'Audio', 'Standard Banner HTML', 'Rich Media Banner', 'Other'>",
+				"duration": "<Choose from: '6 seconds', '10 seconds', '15 seconds', '30 seconds', 'Other', 'Not relevant'>",
+				"creative_base": "<Classify as 'Adaptation of an existing visual' if the brief mentions reusing, resizing, adapting, or working from an existing asset, reference, or master file. Classify as 'New creative' if the brief calls for a new concept, design, or no reference to prior work. If unclear or not applicable, return 'Other'>",
+				"changes_needed_on_creative_base": "<Modifications as stated in the brief. Example: 'Update product imagery and legal supers'>",
+				"asset_copy": "<Client provides final copy | Include exact copy | New copywriting requested | Not needed>",
+				"technical_specifications": "<Include exact dimensions, file formats, platform specs, safe zones, resolution, weight limits if provided. Else, use 'Not specified'>",
+				"channel": "<Choose from: 'YouTube', 'Instagram', 'Facebook', 'Snapchat', 'TikTok', 'Display Network', 'Print', 'Website', 'In-store', 'Other', 'Not specified'>",
+				"delivery_deadline": "<Format as 'YYYY-MM-DD' if exact date is given, or use 'TBD' or 'Not specified'>",
+				"target_audience": "<Verbatim from the brief, or 'Not specified'>"
+			}
+		]
+	},
+	"inputDeliverables": {
+		"type": "input",
+		"dataSource": "mantra-deliverables",
+		"example": "The list of deliverables."
+	},
+	"deliverablesId": {
+		"type": "input",
+		"field": "deliverablesId",
+		"example": "The ID of the Google Drive file containing the list of deliverables.",
+		"required": true
+	},
+	"normalizedDeliverables": {
+		"type": "output",
+		"agent": "deliverables-normalization",
+		"field": "normalizedDeliverables",
+		"example": [
+			{
+				"Asset Name": "...",
+				"Normalized Asset Type": "<must match one from rate card>",
+				"Original Asset Type": "...",
+				"Reasoning": "Mapped to this asset type because..."
+			}
+		]
+	},
+	"complexity": {
+		"type": "output",
+		"agent": "complexity-estimation",
+		"field": "complexity",
+		"example": [
+			{
+				"Client name": "<client name>",
+				"Asset type": "<asset name and type>",
+				"Description": "<your natural-language explanation of complexity and effort required>"
+			}
+		]
+	},
+	"historicalTimelines": {
+		"type": "text",
+		"dataSource": "mantra-historical-timelines",
+		"example": "Historical timelines for this client for reference."
+	},
+	"historicalTimelinesFolderId": {
+		"type": "input",
+		"field": "historicalTimelinesFolderId",
+		"example": "The ID of the Google Drive folder containing the historical timelines.",
+		"required": true
+	},
+	"outputQuote": {
+		"type": "output",
+		"agent": "quote-generation",
+		"field": "quote",
+		"example": [
+			{
+				"Asset": "<asset name>",
+				"Client name": "<client name>",
+				"Platform": "<platform>",
+				"Primary Tier": "<Very Simple | Simple | Medium | Complex | Other>",
+				"Primary Rate (USD)": "$<rate>",
+				"Primary Reasoning": ["resize", "source file provided"],
+				"Alternate Tier": "<Very Simple | Simple | Medium | Complex | Other>",
+				"Alternate Rate (USD)": "$<rate>",
+				"Alternate Reasoning": "If no master file is available, If we need to flip a shot manually, or other answer based on the assumptions of previous output"
+			}
+		]
+	},
+	"outputTimeline": {
+		"type": "output",
+		"agent": "timeline-generation",
+		"field": "timeline",
+		"example": [
+			{
+				"activity": "Activity name",
+				"owner": "Owner",
+				"startWeek": 0,
+				"duration": 3
+			}
+		]
+	},
+	"inputQuote": {
+		"type": "text",
+		"dataSource": "mantra-quote",
+		"example": "The previously generated quote per asset."
+	},
+	"quoteId": {
+		"type": "input",
+		"field": "quoteId",
+		"example": "The ID of the Google Drive file containing the quote.",
+		"required": true
+	},
+	"inputTimeline": {
+		"type": "text",
+		"dataSource": "mantra-timeline",
+		"example": "The previously generated timeline."
+	},
+	"timelineId": {
+		"type": "input",
+		"field": "timelineId",
+		"example": "The ID of the Google Drive file containing the timeline.",
+		"required": true
+	},
+	"finalQuote": {
+		"type": "output",
+		"agent": "final-quote-generation",
+		"field": "finalQuote",
+		"example": "The final quote."
+	}
+}
