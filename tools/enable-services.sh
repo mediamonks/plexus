@@ -8,6 +8,7 @@ gcloud services enable drive.googleapis.com --project monks-plexus
 gcloud services enable docs.googleapis.com --project monks-plexus
 gcloud services enable firestore.googleapis.com --project monks-plexus
 gcloud services enable run.googleapis.com --project monks-plexus
+gcloud services enable secretmanager.googleapis.com --project monks-plexus
 gcloud services enable servicecontrol.googleapis.com --project monks-plexus
 gcloud services enable sheets.googleapis.com --project monks-plexus
 gcloud services enable storage.googleapis.com --project monks-plexus
@@ -18,3 +19,7 @@ gcloud projects add-iam-policy-binding monks-plexus --member=serviceAccount:$PRO
 gcloud iam service-accounts create plexus --display-name="plexus" --project monks-plexus
 gcloud projects add-iam-policy-binding monks-plexus --member="serviceAccount:plexus@monks-plexus.iam.gserviceaccount.com" --role="roles/cloudfunctions.invoker"
 gcloud projects add-iam-policy-binding monks-plexus --member="serviceAccount:plexus@monks-plexus.iam.gserviceaccount.com" --role="roles/run.invoker"
+gcloud projects add-iam-policy-binding monks-plexus --member="serviceAccount:plexus@monks-plexus.iam.gserviceaccount.com" --role="roles/aiplatform.user"
+gcloud projects add-iam-policy-binding monks-plexus --member="serviceAccount:plexus@monks-plexus.iam.gserviceaccount.com" --role="roles/storage.admin"
+gcloud projects add-iam-policy-binding monks-plexus --member="serviceAccount:plexus@monks-plexus.iam.gserviceaccount.com" --role="roles/datastore.user"
+gcloud projects add-iam-policy-binding monks-plexus --member="serviceAccount:plexus@monks-plexus.iam.gserviceaccount.com" --role="roles/drive.file"

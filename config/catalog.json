@@ -273,7 +273,7 @@
 		"example": "The ID of the Google Drive file containing the rate card.",
 		"required": true
 	},
-	"gaps": {
+	"inputGaps": {
 		"type": "input",
 		"field": "gaps",
 		"example": "The list of gaps in the brief.",
@@ -291,7 +291,8 @@
 		"field": "deliverables",
 		"example": [
 			{
-				"deliverable": "<number>x <asset type or description>",
+				"deliverable": "<asset type or description>",
+				"number": 1,
 				"client_name": "<client name>",
 				"asset_name": "<provided asset name or label>",
 				"asset_type": "<One of the following values: 'TV Spot' (may also appear as 'spot', 'OLV', 'Social Video', or 'TVC'), 'Static Banner', 'Social Static – In Feed', 'Social Static – Story', 'HTML Banner', 'Print', 'Retouching' (use when brief says 'image update' or 'print update' and refers to changes like color correction, cleanup, or part replacement), 'Radio Spot', 'Audio', 'Standard Banner HTML', 'Rich Media Banner', 'Other'>",
@@ -308,14 +309,20 @@
 	},
 	"inputDeliverables": {
 		"type": "input",
-		"dataSource": "mantra-deliverables",
-		"example": "The list of deliverables."
+		"field": "deliverables",
+		"example": "The list of deliverables.",
+		"required": true
 	},
-	"deliverablesId": {
+	"xdeliverablesId": {
 		"type": "input",
 		"field": "deliverablesId",
-		"example": "The ID of the Google Drive file containing the list of deliverables.",
+		"example": "The ID of the Google Drive file containing the deliverables.",
 		"required": true
+	},
+	"xinputDeliverables": {
+		"type": "text",
+		"dataSource": "mantra-deliverables",
+		"example": "The list of deliverables."
 	},
 	"normalizedDeliverables": {
 		"type": "output",
@@ -323,10 +330,21 @@
 		"field": "normalizedDeliverables",
 		"example": [
 			{
-				"Asset Name": "...",
-				"Normalized Asset Type": "<must match one from rate card>",
-				"Original Asset Type": "...",
-				"Reasoning": "Mapped to this asset type because..."
+				"deliverable": "<asset type or description>",
+				"number": 1,
+				"client_name": "<client name>",
+				"asset_name": "<provided asset name or label>",
+				"asset_type": "<One of the following values: 'TV Spot' (may also appear as 'spot', 'OLV', 'Social Video', or 'TVC'), 'Static Banner', 'Social Static – In Feed', 'Social Static – Story', 'HTML Banner', 'Print', 'Retouching' (use when brief says 'image update' or 'print update' and refers to changes like color correction, cleanup, or part replacement), 'Radio Spot', 'Audio', 'Standard Banner HTML', 'Rich Media Banner', 'Other'>",
+				"duration": "<Choose from: '6 seconds', '10 seconds', '15 seconds', '30 seconds', 'Other', 'Not relevant'>",
+				"creative_base": "<Classify as 'Adaptation of an existing visual' if the brief mentions reusing, resizing, adapting, or working from an existing asset, reference, or master file. Classify as 'New creative' if the brief calls for a new concept, design, or no reference to prior work. If unclear or not applicable, return 'Other'>",
+				"changes_needed_on_creative_base": "<Modifications as stated in the brief. Example: 'Update product imagery and legal supers'>",
+				"asset_copy": "<Client provides final copy | Include exact copy | New copywriting requested | Not needed>",
+				"technical_specifications": "<Include exact dimensions, file formats, platform specs, safe zones, resolution, weight limits if provided. Else, use 'Not specified'>",
+				"channel": "<Choose from: 'YouTube', 'Instagram', 'Facebook', 'Snapchat', 'TikTok', 'Display Network', 'Print', 'Website', 'In-store', 'Other', 'Not specified'>",
+				"delivery_deadline": "<Format as 'YYYY-MM-DD' if exact date is given, or use 'TBD' or 'Not specified'>",
+				"target_audience": "<Verbatim from the brief, or 'Not specified'>",
+				"normalized_asset_type": "<the asset type as it occurs in the rate card>",
+				"normalization_reasoning": "<a justification for why normalized_asset_type was chosen to match asset_type>"
 			}
 		]
 	},
@@ -359,15 +377,23 @@
 		"field": "quote",
 		"example": [
 			{
-				"Asset": "<asset name>",
-				"Client name": "<client name>",
-				"Platform": "<platform>",
-				"Primary Tier": "<Very Simple | Simple | Medium | Complex | Other>",
-				"Primary Rate (USD)": "$<rate>",
-				"Primary Reasoning": ["resize", "source file provided"],
-				"Alternate Tier": "<Very Simple | Simple | Medium | Complex | Other>",
-				"Alternate Rate (USD)": "$<rate>",
-				"Alternate Reasoning": "If no master file is available, If we need to flip a shot manually, or other answer based on the assumptions of previous output"
+				"deliverable": "<asset type or description>",
+				"number": 1,
+				"client_name": "<client name>",
+				"asset_name": "<provided asset name or label>",
+				"asset_type": "<One of the following values: 'TV Spot' (may also appear as 'spot', 'OLV', 'Social Video', or 'TVC'), 'Static Banner', 'Social Static – In Feed', 'Social Static – Story', 'HTML Banner', 'Print', 'Retouching' (use when brief says 'image update' or 'print update' and refers to changes like color correction, cleanup, or part replacement), 'Radio Spot', 'Audio', 'Standard Banner HTML', 'Rich Media Banner', 'Other'>",
+				"duration": "<Choose from: '6 seconds', '10 seconds', '15 seconds', '30 seconds', 'Other', 'Not relevant'>",
+				"creative_base": "<Classify as 'Adaptation of an existing visual' if the brief mentions reusing, resizing, adapting, or working from an existing asset, reference, or master file. Classify as 'New creative' if the brief calls for a new concept, design, or no reference to prior work. If unclear or not applicable, return 'Other'>",
+				"changes_needed_on_creative_base": "<Modifications as stated in the brief. Example: 'Update product imagery and legal supers'>",
+				"asset_copy": "<Client provides final copy | Include exact copy | New copywriting requested | Not needed>",
+				"technical_specifications": "<Include exact dimensions, file formats, platform specs, safe zones, resolution, weight limits if provided. Else, use 'Not specified'>",
+				"channel": "<Choose from: 'YouTube', 'Instagram', 'Facebook', 'Snapchat', 'TikTok', 'Display Network', 'Print', 'Website', 'In-store', 'Other', 'Not specified'>",
+				"delivery_deadline": "<Format as 'YYYY-MM-DD' if exact date is given, or use 'TBD' or 'Not specified'>",
+				"target_audience": "<Verbatim from the brief, or 'Not specified'>",
+				"normalized_asset_type": "<the asset type as it occurs in the rate card>",
+				"complexity_tier": "<Very Simple | Simple | Medium | Complex | Other>",
+				"complexity_reasoning": "<a justification for why the chosen `complexity_tier` was selected>",
+				"rate": 123
 			}
 		]
 	},
@@ -379,32 +405,45 @@
 			{
 				"activity": "Activity name",
 				"owner": "Owner",
-				"startWeek": 0,
+				"startDay": 1,
 				"duration": 3
 			}
 		]
 	},
-	"inputQuote": {
-		"type": "text",
-		"dataSource": "mantra-quote",
-		"example": "The previously generated quote per asset."
-	},
-	"quoteId": {
+	"quoteData": {
 		"type": "input",
-		"field": "quoteId",
-		"example": "The ID of the Google Drive file containing the quote.",
+		"field": "quoteData",
+		"example": "The previously generated quote per asset.",
 		"required": true
 	},
-	"inputTimeline": {
-		"type": "text",
-		"dataSource": "mantra-timeline",
-		"example": "The previously generated timeline."
-	},
-	"timelineId": {
+	"timelineData": {
 		"type": "input",
-		"field": "timelineId",
-		"example": "The ID of the Google Drive file containing the timeline.",
+		"field": "timelineData",
+		"example": "The previously generated timeline.",
 		"required": true
+	},
+	"startDate": {
+		"type": "input",
+		"field": "startDate",
+		"example": "The start date of the project.",
+		"required": true
+	},
+	"endDate": {
+		"type": "input",
+		"field": "endDate",
+		"example": "The end date of the project.",
+		"required": true
+	},
+	"finalQuoteExampleId": {
+		"type": "input",
+		"field": "finalQuoteExampleId",
+		"example": "The ID of the Google Drive file containing the final quote example.",
+		"required": true
+	},
+	"finalQuoteExample": {
+		"type": "text",
+		"dataSource": "mantra-final-quote-example",
+		"example": "The final quote example."
 	},
 	"finalQuote": {
 		"type": "output",

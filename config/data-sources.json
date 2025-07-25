@@ -1,63 +1,54 @@
 {
-	"whitelabel-brandinfo": {
-		"namespace": "whitelabel",
-		"platform": "gcs",
-		"source": "brandinfo",
-		"type": "text:vector"
-	},
-	"whitelabel-styleguide": {
-		"namespace": "whitelabel",
-		"platform": "gcs",
-		"source": "styleguide",
-		"type": "text:digest",
-		"instructions": "styleguide-digest"
-	},
-	"whitelabel-examples": {
-		"namespace": "whitelabel",
-		"platform": "gcs",
-		"source": "examples",
-		"type": "data:raw"
-	},
-	"whitelabel-products": {
-		"namespace": "whitelabel",
-		"platform": "gcs",
-		"source": "products",
-		"type": "data:raw"
-	},
 	"mantra-brief": {
 		"namespace": "mantra",
 		"platform": "drive",
 		"source": ":briefFolderId",
-		"type": "text:raw"
+		"type": "text:raw",
+		"folder": true
 	},
 	"mantra-ratecard": {
 		"namespace": "mantra",
 		"platform": "drive",
 		"source": ":ratecardId",
-		"type": "text:raw"
+		"type": ":raw",
+		"folder": false
 	},
 	"mantra-deliverables": {
 		"namespace": "mantra",
 		"platform": "drive",
 		"source": ":deliverablesId",
-		"type": "text:raw"
+		"type": "data:raw",
+		"cache": false,
+		"folder": false
 	},
 	"mantra-historical-timelines": {
 		"namespace": "mantra",
 		"platform": "drive",
 		"source": ":historicalTimelinesFolderId",
-		"type": "text:raw"
+		"type": "text:raw",
+		"folder": true
 	},
 	"mantra-quote": {
 		"namespace": "mantra",
 		"platform": "drive",
 		"source": ":quoteId",
-		"type": "text:raw"
+		"type": "text:raw",
+		"cache": false,
+		"folder": false
 	},
 	"mantra-timeline": {
 		"namespace": "mantra",
 		"platform": "drive",
 		"source": ":timelineId",
-		"type": "text:raw"
+		"type": "text:raw",
+		"cache": false,
+		"folder": false
+	},
+	"mantra-final-quote-example": {
+		"namespace": "mantra",
+		"platform": "drive",
+		"source": ":finalQuoteExampleId",
+		"type": "text:raw",
+		"folder": false
 	}
 }

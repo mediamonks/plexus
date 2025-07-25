@@ -54,40 +54,38 @@ module.exports = class Agent {
 	}
 	
 	async prepare() {
-		await Profiler.run(async () => {
-			if (!agentDefinitions[this._id]) throw new Error(`Unknown agent "${this._id}". Must be one of: ${Object.keys(agentDefinitions).join(', ')}`);
-			
-			console.debug('[Agent] Preparing', this.displayName);
-			
-			const { context, temperature } = agentDefinitions[this._id];
-			const catalog = requestContext.get().catalog;
-			const promises = [];
-			
-			for (const contextField of context)
-				promises.push(catalog.get(contextField).then(value => this._context[contextField] = value));
-			
-			if (typeof temperature === 'string')
-				promises.push(catalog.get(temperature).then(value => this._temperature = value));
-			else
-				this._temperature = temperature;
-			
-			if (!this._systemInstructions) {
-				promises.push(
-					storage.cache(`system-instructions/${this.systemInstructionsName}-agent.txt`)
-						.then(path => fs.readFile(path))
-						.then(buffer => this._systemInstructions = buffer.toString())
-						.catch(() => {
-							throw new Error(`Missing system instructions for agent "${this._id}"`)
-						}),
-				);
-			}
-			
-			await Promise.all(promises);
-			
-			this.isReady = true;
-			
-			Debug.log(`${this.displayName} Agent - context: ${JSON.stringify(this._context)}`);
-		}, `${this.displayName} Agent - prepare`);
+		if (!agentDefinitions[this._id]) throw new Error(`Unknown agent "${this._id}". Must be one of: ${Object.keys(agentDefinitions).join(', ')}`);
+		
+		console.debug('[Agent] Preparing', this.displayName);
+		
+		const { context, temperature } = agentDefinitions[this._id];
+		const catalog = requestContext.get().catalog;
+		const promises = [];
+		
+		for (const contextField of context)
+			promises.push(catalog.get(contextField).then(value => this._context[contextField] = value));
+		
+		if (typeof temperature === 'string')
+			promises.push(catalog.get(temperature).then(value => this._temperature = value));
+		else
+			this._temperature = temperature;
+		
+		if (!this._systemInstructions) {
+			promises.push(
+				storage.cache(`system-instructions/${this.systemInstructionsName}-agent.txt`)
+					.then(path => fs.readFile(path))
+					.then(buffer => this._systemInstructions = buffer.toString())
+					.catch(() => {
+						throw new Error(`Missing system instructions for agent "${this._id}"`)
+					}),
+			);
+		}
+		
+		await Promise.all(promises);
+		
+		this.isReady = true;
+		
+		// Debug.log(`${this.displayName} Agent - context: ${JSON.stringify(this._context)}`);
 	}
 	
 	async _invoke() {

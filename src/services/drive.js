@@ -3,9 +3,12 @@ const path = require('node:path');
 const { google } = require('googleapis');
 const mime = require('mime-types');
 const workspace = require('./workspace');
+const config = require('../utils/config');
 const Profiler = require('../utils/Profiler');
 
-const DOWNLOAD_DIR = './temp';
+const tempPath = config.get('tempPath');
+// TODO download to sources/ directory just like gcs??
+const DOWNLOAD_PATH = path.resolve(tempPath, 'download/');
 
 module.exports = auth => {
 	const drive = google.drive({ version: 'v3', auth });
@@ -78,22 +81,27 @@ module.exports = auth => {
 	async function downloadFile(file) {
 		await workspace.quotaDelay();
 		
-		const fileStream = await drive.files.get(
-				{ fileId: file.id, alt: 'media' },
-				{ responseType: 'stream' }
-		);
-		
-		const destPath = path.join(DOWNLOAD_DIR, file.name);
-		const writeStream = fs.createWriteStream(destPath);
-		
-		await new Promise((resolve, reject) => {
-			fileStream.data
-					.on('end', resolve)
-					.on('error', reject)
-					.pipe(writeStream);
-		});
-		
-		return destPath;
+		try {
+			const fileStream = await drive.files.get(
+					{ fileId: file.id, alt: 'media' },
+					{ responseType: 'stream' }
+			);
+			
+			fs.mkdirSync(DOWNLOAD_PATH, { recursive: true });
+			const destPath = path.join(DOWNLOAD_PATH, file.name);
+			const writeStream = fs.createWriteStream(destPath, { encoding: null });
+			
+			await new Promise((resolve, reject) => {
+				fileStream.data
+						.on('end', resolve)
+						.on('error', reject)
+						.pipe(writeStream);
+			});
+			
+			return destPath;
+		} catch (error) {
+			console.error(`Error downloading file "${file.name}":`, error.message);
+		}
 	}
 	
 	async function listFolderContents(folderId, mimeType) {
@@ -136,7 +144,7 @@ module.exports = auth => {
 	}
 	
 	async function downloadFolderContents(folderId) {
-		fs.mkdirSync(DOWNLOAD_DIR, { recursive: true });
+		fs.mkdirSync(DOWNLOAD_PATH, { recursive: true });
 
 		const files = await listFolderContents(folderId);
 
@@ -146,7 +154,7 @@ module.exports = auth => {
 	}
 	
 	async function exportFolderContents(folderId, type) {
-		fs.mkdirSync(DOWNLOAD_DIR, { recursive: true });
+		fs.mkdirSync(DOWNLOAD_PATH, { recursive: true });
 		
 		const files = await listFolderContents(folderId);
 		
@@ -163,7 +171,8 @@ module.exports = auth => {
 			mimeType,
 		}, { responseType: 'stream' });
 		
-		const destPath = path.join(DOWNLOAD_DIR, `${file.name.replace(/\W+/g, '_')}.${type}`);
+		fs.mkdirSync(DOWNLOAD_PATH, { recursive: true });
+		const destPath = path.join(DOWNLOAD_PATH, `${file.name.replace(/\W+/g, '_')}.${type}`);
 		const writeStream = fs.createWriteStream(destPath);
 		
 		await new Promise((resolve, reject) => {
@@ -245,6 +254,18 @@ module.exports = auth => {
 		return response.data;
 	}
 	
+	// TODO abstract common file cache logic (see storage.js)
+	async function cacheFile(metadata) {
+		const filePath = path.join(DOWNLOAD_PATH, metadata.name);
+		fs.mkdirSync(path.dirname(filePath), { recursive: true });
+		try {
+			fs.accessSync(filePath);
+		} catch (error) {
+			await downloadFile(metadata);
+		}
+		return filePath;
+	}
+	
 	return {
 		uploadFile,
 		createFolder,
@@ -258,6 +279,7 @@ module.exports = auth => {
 		createLink,
 		createCsvFile,
 		isFolder,
-		getFileMetadata
+		getFileMetadata,
+		cacheFile,
 	};
 }

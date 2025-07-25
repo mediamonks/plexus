@@ -5,12 +5,36 @@ const llm = require('./llm');
 const vectordb = require('./vectordb');
 const auth = require('../services/auth')();
 const drive = require('../services/drive')(auth);
+const docs = require('../services/docs')(auth);
+const sheets = require('../services/sheets')(auth);
 const storage = require('../services/storage');
 const jsonl = require('../utils/jsonl');
 const pdf = require('../utils/pdf');
+const Profiler = require('../utils/Profiler');
 const requestContext = require('../utils/request-context');
-const dataSources = require('../../config/data-sources.json');
 const UnsupportedError = require('../utils/UnsupportedError');
+const xlsx = require('../utils/xlsx');
+const dataSources = require('../../config/data-sources.json');
+
+// TODO improve error handling for non-existent Drive IDs and GCS paths
+
+async function sourceToSources({ source, platform, namespace, folder }) {
+	const mapping = {
+		gcs: async () => {
+			const path = `sources/${namespace}/${source}`;
+			const isFolder = folder ?? await storage.isFolder(path);
+			if (isFolder) return await storage.list(path);
+			return [path];
+		},
+		drive: async () => {
+			const isFolder = folder ?? await drive.isFolder(source);
+			if (isFolder) return drive.listFolderContents(source);
+			return [await drive.getFileMetadata(source)];
+		}
+	};
+	
+	return mapping[platform]();
+}
 
 async function fileToText(file) {
 	const getText = {
@@ -25,9 +49,60 @@ async function fileToText(file) {
 	return await getText[extension](file);
 }
 
-async function filesToText(files) {
-	return (await Promise.all(files.map(fileToText))).join('\n\n');
+async function gdriveToText(metadata, allowCache) {
+	if (metadata.mimeType === 'application/vnd.google-apps.document') return await docs.getMarkdown(metadata.id);
+	
+	const file = await (allowCache ?? true ? drive.cacheFile(metadata) : drive.downloadFile(metadata));
+	
+	if (metadata.mimeType === 'application/pdf') return await pdf.getPdfText(file);
+	
+	if (metadata.mimeType === 'text/plain') return (await fs.readFile(file)).toString();
 }
+
+async function gdriveToData(metadata, allowCache) {
+	if (metadata.mimeType === 'application/vnd.google-apps.spreadsheet') return await sheets.getData(metadata.id);
+	
+	const file = await (allowCache ?? true ? drive.cacheFile(metadata) : drive.downloadFile(metadata));
+	
+	if (metadata.mimeType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') return await xlsx.getData(file);
+}
+
+function detectDataType(platform, source) {
+	const TYPES = {
+		GCS: {
+			'pdf': 'text',
+			'txt': 'text',
+			'jsonl': 'data',
+		},
+		DRIVE: {
+			'application/vnd.google-apps.document': 'text',
+			'application/pdf': 'text',
+			'text/plain': 'text',
+			'application/vnd.google-apps.spreadsheet': 'data',
+			'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'data',
+		}
+	};
+	
+	if (platform === 'gcs') return TYPES.GCS[path.extname(source).substring(1)];
+	if (platform === 'drive') return TYPES.DRIVE[source.mimeType];
+}
+
+async function sourceToContent({ source, platform, dataType, cache }) {
+	return await {
+		gcs: {
+			text: async path => fileToText(await storage.cache(path)),
+			data: async path => jsonl.read(await storage.cache(path)),
+		},
+		drive: {
+			text: metadata => gdriveToText(metadata, cache),
+			data: metadata => gdriveToData(metadata, cache),
+		}
+	}[platform][dataType](source);
+}
+
+// async function filesToText(files) {
+// 	return (await Promise.all(files.map(fileToText))).join('\n\n');
+// }
 
 async function* textToChunks(text) {
 	const splitter = new RecursiveCharacterTextSplitter({
@@ -57,12 +132,34 @@ async function textToDigest(text, instructions) {
 	});
 }
 
-async function* filesToData(files) {
-	for await (const file of files) yield jsonl.read(file);
-}
+// async function* filesToData(files) {
+// 	for await (const file of files) yield jsonl.read(file);
+// }
 
 async function* dataToRecords(data) {
 	for await (const record of data) yield { ...record, vector: await vectordb.generateDocumentEmbeddings(record) };
+}
+
+async function contentsToTarget({ contents, dataType, target, instructions }) {
+	if (dataType === 'text') {
+		if (target === 'raw') return contents.join('\n\n');
+		if (target === 'digest') return await textToDigest(contents.join('\n\n'), instructions);
+		if (target === 'vector') {
+			return (async function* () {
+				for await (const text of contents) yield* chunksToRecords(textToChunks(text));
+			})();
+		}
+	}
+	
+	if (dataType === 'data') {
+		if (target === 'raw') return contents.flat();
+		if (target === 'profile') throw new Error('Not implemented');
+		if (target === 'vector') {
+			return (async function* () {
+				for await (const data of contents) yield* dataToRecords(data);
+			})();
+		}
+	}
 }
 
 module.exports = class DataSources {
@@ -70,44 +167,49 @@ module.exports = class DataSources {
 		return requestContext.get().catalog;
 	}
 	
+	static async mapSource(source) {
+		if (source.startsWith(':')) return await this.catalog.get(source.substring(1));
+		return source;
+	}
+	
 	static async read(id) {
-		let { namespace, source, platform, type, instructions } = dataSources[id];
+		let { namespace, source, platform, type, instructions, folder, cache } = dataSources[id];
 		
-		if (source.startsWith(':')) source = await this.catalog.get(source.substring(1));
+		let [ dataType, target ] = type.split(':');
 		
-		const retrieve = {
-			gcs: async () => {
-				const path = `sources/${namespace}/${source}`;
-				if (await storage.isFolder(path)) return await storage.cacheAll(path);
-				else return [await storage.cache(path)];
-			},
-			drive: async () => await drive.isFolder(source)
-					? drive.downloadFolderContents(source)
-					: drive.downloadFile(await drive.getFileMetadata(source)), // TODO use local caching similar to gcs. or not?
-		};
+		source = await this.mapSource(source);
 		
-		const files = await retrieve[platform]({ namespace, source });
+		const sources = await Profiler.run(() => sourceToSources({ source, platform, namespace, folder }), `sourceToSources(${id})`);
 		
-		if (!files.length) throw new Error(`Datasource "${id}" contains no files`);
+		if (!sources.length) throw new Error(`Datasource "${id}" contains no files`);
 		
-		//TODO support GDrive sheet to data
-		const mapping = {
-			'text:raw': async () => await filesToText(files),
-			'text:digest': async () => await textToDigest(await filesToText(files), instructions),
-			'text:vector': async () => chunksToRecords(textToChunks(await filesToText(files))),
-			'data:raw': async () => (await Promise.all(files.map(filesToData))).join('\n'),
-			'data:profile': () => new Error('Not implemented'),
-			'data:vector': async () => dataToRecords(filesToData(files)),
-		};
+		if (!dataType) {
+			for (const source of sources) {
+				const detectedType = detectDataType(platform, source);
+				if (!detectedType) throw new Error(`Unable to detect data type for datasource "${id}"`);
+				if (!dataType) dataType = detectedType;
+				else if (dataType !== detectedType) throw new Error(`Datasource "${id}" contains multiple data types`);
+			}
+		}
 		
-		if (!mapping[type]) throw new UnsupportedError('data source type', type, mapping);
+		const contents = await Promise.all(
+			sources.map(
+				async source => Profiler.run(() => sourceToContent({
+					source,
+					platform,
+					dataType: dataType || detectDataType(platform, source),
+					cache
+				}), `sourceToContent(${source.name ?? source})`)
+			)
+		);
 		
-		return mapping[type]();
+		return Profiler.run(() => contentsToTarget({ contents, dataType, target, instructions }), `contentsToTarget(${id})`);
 	}
 	
 	static async write(id, data) {
 		const { type } = dataSources[id];
 		
+		// TODO account for ":raw" etc, detected input type
 		const mapping = {
 			'text:raw': async () => await storage.write(`text/${id}.txt`, data),
 			'text:digest': async () => await storage.write(`text/${id}.txt`, data),
@@ -131,6 +233,7 @@ module.exports = class DataSources {
 	}
 	
 	static async get(id) {
+		// TODO prevent double reads / race conditions by caching read promise
 		const { source, type } = dataSources[id];
 		
 		if (source.startsWith(':')) return this.read(id);

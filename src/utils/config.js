@@ -1,4 +1,3 @@
-const Profiler = require('./Profiler');
 const requestContext = require('./request-context');
 const global = require('../../config/global.json');
 const modules = ['agents', 'azure', 'catalog', 'data-sources', 'firestore', 'input-fields', 'lancedb', 'openai', 'storage', 'vertexai'];

@@ -1,5 +1,5 @@
 {
-	"model": "gemini-2.0-flash-lite",
+	"model": "gemini-2.5-flash-lite",
 	"embeddingModel": "gemini-embedding-001",
 	"embeddingLocation": "europe-west1",
 	"quotaDelayMs": 500,
