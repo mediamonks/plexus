@@ -1,8 +1,8 @@
 {
-	"projectId": "monks-copydesk",
+	"projectId": "monks-plexus",
 	"location": "europe-west1",
 	"platform": "google",
 	"embeddingPlatform": "google",
 	"waitForThreadUpdate": false,
-	"namespace": "mantra"
+	"tempPath": "./temp/"
 }

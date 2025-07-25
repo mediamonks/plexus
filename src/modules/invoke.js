@@ -25,10 +25,14 @@ module.exports = async function invoke() {
 	const { output, waitForThreadUpdate } = config.get();
 	
 	const result = {};
-	if (output) await Promise.all(output.map(outputField =>
-		catalog.get(outputField)
-			.then(value => result[outputField] = value)
-	));
+	try {
+		if (output) await Promise.all(output.map(outputField =>
+			catalog.get(outputField)
+				.then(value => result[outputField] = value)
+		));
+	} catch (error) {
+		throw error;
+	}
 	
 	const threadUpdate = firestore.updateDocument('threads', threadId, {
 		output: result,

@@ -7,14 +7,20 @@ const packageJson = require('../package.json');
 const { SecretManagerServiceClient } = require('@google-cloud/secret-manager');
 
 const args = require('minimist')(process.argv.slice(2));
-let { env, functions, _: names } = args;
+let { env, functions, gateway, secrets, _: names } = args;
 env ??= 'dev';
+
+if (!functions && !gateway && !secrets) {
+	functions = true;
+	gateway = true;
+	secrets = true;
+}
 
 const global = require('../config/deploy.json')[env];
 
 const globalEnv = global.env ?? [];
 
-function gcloud(command) {
+function gcloud(command, captureOutput = false) {
 	const cmd = `gcloud beta ${command.trim().replace(/\s+/g, ' ')} --project=${global.project} --quiet`
 	console.log(cmd);
 	childProcess.execSync(
@@ -23,16 +29,33 @@ function gcloud(command) {
 	);
 }
 
+const projectNumber = childProcess
+	.execSync(`gcloud projects describe ${global.project} --format="value(project_number)"`, { encoding: 'utf8' })
+	.trim();
+
 async function deployFunction({ name, entryPoint, timeout, env, minInstances, cpus, memory }) {
 	entryPoint = entryPoint ?? name;
 	
-	const secrets = globalEnv.concat(env)
-		.filter(Boolean)
+	const secrets = globalEnv.concat(env).filter(Boolean);
+	
+	const secretsString = secrets
 		.map(secret => `${secret}=${secret}:latest`)
-		.join(':');
+		.join(',');
 	
 	const serviceAccount = global.serviceAccount
-		&& `${global.serviceAccount}@${global.project}.iam.gserviceaccount.com`;
+		&& (global.serviceAccount.includes('@') 
+			? global.serviceAccount 
+			: `${global.serviceAccount}@${global.project}.iam.gserviceaccount.com`);
+	
+	const buildServiceAccount = global.buildServiceAccount ?? `${projectNumber}-compute`;
+	
+	for (const secret of secrets) {
+		gcloud(`secrets add-iam-policy-binding ${secret}
+      --member="serviceAccount:${serviceAccount}"
+	    --role="roles/secretmanager.secretAccessor"
+	    --project="${projectNumber}"
+    `);
+	}
 	
 	gcloud(`
 		functions deploy ${name}
@@ -44,7 +67,8 @@ async function deployFunction({ name, entryPoint, timeout, env, minInstances, cp
 			--trigger-http
 			--project=${global.project}
 			--no-allow-unauthenticated
-			${secrets ? `--set-secrets=${secrets}` : ''}
+			--build-service-account=projects/${global.project}/serviceAccounts/${buildServiceAccount}@developer.gserviceaccount.com
+			${secrets ? `--set-secrets="${secretsString}"` : ''}
 			${timeout ? `--timeout=${timeout}s` : ''}
 			${serviceAccount ? `--run-service-account=${serviceAccount}` : ''}
 			${minInstances ? `--min-instances=${minInstances}` : ''}
@@ -55,7 +79,9 @@ async function deployFunction({ name, entryPoint, timeout, env, minInstances, cp
 
 async function updateGateway({ gateway, region, config, api, serviceAccount = global.serviceAccount }) {
 	serviceAccount = serviceAccount
-		&& `${serviceAccount}@${global.project}.iam.gserviceaccount.com`;
+		&& (serviceAccount.includes('@') 
+			? serviceAccount 
+			: `${serviceAccount}@${global.project}.iam.gserviceaccount.com`);
 	
 	try {
 		gcloud(`
@@ -135,20 +161,20 @@ async function updateSecrets() {
 }
 
 (async () => {
-	await updateSecrets();
+	if (secrets) await updateSecrets();
 	
-	if (!names.length) names = global.functions.map(fn => fn.name);
-	
-	for (const name of names) {
-		const definition = global.functions.find(item => item.name === name);
-		if (!definition) {
-			console.error(`Error: no definition found for function "${name}"`);
-			process.exit(1);
+	if (functions) {
+		if (!names.length) names = global.functions.map(fn => fn.name);
+		
+		for (const name of names) {
+			const definition = global.functions.find(item => item.name === name);
+			if (!definition) {
+				console.error(`Error: no definition found for function "${name}"`);
+				process.exit(1);
+			}
+			await deployFunction(definition);
 		}
-		await deployFunction(definition);
 	}
 	
-	if (functions) return;
-	
-	if (global.apiGateway) await updateGateway(global.apiGateway);
+	if (gateway && global.apiGateway) await updateGateway(global.apiGateway);
 })();

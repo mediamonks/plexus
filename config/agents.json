@@ -102,7 +102,7 @@
 	},
 	"complexity-estimation": {
 		"context": [
-			"deliverables",
+			"inputDeliverables",
 			"inputGaps"
 		]
 	},
@@ -123,9 +123,12 @@
 	},
 	"final-quote-generation": {
 		"context": [
-			"inputQuote",
-			"inputTimeline",
-			"additionalInfo"
+			"quoteData",
+			"timelineData",
+			"additionalInfo",
+			"finalQuoteExample",
+			"startDate",
+			"endDate"
 		]
 	}
 }

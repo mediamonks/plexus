@@ -18,7 +18,7 @@
 				'http://localhost:3000'
 		);
 		
-		const authUrl = oauth2Client.generateAuthUrl({ access_type: 'offline', scope: SCOPES });
+		const authUrl = oauth2Client.generateAuthUrl({ access_type: 'offline', scope: SCOPES, prompt: 'consent' });
 		console.log('Opening browser for authentication:', authUrl);
 		open(authUrl).then();
 		

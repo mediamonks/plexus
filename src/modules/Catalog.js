@@ -84,12 +84,17 @@ module.exports = class Catalog {
 		
 		if (!populateFunction) throw new Error(`Unknown type "${fieldDefinition.type}" for context field "${field}". Must be one of ${Object.keys(this.populate).join(', ')}`);
 		
-		return new Promise(resolve => {
+		return new Promise((resolve, reject) => {
 			setTimeout(async () => {
-				console.debug('[Catalog] Populating', fieldDefinition.type, 'field:', field);
-				const value = await populateFunction(fieldDefinition).catch(error => console.error(error));
-				console.debug('[Catalog]', field, '=', typeof value === 'string' ? value.split('\n')[0] + (value.split('\n').length > 1 ? '...' : '') : value);
-				resolve(value);
+				try {
+					console.debug('[Catalog] Populating', fieldDefinition.type, 'field:', field);
+					const value = await populateFunction(fieldDefinition).catch(error => console.error(error));
+					// console.debug('[Catalog]', field, '=', typeof value === 'string' ? value.split('\n')[0] + (value.split('\n').length > 1 ? '...' : '') : value);
+					console.debug('[Catalog]', field, '=', typeof value, value ? value.length : '');
+					resolve(value);
+				} catch (error) {
+					reject(error);
+				}
 			}, 0);
 		});
 	}

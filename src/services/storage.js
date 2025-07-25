@@ -3,9 +3,10 @@ const path = require('node:path');
 const { Storage } = require('@google-cloud/storage');
 const config = require('../utils/config');
 const Profiler = require('../utils/Profiler');
-const storageConfig = config.get('storage');
 
-const TEMP_PATH = './temp/';
+// TODO get all config at invoke time to ensure runtime config is respected
+const storageConfig = config.get('storage');
+const tempPath = config.get('tempPath');
 
 const storage = new Storage();
 
@@ -43,7 +44,7 @@ async function downloadAll(prefix, destination) {
 }
 
 async function cache(file) {
-	const filePath = path.join(TEMP_PATH, file);
+	const filePath = path.join(tempPath, file);
 	await fs.mkdir(path.dirname(filePath), { recursive: true });
 	try {
 		await fs.access(filePath);

@@ -1,8 +1,8 @@
 {
 	"dev": {
 		"region": "europe-west1",
-		"project": "monks-copydesk",
-		"serviceAccount": "copydesk",
+		"project": "monks-plexus",
+		"serviceAccount": "plexus@monks-plexus.iam.gserviceaccount.com",
 		"env": [
 			"OPENAI_API_KEY",
 			"AZURE_TENANT_ID",
@@ -16,13 +16,14 @@
 				"minInstances": 1,
 				"cpus": 1,
 				"memory": "1GiB",
-				"entryPoint": "api"
+				"entryPoint": "api",
+				"timeout": 300
 			}
 		],
 		"apiGateway": {
-			"api": "copydesk-api",
-			"gateway": "copydesk-gateway",
-			"config": "copydesk-config"
+			"api": "plexus-api",
+			"gateway": "plexus-gateway",
+			"config": "plexus-config"
 		}
 	}
 }

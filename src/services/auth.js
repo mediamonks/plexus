@@ -17,4 +17,12 @@ function authenticate() {
 	return oauth2Client;
 }
 
+function _authenticate() {
+	return new google.auth.GoogleAuth({
+		scopes: ['https://www.googleapis.com/auth/drive'],
+		projectId: 'monks-mantra',
+		keyFilename: './auth/mantra.json'
+	});
+}
+
 module.exports = authenticate;
