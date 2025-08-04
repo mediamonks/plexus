@@ -62,8 +62,7 @@ async function query(query, {
 		});
 	}
 	
-	model ??= config.get('model') ?? vertexaiConfig.model;
-	config.set('model', model);
+	model ??= config.get('vertexai/model');
 	
 	const generativeModel = vertexAI.getGenerativeModel({ model });
 	
@@ -90,8 +89,7 @@ async function query(query, {
 }
 
 async function generateEmbeddings(text, model, taskType) {
-	model ??= config.get('embeddingModel') ?? vertexaiConfig.embeddingModel;
-	config.set('embeddingModel', model);
+	model ??= config.get('vertexai/embeddingModel');
 	
 	const endpoint = `projects/${project}/locations/${vertexaiConfig.embeddingLocation}/publishers/google/models/${model}`;
 	const instances = [aiplatform.helpers.toValue({ content: text, task_type: taskType })];

@@ -104,7 +104,8 @@ module.exports = class Agent {
 		for (const contextField of agentDefinitions[this._id].context) {
 			if (!catalogDefinition[contextField].dataSource) continue;
 			if (dataSources[catalogDefinition[contextField].dataSource].type.split(':')[1] !== 'files') continue;
-			files.push(...this._context[contextField]);
+			files.push(...this._context[contextField].map(file => file.source));
+			this._context[contextField] = this._context[contextField].map(file => file.name);
 		}
 		
 		console.debug(`[${this._displayName}]\n\n${this.systemInstructions}\n\n${JSON.stringify(this._context, undefined, 2)}`);

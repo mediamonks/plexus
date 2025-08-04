@@ -1,9 +1,9 @@
+const { v4: uuid } = require('uuid');
 const Catalog = require('./Catalog');
 const requestContext = require('../utils/request-context');
 const Profiler = require('../utils/Profiler');
 const firestore = require('../services/firestore');
 const History = require('../utils/History');
-const { v4: uuid } = require('uuid');
 const config = require('../utils/config');
 
 module.exports = async function invoke() {

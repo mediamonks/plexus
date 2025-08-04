@@ -5,10 +5,12 @@ const mime = require('mime-types');
 const workspace = require('./workspace');
 const config = require('../utils/config');
 const Profiler = require('../utils/Profiler');
+const { Readable } = require('stream');
 
 const tempPath = config.get('tempPath');
 // TODO download to sources/ directory just like gcs??
-const DOWNLOAD_PATH = path.resolve(tempPath, 'download/');
+const DOWNLOAD_PATH = path.join(tempPath, 'download', 'drive');
+const TEMP_FOLDER_ID = '1NXjp0lzXROd4fdDQdFgUrBHB0BE9tW9w';
 
 module.exports = auth => {
 	const drive = google.drive({ version: 'v3', auth });
@@ -16,7 +18,7 @@ module.exports = auth => {
 	async function createFile(name, folderId, mimeType, body, mediaMimeType) {
 		await workspace.quotaDelay(workspace.SERVICE.DRIVE, workspace.OPERATION.WRITE);
 		
-		const file = await drive.files.create({
+		const response = await drive.files.create({
 			resource: {
 				name,
 				parents: [folderId],
@@ -24,13 +26,18 @@ module.exports = auth => {
 			},
 			media: body && {
 				mimeType: mediaMimeType || mimeType,
-				body,
+				body: body instanceof Buffer ? new Readable({
+					read() {
+						this.push(body);
+						this.push(null);
+					}
+				}) : body,
 			},
 			fields: 'id, name, webViewLink, webContentLink',
 			supportsAllDrives: true
 		});
 		
-		return body ? file.data.webViewLink : file.data.id;
+		return response.data;
 	}
 	
 	async function uploadFile(filePath, folderId) {
@@ -78,7 +85,7 @@ module.exports = auth => {
 		return res.data.files[0]?.id;
 	}
 	
-	async function downloadFile(file) {
+	async function downloadFile(file, destPath) {
 		await workspace.quotaDelay();
 		
 		try {
@@ -87,8 +94,9 @@ module.exports = auth => {
 					{ responseType: 'stream' }
 			);
 			
-			fs.mkdirSync(DOWNLOAD_PATH, { recursive: true });
-			const destPath = path.join(DOWNLOAD_PATH, file.name);
+			destPath ??= path.join(DOWNLOAD_PATH, file.name);
+			fs.mkdirSync(path.dirname(destPath), { recursive: true });
+			
 			const writeStream = fs.createWriteStream(destPath, { encoding: null });
 			
 			await new Promise((resolve, reject) => {
@@ -121,6 +129,7 @@ module.exports = auth => {
 				pageToken
 			});
 			
+			// TODO rewrite following shortcuts so it doesn't rely on mimeType
 			for (const file of response.data.files) {
 				if (file.mimeType !== 'application/vnd.google-apps.shortcut') {
 					files.push(file);
@@ -161,7 +170,15 @@ module.exports = auth => {
 		return await Promise.all(files.map(file => exportFile(file, type)));
 	}
 	
-	async function importFile(file) {
+	async function importFile(file, allowCache) {
+		const newName = `imported-${file.id}`;
+		const cacheContents = await listFolderContents(TEMP_FOLDER_ID);
+		const existingFile = cacheContents.find(cacheFile => cacheFile.name === newName);
+		
+		if (allowCache) console.debug('[Drive] Import', file.name, 'cache', existingFile ? 'hit' : 'miss');
+		if (existingFile && allowCache) return existingFile;
+		if (existingFile) await deleteFile(existingFile.id);
+		
 		const conversionMap = {
 			'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'application/vnd.google-apps.spreadsheet',
 			'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'application/vnd.google-apps.document',
@@ -190,8 +207,8 @@ module.exports = auth => {
 		const buffer = Buffer.concat(chunks);
 		
 		const importedFile = await createFile(
-			`${file.name} (Imported)`,
-			file.parents[0],
+			newName,
+			TEMP_FOLDER_ID,
 			targetMimeType,
 			buffer,
 			file.mimeType,
@@ -203,8 +220,14 @@ module.exports = auth => {
 		};
 	}
 	
-	async function exportFile(file, type) {
-		const mimeType = mime.types[type];
+	async function exportFile(file, type, allowCache) {
+		const mimeType = mime.lookup(type);
+		
+		if (!mimeType) throw new Error(`Cannot export file type ${type}. Supported types: ${Object.keys(mime.types).join(', ')}`);
+		
+		const destPath = path.join(DOWNLOAD_PATH, `${file.id}.${type}`);
+		
+		if (allowCache && fs.existsSync(destPath)) return destPath;
 		
 		await workspace.quotaDelay();
 		
@@ -214,7 +237,7 @@ module.exports = auth => {
 		}, { responseType: 'stream' });
 		
 		fs.mkdirSync(DOWNLOAD_PATH, { recursive: true });
-		const destPath = path.join(DOWNLOAD_PATH, `${file.name.replace(/\W+/g, '_')}.${type}`);
+		
 		const writeStream = fs.createWriteStream(destPath);
 		
 		await new Promise((resolve, reject) => {
@@ -298,14 +321,22 @@ module.exports = auth => {
 	
 	// TODO abstract common file cache logic (see storage.js)
 	async function cacheFile(metadata) {
-		const filePath = path.join(DOWNLOAD_PATH, metadata.name);
-		fs.mkdirSync(path.dirname(filePath), { recursive: true });
+		const filePath = path.join(DOWNLOAD_PATH, `${metadata.id}.${mime.extension(metadata.mimeType)}`);
+		fs.mkdirSync(DOWNLOAD_PATH, { recursive: true });
 		try {
 			fs.accessSync(filePath);
 		} catch (error) {
-			await downloadFile(metadata);
+			await downloadFile(metadata, filePath);
 		}
 		return filePath;
+	}
+	
+	async function deleteFile(id) {
+		await workspace.quotaDelay(workspace.SERVICE.DRIVE, workspace.OPERATION.WRITE);
+		
+		await drive.files.delete({
+			fileId: id
+		});
 	}
 	
 	return {

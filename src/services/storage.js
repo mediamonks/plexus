@@ -35,7 +35,19 @@ async function list(prefix) {
 }
 
 async function download(file, destination) {
-	await storage.bucket(storageConfig.bucket).file(file).download({ destination });
+	let bucket;
+	
+	if (file.startsWith('gs://')) {
+		bucket = file.substring(5, file.indexOf('/', 5));
+		destination ??= path.join(tempPath, 'download', 'gcs', file.replace(/^gs:\/\//, ''));
+	} else {
+		bucket = storageConfig.bucket;
+		destination ??= path.join(tempPath, file);
+	}
+	
+	await fs.mkdir(path.dirname(destination), { recursive: true });
+	
+	await storage.bucket(bucket).file(file).download({ destination });
 }
 
 async function downloadAll(prefix, destination) {
@@ -44,19 +56,28 @@ async function downloadAll(prefix, destination) {
 }
 
 async function cache(file) {
-	const filePath = path.join(tempPath, file);
-	await fs.mkdir(path.dirname(filePath), { recursive: true });
-	try {
-		await fs.access(filePath);
-	} catch (error) {
-		await download(file, filePath);
+	let destination;
+	
+	if (file.startsWith('gs://')) {
+		destination = path.join('download', 'gcs', file.replace(/^gs:\/\//, ''));
+	} else {
+		destination = file;
 	}
-	return filePath;
+	
+	destination = path.join(tempPath, destination);
+	
+	try {
+		await fs.access(destination);
+	} catch (error) {
+		await download(file, destination);
+	}
+	
+	return destination;
 }
 
-async function cacheAll(prefix) {
+async function cacheAll(prefix, destination) {
 	const files = await list(prefix);
-	return Promise.all(files.map(file => cache(file.name)));
+	return Promise.all(files.map(file => cache(file.name, path.join(destination, file.name))));
 }
 
 async function isFolder(path) {

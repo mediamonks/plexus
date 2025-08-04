@@ -37,7 +37,6 @@
 		"open": "^10.1.2",
 		"openai": "^4.82.0",
 		"pdf-parse": "^1.1.1",
-		"swagger-jsdoc": "^6.2.8",
 		"turndown": "^7.2.0",
 		"uuid": "^11.1.0",
 		"xlsx": "^0.18.5"

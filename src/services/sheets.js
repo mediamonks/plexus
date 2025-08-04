@@ -183,16 +183,16 @@ module.exports = auth => {
 	
 	async function create(name, data, folderId) {
 		try {
-			const spreadsheetId = await drive.createFile(name, folderId, 'application/vnd.google-apps.spreadsheet');
+			const metadata = await drive.createFile(name, folderId, 'application/vnd.google-apps.spreadsheet');
 			
 			if (!data || !data.length) {
-				return spreadsheetId;
+				return metadata;
 			}
 			
 			await workspace.quotaDelay(workspace.SERVICE.SHEETS, workspace.OPERATION.WRITE);
 			
 			await sheets.spreadsheets.values.update({
-				spreadsheetId,
+				spreadsheetId: metadata.id,
 				range: `${TAB_NAME}!A1`,
 				valueInputOption: 'USER_ENTERED',
 				resource: {
@@ -200,7 +200,7 @@ module.exports = auth => {
 				}
 			});
 			
-			return spreadsheetId;
+			return metadata;
 		} catch (error) {
 			throw new Error(`Failed to create spreadsheet "${name}": ${error.message}`);
 		}
