@@ -13,7 +13,7 @@ const DOWNLOAD_PATH = path.resolve(tempPath, 'download/');
 module.exports = auth => {
 	const drive = google.drive({ version: 'v3', auth });
 	
-	async function createFile(name, folderId, mimeType, body) {
+	async function createFile(name, folderId, mimeType, body, mediaMimeType) {
 		await workspace.quotaDelay(workspace.SERVICE.DRIVE, workspace.OPERATION.WRITE);
 		
 		const file = await drive.files.create({
@@ -23,7 +23,7 @@ module.exports = auth => {
 				mimeType,
 			},
 			media: body && {
-				mimeType,
+				mimeType: mediaMimeType || mimeType,
 				body,
 			},
 			fields: 'id, name, webViewLink, webContentLink',
@@ -161,6 +161,48 @@ module.exports = auth => {
 		return await Promise.all(files.map(file => exportFile(file, type)));
 	}
 	
+	async function importFile(file) {
+		const conversionMap = {
+			'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'application/vnd.google-apps.spreadsheet',
+			'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'application/vnd.google-apps.document',
+			'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'application/vnd.google-apps.presentation',
+			'application/vnd.ms-excel': 'application/vnd.google-apps.spreadsheet',
+			'application/msword': 'application/vnd.google-apps.document',
+			'application/vnd.ms-powerpoint': 'application/vnd.google-apps.presentation',
+		};
+		
+		const targetMimeType = conversionMap[file.mimeType];
+		if (!targetMimeType) {
+			throw new Error(`Cannot import file type ${file.mimeType}. Supported types: ${Object.keys(conversionMap).join(', ')}`);
+		}
+		
+		await workspace.quotaDelay(workspace.SERVICE.DRIVE, workspace.OPERATION.WRITE);
+		
+		const fileContent = await drive.files.get({
+			fileId: file.id,
+			alt: 'media'
+		}, { responseType: 'stream' });
+		
+		const chunks = [];
+		for await (const chunk of fileContent.data) {
+			chunks.push(chunk);
+		}
+		const buffer = Buffer.concat(chunks);
+		
+		const importedFile = await createFile(
+			`${file.name} (Imported)`,
+			file.parents[0],
+			targetMimeType,
+			buffer,
+			file.mimeType,
+		);
+		
+		return {
+			...importedFile,
+			mimeType: targetMimeType
+		};
+	}
+	
 	async function exportFile(file, type) {
 		const mimeType = mime.types[type];
 		
@@ -184,7 +226,7 @@ module.exports = auth => {
 		
 		return destPath;
 	}
-
+	
 	async function createLink(targetId, folderId, name) {
 		if (!name) {
 			await workspace.quotaDelay();
@@ -281,5 +323,6 @@ module.exports = auth => {
 		isFolder,
 		getFileMetadata,
 		cacheFile,
+		importFile,
 	};
 }

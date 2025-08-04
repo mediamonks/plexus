@@ -68,8 +68,9 @@
 	},
 	"gap-identification": {
 		"context": [
-			"brief",
-			"additionalInfo"
+			"briefFiles",
+			"additionalInfo",
+			"now"
 		]
 	},
 	"gap-validation": {
@@ -90,8 +91,9 @@
 	},
 	"info-extraction": {
 		"context": [
-			"brief",
-			"additionalInfo"
+			"briefFiles",
+			"additionalInfo",
+			"now"
 		]
 	},
 	"deliverables-normalization": {
@@ -126,7 +128,6 @@
 			"quoteData",
 			"timelineData",
 			"additionalInfo",
-			"finalQuoteExample",
 			"startDate",
 			"endDate"
 		]

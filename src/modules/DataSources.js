@@ -16,6 +16,12 @@ const UnsupportedError = require('../utils/UnsupportedError');
 const xlsx = require('../utils/xlsx');
 const dataSources = require('../../config/data-sources.json');
 
+const LLM_SUPPORTED_MIME_TYPES = [
+	'application/pdf',
+	'text/plain',
+	'application/json',
+];
+
 // TODO improve error handling for non-existent Drive IDs and GCS paths
 
 async function sourceToSources({ source, platform, namespace, folder }) {
@@ -49,10 +55,19 @@ async function fileToText(file) {
 	return await getText[extension](file);
 }
 
+async function gdriveToFile(metadata, allowCache) {
+	if (LLM_SUPPORTED_MIME_TYPES.includes(metadata.mimeType))
+			return (allowCache ?? true ? drive.cacheFile(metadata) : drive.downloadFile(metadata));
+	
+	if (!metadata.mimeType.startsWith('application/vnd.google-apps.')) metadata = await drive.importFile(metadata);
+	
+	return drive.exportFile(metadata, 'pdf');
+}
+
 async function gdriveToText(metadata, allowCache) {
 	if (metadata.mimeType === 'application/vnd.google-apps.document') return await docs.getMarkdown(metadata.id);
 	
-	const file = await (allowCache ?? true ? drive.cacheFile(metadata) : drive.downloadFile(metadata));
+	const file = await gdriveToFile(metadata, allowCache);
 	
 	if (metadata.mimeType === 'application/pdf') return await pdf.getPdfText(file);
 	
@@ -62,7 +77,7 @@ async function gdriveToText(metadata, allowCache) {
 async function gdriveToData(metadata, allowCache) {
 	if (metadata.mimeType === 'application/vnd.google-apps.spreadsheet') return await sheets.getData(metadata.id);
 	
-	const file = await (allowCache ?? true ? drive.cacheFile(metadata) : drive.downloadFile(metadata));
+	const file = await gdriveToFile(metadata, allowCache);
 	
 	if (metadata.mimeType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') return await xlsx.getData(file);
 }
@@ -85,6 +100,12 @@ function detectDataType(platform, source) {
 	
 	if (platform === 'gcs') return TYPES.GCS[path.extname(source).substring(1)];
 	if (platform === 'drive') return TYPES.DRIVE[source.mimeType];
+}
+
+async function sourceToFile({ source, platform, cache }) {
+	if (platform === 'gcs') return source;
+	
+	return gdriveToFile(source, cache);
 }
 
 async function sourceToContent({ source, platform, dataType, cache }) {
@@ -192,7 +213,9 @@ module.exports = class DataSources {
 			}
 		}
 		
-		const contents = await Promise.all(
+		if (dataType === 'files') return await Promise.all(sources.map(source => sourceToFile({ source, platform, cache })));
+		
+		const contents = (await Promise.all(
 			sources.map(
 				async source => Profiler.run(() => sourceToContent({
 					source,
@@ -201,7 +224,7 @@ module.exports = class DataSources {
 					cache
 				}), `sourceToContent(${source.name ?? source})`)
 			)
-		);
+		)).filter(Boolean);
 		
 		return Profiler.run(() => contentsToTarget({ contents, dataType, target, instructions }), `contentsToTarget(${id})`);
 	}

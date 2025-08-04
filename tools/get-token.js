@@ -11,6 +11,7 @@
 	];
 	
 	async function authenticate() {
+		console.log('Requesting scopes:', SCOPES);
 		const credentials = JSON.parse(fs.readFileSync(CREDENTIALS_PATH).toString()).web;
 		const oauth2Client = new google.auth.OAuth2(
 				credentials.client_id,

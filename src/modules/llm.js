@@ -5,7 +5,7 @@ const platforms = {
 };
 const config = require('../utils/config');
 
-async function query(prompt, { systemInstructions, temperature, history, structuredResponse }) {
+async function query(prompt, { systemInstructions, temperature, history, structuredResponse, files }) {
 	const { platform, model } = config.get();
 	temperature ??= config.get('temperature');
 	
@@ -17,6 +17,7 @@ async function query(prompt, { systemInstructions, temperature, history, structu
 		history,
 		structuredResponse,
 		model,
+		files,
 	});
 }
 
