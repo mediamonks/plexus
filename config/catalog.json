@@ -193,7 +193,7 @@
 	"briefFiles": {
 		"type": "data",
 		"dataSource": "mantra-brief-files",
-		"example": "Any files related to the project brief."
+		"example": "List of files related to the project brief. (Contents sent separately.)"
 	},
 	"briefFolderId": {
 		"type": "input",

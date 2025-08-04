@@ -34,6 +34,7 @@ function merge(key, value1, value2) {
 }
 
 function get(name) {
+	//TODO this whole function needs refactoring based on all possible use-cases
 	const staticConfig = getStaticConfig();
 	const requestConfig = getRequestConfig();
 	
@@ -51,6 +52,8 @@ function get(name) {
 	}
 	
 	if (requestConfig[module]?.[key] !== undefined) return requestConfig[module]?.[key];
+	
+	if (staticConfig[module]?.[key] !== undefined) return staticConfig[module]?.[key];
 	
 	if (requestConfig[key] === undefined && staticConfig[module][key] === undefined)
 		return staticConfig[key];

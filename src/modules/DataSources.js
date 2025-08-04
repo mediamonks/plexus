@@ -55,13 +55,17 @@ async function fileToText(file) {
 	return await getText[extension](file);
 }
 
-async function gdriveToFile(metadata, allowCache) {
+async function gdriveToFile(metadata, allowCache, parentContents) {
+	// TODO not the right place for this default, should be in read function
+	allowCache = allowCache ?? true;
+	
 	if (LLM_SUPPORTED_MIME_TYPES.includes(metadata.mimeType))
-			return (allowCache ?? true ? drive.cacheFile(metadata) : drive.downloadFile(metadata));
+			return (allowCache ? drive.cacheFile(metadata) : drive.downloadFile(metadata));
 	
-	if (!metadata.mimeType.startsWith('application/vnd.google-apps.')) metadata = await drive.importFile(metadata);
+	if (!metadata.mimeType.startsWith('application/vnd.google-apps.'))
+			metadata = await drive.importFile(metadata, allowCache);
 	
-	return drive.exportFile(metadata, 'pdf');
+	return drive.exportFile(metadata, 'pdf', allowCache);
 }
 
 async function gdriveToText(metadata, allowCache) {
@@ -103,15 +107,15 @@ function detectDataType(platform, source) {
 }
 
 async function sourceToFile({ source, platform, cache }) {
-	if (platform === 'gcs') return source;
+	if (platform === 'gcs') return { name: path.basename(source), source };
 	
-	return gdriveToFile(source, cache);
+	return { name: source.name, source: await gdriveToFile(source, cache) };
 }
 
 async function sourceToContent({ source, platform, dataType, cache }) {
 	return await {
 		gcs: {
-			text: async path => fileToText(await storage.cache(path)),
+			text: async path => fileToText(await storage.cache(path)), // TODO respect cache flag?
 			data: async path => jsonl.read(await storage.cache(path)),
 		},
 		drive: {
@@ -189,7 +193,7 @@ module.exports = class DataSources {
 	}
 	
 	static async mapSource(source) {
-		if (source.startsWith(':')) return await this.catalog.get(source.substring(1));
+		if (source.startsWith(':')) return this.catalog.get(source.substring(1));
 		return source;
 	}
 	
