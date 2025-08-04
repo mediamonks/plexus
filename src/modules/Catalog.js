@@ -73,7 +73,7 @@ module.exports = class Catalog {
 		},
 		
 		//TODO rename to literal/verbatim/data...? it's not necessarily text
-		text: async ({ dataSource }) => {
+		data: async ({ dataSource }) => {
 			return DataSources.get(dataSource);
 		},
 	}

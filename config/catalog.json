@@ -35,7 +35,7 @@
 		]
 	},
 	"brandGuidelines": {
-		"type": "text",
+		"type": "data",
 		"dataSource": "whitelabel-styleguide",
 		"example": "Summary of key brand voice and style rules."
 	},
@@ -174,10 +174,26 @@
 		"field": "revisionNotes",
 		"example": "Summary of changes made to match the requested tone of voice, always in English."
 	},
+	"now": {
+		"type": "input",
+		"field": "now",
+		"example": "The current date and time.",
+		"required": true
+	},
 	"brief": {
-		"type": "text",
+		"type": "data",
 		"dataSource": "mantra-brief",
 		"example": "The text of the project brief."
+	},
+	"briefData": {
+		"type": "data",
+		"dataSource": "mantra-brief-data",
+		"example": "Any data related to the project brief."
+	},
+	"briefFiles": {
+		"type": "data",
+		"dataSource": "mantra-brief-files",
+		"example": "Any files related to the project brief."
 	},
 	"briefFolderId": {
 		"type": "input",
@@ -188,7 +204,9 @@
 	"additionalInfo": {
 		"type": "input",
 		"field": "additionalInfo",
-		"example": "Optional additional information about the brief and the project in general."
+		"example": [
+			"Optional additional information about the brief and the project in general."
+		]
 	},
 	"criticalProductionBlockers": {
 		"type": "output",
@@ -263,7 +281,7 @@
 		]
 	},
 	"rateCard": {
-		"type": "text",
+		"type": "data",
 		"dataSource": "mantra-ratecard",
 		"example": "The full rate card (asset types, tier definitions, rates)."
 	},
@@ -320,7 +338,7 @@
 		"required": true
 	},
 	"xinputDeliverables": {
-		"type": "text",
+		"type": "data",
 		"dataSource": "mantra-deliverables",
 		"example": "The list of deliverables."
 	},
@@ -336,13 +354,13 @@
 				"asset_name": "<provided asset name or label>",
 				"asset_type": "<One of the following values: 'TV Spot' (may also appear as 'spot', 'OLV', 'Social Video', or 'TVC'), 'Static Banner', 'Social Static – In Feed', 'Social Static – Story', 'HTML Banner', 'Print', 'Retouching' (use when brief says 'image update' or 'print update' and refers to changes like color correction, cleanup, or part replacement), 'Radio Spot', 'Audio', 'Standard Banner HTML', 'Rich Media Banner', 'Other'>",
 				"duration": "<Choose from: '6 seconds', '10 seconds', '15 seconds', '30 seconds', 'Other', 'Not relevant'>",
-				"creative_base": "<Classify as 'Adaptation of an existing visual' if the brief mentions reusing, resizing, adapting, or working from an existing asset, reference, or master file. Classify as 'New creative' if the brief calls for a new concept, design, or no reference to prior work. If unclear or not applicable, return 'Other'>",
+				"creative_base": "<Classify as 'Adaptation of an existing visual' if the brief mentions reusing, resizing, adapting, or working from an existing asset, reference, or master file. Classify as 'New creative' if the brief calls for a new concept, design, or no reference to prior work. If unclear or not applicable, use 'Other'>",
 				"changes_needed_on_creative_base": "<Modifications as stated in the brief. Example: 'Update product imagery and legal supers'>",
 				"asset_copy": "<Client provides final copy | Include exact copy | New copywriting requested | Not needed>",
-				"technical_specifications": "<Include exact dimensions, file formats, platform specs, safe zones, resolution, weight limits if provided. Else, use 'Not specified'>",
-				"channel": "<Choose from: 'YouTube', 'Instagram', 'Facebook', 'Snapchat', 'TikTok', 'Display Network', 'Print', 'Website', 'In-store', 'Other', 'Not specified'>",
-				"delivery_deadline": "<Format as 'YYYY-MM-DD' if exact date is given, or use 'TBD' or 'Not specified'>",
-				"target_audience": "<Verbatim from the brief, or 'Not specified'>",
+				"technical_specifications": "<Include exact dimensions, file formats, platform specs, safe zones, resolution, weight limits if provided>",
+				"channel": "<Choose from: 'YouTube', 'Instagram', 'Facebook', 'Snapchat', 'TikTok', 'Display Network', 'Print', 'Website', 'In-store', 'Other'>",
+				"delivery_deadline": "<Format as 'YYYY-MM-DD' if exact date is given>",
+				"target_audience": "<Verbatim target audience from the brief>",
 				"normalized_asset_type": "<the asset type as it occurs in the rate card>",
 				"normalization_reasoning": "<a justification for why normalized_asset_type was chosen to match asset_type>"
 			}
@@ -361,7 +379,7 @@
 		]
 	},
 	"historicalTimelines": {
-		"type": "text",
+		"type": "data",
 		"dataSource": "mantra-historical-timelines",
 		"example": "Historical timelines for this client for reference."
 	},
@@ -441,7 +459,7 @@
 		"required": true
 	},
 	"finalQuoteExample": {
-		"type": "text",
+		"type": "data",
 		"dataSource": "mantra-final-quote-example",
 		"example": "The final quote example."
 	},

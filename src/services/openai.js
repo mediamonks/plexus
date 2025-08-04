@@ -22,7 +22,10 @@ async function query(prompt, {
 	history = new History(),
 	structuredResponse = false,
 	model,
+	files,
 } = {}) {
+	if (files && files.length) throw new Error('OpenAI implementation does not yet support file uploads');
+	
 	const messages = [
 		...history.toOpenAi(),
 		{ role: 'user', content: prompt }

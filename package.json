@@ -12,7 +12,8 @@
 		"deploy:dev": "npm run deploy --env=dev",
 		"deploy:functions:dev": "npm run deploy:functions --env=dev",
 		"deploy:stg": "npm run deploy --env=stg",
-		"deploy:functions:stg": "npm run deploy:functions --env=stg"
+		"deploy:functions:stg": "npm run deploy:functions --env=stg",
+		"deploy:data:dev": "gsutil -m cp -r temp/system-instructions/* gs://monks-plexus/system-instructions"
 	},
 	"author": "",
 	"license": "ISC",

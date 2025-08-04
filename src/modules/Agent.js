@@ -6,6 +6,7 @@ const Profiler = require('../utils/Profiler');
 const requestContext = require('../utils/request-context');
 const agentDefinitions = require('../../config/agents.json');
 const catalogDefinition = require('../../config/catalog.json');
+const dataSources = require('../../config/data-sources.json');
 const inputOutputTemplate = require('node:fs')
 		.readFileSync('./data/input-output-template.txt', 'utf8')
 		.toString();
@@ -62,8 +63,10 @@ module.exports = class Agent {
 		const catalog = requestContext.get().catalog;
 		const promises = [];
 		
-		for (const contextField of context)
+		for (const contextField of context) {
+			this._context[contextField] = undefined;
 			promises.push(catalog.get(contextField).then(value => this._context[contextField] = value));
+		}
 		
 		if (typeof temperature === 'string')
 			promises.push(catalog.get(temperature).then(value => this._temperature = value));
@@ -96,12 +99,23 @@ module.exports = class Agent {
 		if (required) for (const requiredField of required)
 			if (this._context[requiredField] === undefined) return {};
 		
+		//TODO this is ugly
+		const files = [];
+		for (const contextField of agentDefinitions[this._id].context) {
+			if (!catalogDefinition[contextField].dataSource) continue;
+			if (dataSources[catalogDefinition[contextField].dataSource].type.split(':')[1] !== 'files') continue;
+			files.push(...this._context[contextField]);
+		}
+		
+		console.debug(`[${this._displayName}]\n\n${this.systemInstructions}\n\n${JSON.stringify(this._context, undefined, 2)}`);
+		
 		const response = await Profiler.run(async () =>
-				llm.query(JSON.stringify(this._context), {
+				llm.query(JSON.stringify(this._context, undefined, 2), {
 					systemInstructions: this.systemInstructions,
 					temperature: this._temperature,
 					history: useHistory && requestContext.get().history,
 					structuredResponse: true,
+					files,
 				}),
 			`${this.displayName} Agent - query`);
 		

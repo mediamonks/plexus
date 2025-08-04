@@ -6,6 +6,20 @@
 		"type": "text:raw",
 		"folder": true
 	},
+	"mantra-brief-data": {
+		"namespace": "mantra",
+		"platform": "drive",
+		"source": ":briefFolderId",
+		"type": "data:raw",
+		"folder": true
+	},
+	"mantra-brief-files": {
+		"namespace": "mantra",
+		"platform": "drive",
+		"source": ":briefFolderId",
+		"type": "files:files",
+		"folder": true
+	},
 	"mantra-ratecard": {
 		"namespace": "mantra",
 		"platform": "drive",
