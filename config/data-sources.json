@@ -64,7 +64,8 @@
 		"namespace": "mantra",
 		"platform": "drive",
 		"source": ":historicalTimelinesFolderId",
-		"type": "text:raw",
+		"type": "files:files",
+		"cache": true,
 		"folder": true
 	},
 	"mantra-quote": {
@@ -88,6 +89,13 @@
 		"platform": "drive",
 		"source": ":finalQuoteExampleId",
 		"type": "text:raw",
+		"folder": false
+	},
+	"mantra-ratecard-file": {
+		"namespace": "mantra",
+		"platform": "drive",
+		"source": ":ratecardId",
+		"type": "files:files",
 		"folder": false
 	}
 }

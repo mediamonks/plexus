@@ -206,6 +206,8 @@ module.exports = class DataSources {
 		
 		source = await this.mapSource(source);
 		
+		if (!source) return [];
+		
 		const sources = await Profiler.run(() => sourceToSources({ source, platform, namespace, folder }), `sourceToSources(${id})`);
 		
 		if (!sources.length) throw new Error(`Datasource "${id}" contains no files`);

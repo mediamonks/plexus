@@ -88,7 +88,7 @@ module.exports = class Catalog {
 			setTimeout(async () => {
 				try {
 					console.debug('[Catalog] Populating', fieldDefinition.type, 'field:', field);
-					const value = await populateFunction(fieldDefinition).catch(error => console.error(error));
+					const value = await populateFunction(fieldDefinition);
 					// console.debug('[Catalog]', field, '=', typeof value === 'string' ? value.split('\n')[0] + (value.split('\n').length > 1 ? '...' : '') : value);
 					console.debug('[Catalog]', field, '=', typeof value, value ? value.length : '');
 					resolve(value);
