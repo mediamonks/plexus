@@ -1,4 +1,29 @@
 {
+	"whitelabel-brandinfo": {
+		"namespace": "whitelabel",
+		"platform": "gcs",
+		"source": "brandinfo",
+		"type": "text:vector"
+	},
+	"whitelabel-styleguide": {
+		"namespace": "whitelabel",
+		"platform": "gcs",
+		"source": "styleguide",
+		"type": "text:digest",
+		"instructions": "styleguide-digest"
+	},
+	"whitelabel-examples": {
+		"namespace": "whitelabel",
+		"platform": "gcs",
+		"source": "examples",
+		"type": "data:raw"
+	},
+	"whitelabel-products": {
+		"namespace": "whitelabel",
+		"platform": "gcs",
+		"source": "products",
+		"type": "data:raw"
+	},
 	"mantra-brief": {
 		"namespace": "mantra",
 		"platform": "drive",
