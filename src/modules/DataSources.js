@@ -3,10 +3,9 @@ const path = require('node:path');
 const { RecursiveCharacterTextSplitter } = require('langchain/text_splitter');
 const llm = require('./llm');
 const vectordb = require('./vectordb');
-const auth = require('../services/auth')();
-const drive = require('../services/drive')(auth);
-const docs = require('../services/docs')(auth);
-const sheets = require('../services/sheets')(auth);
+const docs = require('../services/docs');
+const drive = require('../services/drive');
+const sheets = require('../services/sheets');
 const storage = require('../services/storage');
 const jsonl = require('../utils/jsonl');
 const pdf = require('../utils/pdf');
@@ -33,9 +32,10 @@ async function sourceToSources({ source, platform, namespace, folder }) {
 			return [path];
 		},
 		drive: async () => {
-			const isFolder = folder ?? await drive.isFolder(source);
-			if (isFolder) return drive.listFolderContents(source);
-			return [await drive.getFileMetadata(source)];
+			const driveClient = await drive();
+			const isFolder = folder ?? await driveClient.isFolder(source);
+			if (isFolder) return driveClient.listFolderContents(source);
+			return [await driveClient.getFileMetadata(source)];
 		}
 	};
 	
@@ -55,21 +55,23 @@ async function fileToText(file) {
 	return await getText[extension](file);
 }
 
-async function gdriveToFile(metadata, allowCache, parentContents) {
+async function gdriveToFile(metadata, allowCache) {
 	// TODO not the right place for this default, should be in read function
 	allowCache = allowCache ?? true;
 	
+	const driveClient = await drive();
+	
 	if (LLM_SUPPORTED_MIME_TYPES.includes(metadata.mimeType))
-			return (allowCache ? drive.cacheFile(metadata) : drive.downloadFile(metadata));
+			return (allowCache ? driveClient.cacheFile(metadata) : driveClient.downloadFile(metadata));
 	
 	if (!metadata.mimeType.startsWith('application/vnd.google-apps.'))
-			metadata = await drive.importFile(metadata, allowCache);
+			metadata = await driveClient.importFile(metadata, allowCache);
 	
-	return drive.exportFile(metadata, 'pdf', allowCache);
+	return driveClient.exportFile(metadata, 'pdf', allowCache);
 }
 
 async function gdriveToText(metadata, allowCache) {
-	if (metadata.mimeType === 'application/vnd.google-apps.document') return await docs.getMarkdown(metadata.id);
+	if (metadata.mimeType === 'application/vnd.google-apps.document') return await (await docs()).getMarkdown(metadata.id);
 	
 	const file = await gdriveToFile(metadata, allowCache);
 	
@@ -79,7 +81,7 @@ async function gdriveToText(metadata, allowCache) {
 }
 
 async function gdriveToData(metadata, allowCache) {
-	if (metadata.mimeType === 'application/vnd.google-apps.spreadsheet') return await sheets.getData(metadata.id);
+	if (metadata.mimeType === 'application/vnd.google-apps.spreadsheet') return await (await sheets()).getData(metadata.id);
 	
 	const file = await gdriveToFile(metadata, allowCache);
 	

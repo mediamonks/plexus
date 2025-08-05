@@ -27,8 +27,8 @@ async function invoke(body) {
 	
 	await invoke({
 		'config': { 'output': ['followUp', 'outputDeliverables', 'validatedCriticalProductionBlockers', 'validatedImportantClarifications', 'validatedBriefInconsistencies'] },
-		'briefFolderId': '1t9wbpfp6ENV_C9Uqett91eXKOK4VaoBE',
-		'outputFolderId': '1qoqqlQX29E4_za4JTdRX5P5uPZRQuPx4',
+		'briefFolderId': '1a2_DTNuBIfTFb8Spi6FnQWEt1abTzwgw',
+		'outputFolderId': '1ew_B-BlwD_bCytp9NiJ_VJ5qcYRCazAE',
 		'additionalInfo': [],
 		'now': '2025-07-30T09:52:23.637Z'
 	});

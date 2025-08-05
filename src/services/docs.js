@@ -1,7 +1,10 @@
 const { google } = require('googleapis');
 const TurndownService = require('turndown');
+const authenticate = require('./auth');
 
-module.exports = auth => {
+module.exports = async () => {
+	const auth = await authenticate();
+	
 	const docs = google.docs({ version: 'v1', auth });
 	const drive = google.drive({ version: 'v3', auth });
 	
