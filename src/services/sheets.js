@@ -1,13 +1,15 @@
 const { google } = require('googleapis');
+const authenticate = require('./auth');
 const workspace = require('./workspace');
 
 const TOTAL_SCORE_COLUMN_INDEX = 3;
 const TAB_NAME = 'Sheet1';
 const COLUMN_COUNT = 14;
 
-module.exports = auth => {
+module.exports = async () => {
+	const auth = await authenticate();
 	const sheets = google.sheets({ version: 'v4', auth });
-	const drive = require('./drive')(auth);
+	const drive = await require('./drive')();
 	
 	async function getRowCount(spreadsheetId) {
 		await workspace.quotaDelay(workspace.SERVICE.SHEETS);

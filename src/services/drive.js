@@ -2,6 +2,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { google } = require('googleapis');
 const mime = require('mime-types');
+const authenticate = require('./auth');
 const workspace = require('./workspace');
 const config = require('../utils/config');
 const Profiler = require('../utils/Profiler');
@@ -12,7 +13,8 @@ const tempPath = config.get('tempPath');
 const DOWNLOAD_PATH = path.join(tempPath, 'download', 'drive');
 const TEMP_FOLDER_ID = '1NXjp0lzXROd4fdDQdFgUrBHB0BE9tW9w';
 
-module.exports = auth => {
+module.exports = async () => {
+	const auth = await authenticate();
 	const drive = google.drive({ version: 'v3', auth });
 	
 	async function createFile(name, folderId, mimeType, body, mediaMimeType) {
