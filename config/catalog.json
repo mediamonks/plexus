@@ -280,7 +280,7 @@
 			}
 		]
 	},
-	"rateCard": {
+	"xratecardData": {
 		"type": "data",
 		"dataSource": "mantra-ratecard",
 		"example": "The full rate card (asset types, tier definitions, rates)."
@@ -289,6 +289,12 @@
 		"type": "input",
 		"field": "ratecardId",
 		"example": "The ID of the Google Drive file containing the rate card.",
+		"required": true
+	},
+	"ratecardData": {
+		"type": "input",
+		"field": "ratecardData",
+		"example": "The full rate card (asset types, tier definitions, rates).",
 		"required": true
 	},
 	"inputGaps": {

@@ -98,7 +98,7 @@
 	},
 	"deliverables-normalization": {
 		"context": [
-			"rateCard",
+			"ratecardData",
 			"inputDeliverables"
 		]
 	},
@@ -110,7 +110,7 @@
 	},
 	"quote-generation": {
 		"context": [
-			"rateCard",
+			"ratecardData",
 			"normalizedDeliverables",
 			"complexity",
 			"additionalInfo"
