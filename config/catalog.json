@@ -288,13 +288,17 @@
 	"ratecardId": {
 		"type": "input",
 		"field": "ratecardId",
-		"example": "The ID of the Google Drive file containing the rate card.",
-		"required": true
+		"example": "The ID of the Google Drive file containing the rate card."
+	},
+	"ratecardFile": {
+		"type": "data",
+		"dataSource": "mantra-ratecard-file",
+		"example": "Optional: The file containing the rate card. (Contents sent separately.)"
 	},
 	"ratecardData": {
 		"type": "input",
 		"field": "ratecardData",
-		"example": "The full rate card (asset types, tier definitions, rates).",
+		"example": "Optional: The full rate card (asset types, tier definitions, rates).",
 		"required": true
 	},
 	"inputGaps": {

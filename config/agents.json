@@ -98,8 +98,9 @@
 	},
 	"deliverables-normalization": {
 		"context": [
-			"ratecardData",
-			"inputDeliverables"
+			"inputDeliverables",
+			"ratecardFile",
+			"ratecardData"
 		]
 	},
 	"complexity-estimation": {
@@ -110,10 +111,11 @@
 	},
 	"quote-generation": {
 		"context": [
-			"ratecardData",
 			"normalizedDeliverables",
 			"complexity",
-			"additionalInfo"
+			"additionalInfo",
+			"ratecardFile",
+			"ratecardData"
 		]
 	},
 	"timeline-generation": {
