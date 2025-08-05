@@ -319,19 +319,20 @@
 		"field": "deliverables",
 		"example": [
 			{
-				"deliverable": "<asset type or description>",
-				"number": 1,
-				"client_name": "<client name>",
-				"asset_name": "<provided asset name or label>",
-				"asset_type": "<One of the following values: 'TV Spot' (may also appear as 'spot', 'OLV', 'Social Video', or 'TVC'), 'Static Banner', 'Social Static – In Feed', 'Social Static – Story', 'HTML Banner', 'Print', 'Retouching' (use when brief says 'image update' or 'print update' and refers to changes like color correction, cleanup, or part replacement), 'Radio Spot', 'Audio', 'Standard Banner HTML', 'Rich Media Banner', 'Other'>",
-				"duration": "<Choose from: '6 seconds', '10 seconds', '15 seconds', '30 seconds', 'Other', 'Not relevant'>",
-				"creative_base": "<Classify as 'Adaptation of an existing visual' if the brief mentions reusing, resizing, adapting, or working from an existing asset, reference, or master file. Classify as 'New creative' if the brief calls for a new concept, design, or no reference to prior work. If unclear or not applicable, return 'Other'>",
+				"deliverable": "a description of the type of deliverable",
+				"number": "the number of requested deliverables of this type, use a plain number, not a string",
+				"client_name": "the name of the client",
+				"asset_name": "provided asset name or label",
+				"asset_type": "one of the following values: 'TV Spot' (may also appear as 'spot', 'OLV', 'Social Video', or 'TVC'), 'Static Banner', 'Social Static', 'HTML Banner', 'Print', 'Retouching' (use when brief says 'image update' or 'print update' and refers to changes like color correction, cleanup, or part replacement), 'Radio Spot', 'Audio', 'Standard Banner HTML', 'Rich Media Banner', 'Other'>",
+				"placement": "the placement of the deliverable, e.g. 'In-Feed' or 'Story'",
+				"duration": "choose from: '6 seconds', '10 seconds', '15 seconds', '30 seconds', 'Other', or leave empty",
+				"creative_base": "classify as 'Adaptation of an existing visual' if the brief mentions reusing, resizing, adapting, or working from an existing asset, reference, or master file. Classify as 'New creative' if the brief calls for a new concept, design, or no reference to prior work. If unclear or not applicable, return 'Other'>",
 				"changes_needed_on_creative_base": "<Modifications as stated in the brief. Example: 'Update product imagery and legal supers'>",
-				"asset_copy": "<Client provides final copy | Include exact copy | New copywriting requested | Not needed>",
-				"technical_specifications": "<Include exact dimensions, file formats, platform specs, safe zones, resolution, weight limits if provided. Else, use 'Not specified'>",
-				"channel": "<Choose from: 'YouTube', 'Instagram', 'Facebook', 'Snapchat', 'TikTok', 'Display Network', 'Print', 'Website', 'In-store', 'Other', 'Not specified'>",
-				"delivery_deadline": "<Format as 'YYYY-MM-DD' if exact date is given, or use 'TBD' or 'Not specified'>",
-				"target_audience": "<Verbatim from the brief, or 'Not specified'>"
+				"asset_copy": "one of: 'Client provides final copy', 'Include exact copy', 'New copywriting requested', 'Not needed', or leave empty if not specified",
+				"technical_specifications": "include exact dimensions, file formats, platform specs, safe zones, resolution, weight limits if provided. leave empty if not specified",
+				"channel": "choose from: 'YouTube', 'Instagram', 'Facebook', 'Snapchat', 'TikTok', 'Display Network', 'Print', 'Website', 'In-store', 'Other', or leave empty if not specified",
+				"delivery_deadline": "format as 'YYYY-MM-DD' if exact date is given, or leave empty if not specified",
+				"target_audience": "verbatim from the brief, or leave empty if not specified"
 			}
 		]
 	},
