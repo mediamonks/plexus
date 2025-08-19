@@ -11,7 +11,7 @@ const { Readable } = require('stream');
 const tempPath = config.get('tempPath');
 // TODO download to sources/ directory just like gcs??
 const DOWNLOAD_PATH = path.join(tempPath, 'download', 'drive');
-const TEMP_FOLDER_ID = '1NXjp0lzXROd4fdDQdFgUrBHB0BE9tW9w';
+const TEMP_FOLDER_ID = '1GAohqXcRbIyu-Nk86GQxfRBAKAJtq_6y';
 
 module.exports = async () => {
 	const auth = await authenticate();
