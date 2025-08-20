@@ -1,5 +1,5 @@
 const { v4: uuid } = require('uuid');
-const Catalog = require('./Catalog');
+const Catalog = require('../entities/catalog/Catalog');
 const requestContext = require('../utils/request-context');
 const Profiler = require('../utils/Profiler');
 const firestore = require('../services/firestore');
@@ -27,7 +27,7 @@ module.exports = async function invoke() {
 	const result = {};
 	try {
 		if (output) await Promise.all(output.map(outputField =>
-			catalog.get(outputField)
+			catalog.get(outputField).getValue()
 				.then(value => result[outputField] = value)
 		));
 	} catch (error) {

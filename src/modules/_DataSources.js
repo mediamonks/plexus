@@ -6,20 +6,22 @@ const vectordb = require('./vectordb');
 const docs = require('../services/docs');
 const drive = require('../services/drive');
 const sheets = require('../services/sheets');
-const storage = require('../services/storage');
+const storage = require('../services/gcs');
+const config = require('../utils/config');
 const jsonl = require('../utils/jsonl');
 const pdf = require('../utils/pdf');
 const Profiler = require('../utils/Profiler');
 const requestContext = require('../utils/request-context');
+const UnknownError = require('../utils/UnknownError');
 const UnsupportedError = require('../utils/UnsupportedError');
 const xlsx = require('../utils/xlsx');
-const dataSources = require('../../config/data-sources.json');
 const status = require('../utils/status');
 
 const LLM_SUPPORTED_MIME_TYPES = [
 	'application/pdf',
 	'text/plain',
 	'application/json',
+	'image/png',
 ];
 
 // TODO improve error handling for non-existent Drive IDs and GCS paths
@@ -51,14 +53,9 @@ function resolveUri(dataSource) {
 		}
 	};
 	
-	const patterns = {
-		drive: /^https?:\/\/(?:drive|docs)\.google\.com\/(?:drive\/(folders)|(?:file|document|spreadsheets|presentation)\/d)\/([\w\-]+)/,
-		gcs: /^gs:\/\//
-	};
-	
 	const platform = Object.keys(platforms).find(platform => platforms[platform].pattern.test(uri));
 	
-	if (!platform) throw new UnsupportedError('data source URI', uri, patterns);
+	if (!platform) throw new UnsupportedError('data source URI', uri, platforms);
 	
 	const source = platforms[platform].source(uri);
 	
@@ -254,8 +251,12 @@ module.exports = class DataSources {
 	}
 	
 	static async read(id) {
+		const dataSources = config.get('data-sources');
 		let dataSource = dataSources[id];
-		let { source, platform, type, instructions, cache } = dataSources[id];
+		
+		if (!dataSource) throw new UnknownError('data source', id, dataSources);
+		
+		let { platform, type, instructions, cache } = dataSources[id];
 		
 		let [ dataType, target ] = type.split(':');
 		
@@ -293,6 +294,10 @@ module.exports = class DataSources {
 	}
 	
 	static async write(id, data) {
+		const dataSources = config.get('data-sources');
+		
+		if (!dataSources[id]) throw new UnknownError('data source', id, dataSources);
+		
 		const { type } = dataSources[id];
 		
 		// TODO account for ":raw" etc, detected input type
@@ -320,7 +325,11 @@ module.exports = class DataSources {
 	
 	static async get(id) {
 		// TODO prevent double reads / race conditions by caching read promise
+		const dataSources = config.get('data-sources');
 		const dataSource = dataSources[id];
+		
+		if (!dataSource) throw new UnknownError('data source', id, dataSources);
+		
 		const { type } = dataSource;
 		
 		if (isDynamicSource(dataSource)) return status.wrap(`Reading data source ${id}`, () => this.read(id));

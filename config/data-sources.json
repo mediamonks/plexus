@@ -40,44 +40,51 @@
 	},
 	"mantra-brief-files": {
 		"namespace": "mantra",
+		"platform": "drive",
 		"uri": "{briefFolderUri}",
-		"type": "files:files",
+		"type": "data:files",
 		"cache": false
 	},
 	"mantra-ratecard": {
 		"namespace": "mantra",
+		"platform": "drive",
 		"uri": "{ratecardUri}",
 		"type": ":raw",
 		"cache": true
 	},
 	"mantra-deliverables": {
 		"namespace": "mantra",
+		"platform": "drive",
 		"uri": "{deliverablesUri}",
 		"type": "data:raw",
 		"cache": false
 	},
 	"mantra-historical-timelines": {
 		"namespace": "mantra",
+		"platform": "drive",
 		"uri": "{historicalTimelinesFolderUri}",
-		"type": "files:files",
+		"type": "data:files",
 		"cache": true
 	},
 	"mantra-quote": {
 		"namespace": "mantra",
+		"platform": "drive",
 		"uri": "{quoteUri}",
 		"type": "text:raw",
 		"cache": false
 	},
 	"mantra-timeline": {
 		"namespace": "mantra",
+		"platform": "drive",
 		"uri": "{timelineUri}",
 		"type": "text:raw",
 		"cache": false
 	},
 	"mantra-ratecard-file": {
 		"namespace": "mantra",
+		"platform": "drive",
 		"uri": "{ratecardUri}",
-		"type": "files:files",
+		"type": "data:files",
 		"cache": true
 	}
 }
