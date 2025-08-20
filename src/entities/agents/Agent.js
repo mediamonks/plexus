@@ -1,36 +1,49 @@
-const fs = require('node:fs/promises');
-const llm = require('./llm');
-const storage = require('../services/storage');
-const Debug = require('../utils/Debug');
-const Profiler = require('../utils/Profiler');
-const requestContext = require('../utils/request-context');
-const status = require('../utils/status');
-const agentDefinitions = require('../../config/agents.json');
-const catalogDefinition = require('../../config/catalog.json');
-const dataSources = require('../../config/data-sources.json');
+const { default: Storage, STORAGE_FILE_DATA_TYPE } = require('../storage/Storage');
+const llm = require('../../modules/llm');
+const config = require('../../utils/config');
+const Debug = require('../../utils/Debug');
+const Profiler = require('../../utils/Profiler');
+const requestContext = require('../../utils/request-context');
+const status = require('../../utils/status');
+const UnknownError = require('../../utils/UnknownError');
+
 const inputOutputTemplate = require('node:fs')
 		.readFileSync('./data/input-output-template.txt', 'utf8')
 		.toString();
 
 module.exports = class Agent {
 	isReady = false;
-	_displayName;
+	_configuration;
 	_context = {};
-	_ready;
+	_displayName;
 	_invocation;
+	_ready;
 	_systemInstructions;
 	_temperature = 0;
 
 	constructor(id) {
 		this._id = id;
-
-		console.debug('[Agent] Creating', this.displayName);
 		
 		this._ready = this.prepare();
 	}
 	
+	get id() {
+		return this._id;
+	}
+	
+	get configuration() {
+		if (!this._configuration) {
+			const agentsConfig = config.get('agents');
+			const configuration = agentsConfig[this.id];
+			if (!configuration) throw new UnknownError('agent', this.id, agentsConfig);
+			this._configuration = configuration;
+		}
+		
+		return this._configuration;
+	}
+	
 	get displayName() {
-		this._displayName ??= this._id
+		this._displayName ??= this.id
 				.split(/[-_\s]+/)
 				.map(word => word.charAt(0).toUpperCase() + word.slice(1))
 				.join('');
@@ -39,15 +52,18 @@ module.exports = class Agent {
 	}
 	
 	get systemInstructionsName() {
-		return this._id;
+		return this.id;
 	}
 	
+	// TODO remove dependency on catalogDefinition
 	get systemInstructions() {
-		const inputDescription = agentDefinitions[this._id].context
-				.reduce((result, key) => ({ ...result, [key]: catalogDefinition[key].example }), {});
-		const outputDescription = Object.keys(catalogDefinition)
-				.filter(key => catalogDefinition[key].type === 'output' && catalogDefinition[key].agent === this._id)
-				.reduce((result, key) => ({ ...result, [catalogDefinition[key].field]: catalogDefinition[key].example }), {});
+		const catalogConfig = this.catalog.configuration;
+		
+		const inputDescription = this.configuration.context
+				.reduce((result, key) => ({ ...result, [key]: catalogConfig[key].example }), {});
+		const outputDescription = Object.keys(catalogConfig)
+				.filter(key => catalogConfig[key].type === 'output' && catalogConfig[key].agent === this._id)
+				.reduce((result, key) => ({ ...result, [catalogConfig[key].field]: catalogConfig[key].example }), {});
 		const inputOutput = inputOutputTemplate
 				.replace(/\{input}/, JSON.stringify(inputDescription, undefined, 2))
 				.replace(/\{output}/, JSON.stringify(outputDescription, undefined, 2));
@@ -55,30 +71,30 @@ module.exports = class Agent {
 		return [this._systemInstructions, inputOutput].join('');
 	}
 	
+	get catalog() {
+		return requestContext.get().catalog;
+	}
+	
 	async prepare() {
-		if (!agentDefinitions[this._id]) throw new Error(`Unknown agent "${this._id}". Must be one of: ${Object.keys(agentDefinitions).join(', ')}`);
-		
 		console.debug('[Agent] Preparing', this.displayName);
 		
-		const { context, temperature } = agentDefinitions[this._id];
-		const catalog = requestContext.get().catalog;
+		const { context, temperature } = this.configuration;
 		const promises = [];
 		
 		for (const contextField of context) {
 			this._context[contextField] = undefined;
-			promises.push(catalog.get(contextField).then(value => this._context[contextField] = value));
+			promises.push(this.catalog.get(contextField).getValue().then(value => this._context[contextField] = value));
 		}
 		
 		if (typeof temperature === 'string')
-			promises.push(catalog.get(temperature).then(value => this._temperature = value));
+			promises.push(this.catalog.get(temperature).getValue().then(value => this._temperature = value));
 		else
 			this._temperature = temperature;
 		
 		if (!this._systemInstructions) {
 			promises.push(
-				storage.cache(`system-instructions/${this.systemInstructionsName}-agent.txt`)
-					.then(path => fs.readFile(path))
-					.then(buffer => this._systemInstructions = buffer.toString())
+				Storage.get(STORAGE_FILE_DATA_TYPE.TEXT, `system-instructions/${this.systemInstructionsName}-agent`).read()
+					.then(text => this._systemInstructions = text)
 					.catch(() => {
 						throw new Error(`Missing system instructions for agent "${this._id}"`)
 					}),
@@ -93,7 +109,7 @@ module.exports = class Agent {
 	}
 	
 	async _invoke() {
-		let { required, useHistory } = agentDefinitions[this._id];
+		const { required, useHistory, context } = this.configuration;
 		
 		await this._ready;
 		
@@ -101,10 +117,12 @@ module.exports = class Agent {
 			if (this._context[requiredField] === undefined) return {};
 		
 		//TODO this is ugly
+		const catalogConfig = this.catalog.configuration;
+		const dataSources = config.get('data-sources');
 		const files = [];
-		for (const contextField of agentDefinitions[this._id].context) {
-			if (!catalogDefinition[contextField].dataSource) continue;
-			if (dataSources[catalogDefinition[contextField].dataSource].type.split(':')[1] !== 'files') continue;
+		for (const contextField of context) {
+			if (!catalogConfig[contextField].dataSource) continue;
+			if (dataSources[catalogConfig[contextField].dataSource].type.split(':')[1] !== 'files') continue;
 			files.push(...this._context[contextField].map(file => file.source));
 			this._context[contextField] = this._context[contextField].map(file => file.name);
 		}

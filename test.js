@@ -42,6 +42,58 @@ async function invoke(body) {
 	
 	// await invoke({
 	// 	"config": {
+	// 		"data-sources": {
+	// 			"sow-files": {
+	// 				"namespace": "sow",
+	// 				"platform": "drive",
+	// 				"source": ":sowFolderId",
+	// 				"type": "files:files",
+	// 				"folder": true
+	// 			}
+	// 		},
+	// 		"catalog": {
+	// 			"sowFolderId": {
+	// 				"type": "input",
+	// 				"field": "folderId",
+	// 				"required": true
+	// 			},
+	// 			"sowFiles": {
+	// 				"type": "data",
+	// 				"dataSource": "sow-files",
+	// 				"example": "List of SOW documents. (Contents sent separately.)"
+	// 			},
+	// 			"sowOutput": {
+	// 				"type": "output",
+	// 				"agent": "sow-scanner",
+	// 				"field": "data",
+	// 				"example": [
+	// 					{
+	// 						"title": "The title of the SOW.",
+	// 						"hours": {
+	// 							"2025-06": 400,
+	// 							"2025-07": 600,
+	// 							"2025-08": 80
+	// 						}
+	// 					}
+	// 				]
+	// 			}
+	// 		},
+	// 		"agents": {
+	// 			"sow-scanner": {
+	// 				"context": [
+	// 					"sowFiles"
+	// 				]
+	// 			}
+	// 		},
+	// 		"output": [
+	// 			"sowOutput",
+	// 		]
+	// 	},
+	// 	"folderId": "1CUowR3FChC-Q7AJFJWTlIxNkRoeNxWti",
+	// });
+	
+	// await invoke({
+	// 	"config": {
 	// 		"output": [
 	// 			"outputQuote",
 	// 			"outputTimeline"

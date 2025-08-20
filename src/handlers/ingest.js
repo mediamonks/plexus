@@ -1,1 +1,1 @@
-module.exports = async (_, { namespace }) => require('../services/tasks').delegate('ingest.ingestAll', [namespace]);
+module.exports = async (_, { namespace }) => require('../services/tasks').delegate('ingest', [namespace]);

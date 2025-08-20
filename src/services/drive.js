@@ -206,7 +206,7 @@ module.exports = async () => {
 		for await (const chunk of fileContent.data) {
 			chunks.push(chunk);
 		}
-		const buffer = Buffer.concat(chunks);
+		const buffer = Buffer.concat(chunks); // TODO use fileContent.data directly?
 		
 		const importedFile = await createFile(
 			newName,
@@ -233,10 +233,15 @@ module.exports = async () => {
 		
 		await workspace.quotaDelay();
 		
-		const fileStream = await drive.files.export({
-			fileId: file.id,
-			mimeType,
-		}, { responseType: 'stream' });
+		let fileStream;
+		try {
+			fileStream = await drive.files.export({
+				fileId: file.id,
+				mimeType,
+			}, { responseType: 'stream' });
+		} catch (error) {
+			throw new Error(`Error exporting file "${file.name}": ${error.message}`);
+		}
 		
 		fs.mkdirSync(DOWNLOAD_PATH, { recursive: true });
 		
@@ -321,7 +326,7 @@ module.exports = async () => {
 		return response.data;
 	}
 	
-	// TODO abstract common file cache logic (see storage.js)
+	// TODO abstract common file cache logic (see gcs.js)
 	async function cacheFile(metadata) {
 		const filePath = path.join(DOWNLOAD_PATH, `${metadata.id}.${mime.extension(metadata.mimeType)}`);
 		fs.mkdirSync(DOWNLOAD_PATH, { recursive: true });
