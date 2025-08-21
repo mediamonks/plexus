@@ -14,6 +14,7 @@ const requestContext = require('../utils/request-context');
 const UnsupportedError = require('../utils/UnsupportedError');
 const xlsx = require('../utils/xlsx');
 const dataSources = require('../../config/data-sources.json');
+const status = require('../utils/status');
 
 const LLM_SUPPORTED_MIME_TYPES = [
 	'application/pdf',
@@ -23,8 +24,51 @@ const LLM_SUPPORTED_MIME_TYPES = [
 
 // TODO improve error handling for non-existent Drive IDs and GCS paths
 
+function isDynamicSource(dataSource) {
+	const { source, uri } = dataSource;
+	
+	if (!uri) return source.startsWith(':');
+	
+	const pattern = /\{\w+}/;
+	return pattern.test(uri);
+}
+
+function resolveUri(dataSource) {
+	let { uri, folder } = dataSource;
+	
+	if (!uri) return dataSource;
+	
+	const platforms = {
+		drive: {
+			pattern: /https?:\/\/(?:drive|docs)\.google\.com\/(?:drive\/(folders)|(?:file|document|spreadsheets|presentation)\/d)\/([\w\-]+)/,
+			source: uri => platforms.drive.pattern.exec(uri)[2],
+			isFolder: uri => platforms.drive.pattern.exec(uri)[1] === 'folders',
+		},
+		gcs: {
+			pattern: /^gs:\/\//,
+			source: uri => uri,
+			isFolder: () => undefined,
+		}
+	};
+	
+	const patterns = {
+		drive: /^https?:\/\/(?:drive|docs)\.google\.com\/(?:drive\/(folders)|(?:file|document|spreadsheets|presentation)\/d)\/([\w\-]+)/,
+		gcs: /^gs:\/\//
+	};
+	
+	const platform = Object.keys(platforms).find(platform => platforms[platform].pattern.test(uri));
+	
+	if (!platform) throw new UnsupportedError('data source URI', uri, patterns);
+	
+	const source = platforms[platform].source(uri);
+	
+	folder ??= platforms[platform].isFolder(uri);
+	
+	return { ...dataSource, platform, source, folder };
+}
+
 async function sourceToSources({ source, platform, namespace, folder }) {
-	const mapping = {
+	return {
 		gcs: async () => {
 			const path = `sources/${namespace}/${source}`;
 			const isFolder = folder ?? await storage.isFolder(path);
@@ -37,9 +81,7 @@ async function sourceToSources({ source, platform, namespace, folder }) {
 			if (isFolder) return driveClient.listFolderContents(source);
 			return [await driveClient.getFileMetadata(source)];
 		}
-	};
-	
-	return mapping[platform]();
+	}[platform]();
 }
 
 async function fileToText(file) {
@@ -194,21 +236,34 @@ module.exports = class DataSources {
 		return requestContext.get().catalog;
 	}
 	
-	static async mapSource(source) {
-		if (source.startsWith(':')) return this.catalog.get(source.substring(1));
-		return source;
+	static async resolveSource(dataSource) {
+		let { source, uri } = dataSource;
+		
+		if (!isDynamicSource(dataSource)) return dataSource;
+		
+		if (!uri) return { ...dataSource, source: await this.catalog.get(source.substring(1)) };
+		
+		const pattern = /\{\w+}/g;
+		const matches = uri.match(pattern);
+		await Promise.all(matches.map(async match => {
+			const key = match.substring(1, match.length - 1);
+			uri = uri.replace(match, await this.catalog.get(key));
+		}));
+		
+		return { ...dataSource, uri };
 	}
 	
 	static async read(id) {
-		let { namespace, source, platform, type, instructions, folder, cache } = dataSources[id];
+		let dataSource = dataSources[id];
+		let { source, platform, type, instructions, cache } = dataSources[id];
 		
 		let [ dataType, target ] = type.split(':');
 		
-		source = await this.mapSource(source);
+		dataSource = await this.resolveSource(dataSource);
 		
-		if (!source) return [];
+		dataSource = resolveUri(dataSource);
 		
-		const sources = await Profiler.run(() => sourceToSources({ source, platform, namespace, folder }), `sourceToSources(${id})`);
+		const sources = await Profiler.run(() => sourceToSources(dataSource), `sourceToSources(${id})`);
 		
 		if (!sources.length) throw new Error(`Datasource "${id}" contains no files`);
 		
@@ -265,9 +320,10 @@ module.exports = class DataSources {
 	
 	static async get(id) {
 		// TODO prevent double reads / race conditions by caching read promise
-		const { source, type } = dataSources[id];
+		const dataSource = dataSources[id];
+		const { type } = dataSource;
 		
-		if (source.startsWith(':')) return this.read(id);
+		if (isDynamicSource(dataSource)) return status.wrap(`Reading data source ${id}`, () => this.read(id));
 		
 		const mapping = {
 			text: async () => {

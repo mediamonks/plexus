@@ -40,62 +40,44 @@
 	},
 	"mantra-brief-files": {
 		"namespace": "mantra",
-		"platform": "drive",
-		"source": ":briefFolderId",
+		"uri": "{briefFolderUri}",
 		"type": "files:files",
-		"folder": true
+		"cache": false
 	},
 	"mantra-ratecard": {
 		"namespace": "mantra",
-		"platform": "drive",
-		"source": ":ratecardId",
+		"uri": "{ratecardUri}",
 		"type": ":raw",
-		"folder": false
+		"cache": true
 	},
 	"mantra-deliverables": {
 		"namespace": "mantra",
-		"platform": "drive",
-		"source": ":deliverablesId",
+		"uri": "{deliverablesUri}",
 		"type": "data:raw",
-		"cache": false,
-		"folder": false
+		"cache": false
 	},
 	"mantra-historical-timelines": {
 		"namespace": "mantra",
-		"platform": "drive",
-		"source": ":historicalTimelinesFolderId",
+		"uri": "{historicalTimelinesFolderUri}",
 		"type": "files:files",
-		"cache": true,
-		"folder": true
+		"cache": true
 	},
 	"mantra-quote": {
 		"namespace": "mantra",
-		"platform": "drive",
-		"source": ":quoteId",
+		"uri": "{quoteUri}",
 		"type": "text:raw",
-		"cache": false,
-		"folder": false
+		"cache": false
 	},
 	"mantra-timeline": {
 		"namespace": "mantra",
-		"platform": "drive",
-		"source": ":timelineId",
+		"uri": "{timelineUri}",
 		"type": "text:raw",
-		"cache": false,
-		"folder": false
-	},
-	"mantra-final-quote-example": {
-		"namespace": "mantra",
-		"platform": "drive",
-		"source": ":finalQuoteExampleId",
-		"type": "text:raw",
-		"folder": false
+		"cache": false
 	},
 	"mantra-ratecard-file": {
 		"namespace": "mantra",
-		"platform": "drive",
-		"source": ":ratecardId",
+		"uri": "{ratecardUri}",
 		"type": "files:files",
-		"folder": false
+		"cache": true
 	}
 }
