@@ -4,6 +4,7 @@ const storage = require('../services/storage');
 const Debug = require('../utils/Debug');
 const Profiler = require('../utils/Profiler');
 const requestContext = require('../utils/request-context');
+const status = require('../utils/status');
 const agentDefinitions = require('../../config/agents.json');
 const catalogDefinition = require('../../config/catalog.json');
 const dataSources = require('../../config/data-sources.json');
@@ -108,9 +109,10 @@ module.exports = class Agent {
 			this._context[contextField] = this._context[contextField].map(file => file.name);
 		}
 		
-		console.debug(`[${this._displayName}]\n\n${this.systemInstructions}\n\n${JSON.stringify(this._context, undefined, 2)}`);
+		// console.debug(`[${this._displayName}]\n\n${this.systemInstructions}\n\n${JSON.stringify(this._context, undefined, 2)}`);
 		
-		const response = await Profiler.run(async () =>
+		const response = await status.wrap(`Running ${this.displayName} agent`, () =>
+			Profiler.run(() =>
 				llm.query(JSON.stringify(this._context, undefined, 2), {
 					systemInstructions: this.systemInstructions,
 					temperature: this._temperature,
@@ -118,7 +120,9 @@ module.exports = class Agent {
 					structuredResponse: true,
 					files,
 				}),
-			`${this.displayName} Agent - query`);
+				`${this.displayName} Agent - query`
+			)
+		);
 		
 		let output;
 		try {

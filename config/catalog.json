@@ -201,6 +201,12 @@
 		"example": "The ID of the Google Drive folder containing the project brief.",
 		"required": true
 	},
+	"briefFolderUri": {
+		"type": "input",
+		"field": "briefFolderUri",
+		"example": "The URI to the Google Drive folder containing the project brief.",
+		"required": true
+	},
 	"additionalInfo": {
 		"type": "input",
 		"field": "additionalInfo",
@@ -318,20 +324,20 @@
 		"field": "deliverables",
 		"example": [
 			{
-				"deliverable": "a description of the type of deliverable",
-				"number": "the number of requested deliverables of this type, use a plain number, not a string",
-				"client_name": "the name of the client",
-				"asset_name": "provided asset name or label",
-				"asset_type": "one of the following values: 'TV Spot' (may also appear as 'spot', 'OLV', 'Social Video', or 'TVC'), 'Static Banner', 'Social Static', 'HTML Banner', 'Print', 'Retouching' (use when brief says 'image update' or 'print update' and refers to changes like color correction, cleanup, or part replacement), 'Radio Spot', 'Audio', 'Standard Banner HTML', 'Rich Media Banner', 'Other'>",
-				"placement": "the placement of the deliverable, e.g. 'In-Feed' or 'Story'",
-				"duration": "choose from: '6 seconds', '10 seconds', '15 seconds', '30 seconds', 'Other', or leave empty",
-				"creative_base": "classify as 'Adaptation of an existing visual' if the brief mentions reusing, resizing, adapting, or working from an existing asset, reference, or master file. Classify as 'New creative' if the brief calls for a new concept, design, or no reference to prior work. If unclear or not applicable, return 'Other'>",
-				"changes_needed_on_creative_base": "<Modifications as stated in the brief. Example: 'Update product imagery and legal supers'>",
-				"asset_copy": "one of: 'Client provides final copy', 'Include exact copy', 'New copywriting requested', 'Not needed', or leave empty if not specified",
-				"technical_specifications": "include exact dimensions, file formats, platform specs, safe zones, resolution, weight limits if provided. leave empty if not specified",
-				"channel": "choose from: 'YouTube', 'Instagram', 'Facebook', 'Snapchat', 'TikTok', 'Display Network', 'Print', 'Website', 'In-store', 'Other', or leave empty if not specified",
-				"delivery_deadline": "format as 'YYYY-MM-DD' if exact date is given, or leave empty if not specified",
-				"target_audience": "verbatim from the brief, or leave empty if not specified"
+				"deliverable": "A description of the deliverable",
+				"number": "The number of requested deliverables of this type, use a plain number, not a string",
+				"client_name": "The name of the client",
+				"asset_name": "Provided asset name or label, leave blank if not provided",
+				"asset_type": "One of the following values: 'TV Spot' (may also appear as 'spot', 'OLV', 'Social Video', or 'TVC'), 'Static Banner', 'Social Static', 'HTML Banner', 'Print', 'Retouching' (use when brief says 'image update' or 'print update' and refers to changes like color correction, cleanup, or part replacement), 'Radio Spot', 'Audio', 'Standard Banner HTML', 'Rich Media Banner', 'Other'",
+				"placement": "The placement of the deliverable, e.g. 'In-Feed' or 'Story'",
+				"duration": "Choose from: '6 seconds', '10 seconds', '15 seconds', '30 seconds', 'Other', or leave empty",
+				"creative_base": "Classify as 'Adaptation of an existing visual' if the brief mentions reusing, resizing, adapting, or working from an existing asset, reference, or master file. Classify as 'New creative' if the brief calls for a new concept, design, or no reference to prior work. If unclear or not applicable, return 'Other'>",
+				"changes_needed_on_creative_base": "Modifications as stated in the brief. Example: 'Update product imagery and legal supers'",
+				"asset_copy": "One of: 'Client provides final copy', 'Include exact copy', 'New copywriting requested', 'Not needed', or leave empty if not specified",
+				"technical_specifications": "Include exact dimensions, file formats, platform specs, safe zones, resolution, weight limits if provided. leave empty if not specified",
+				"channel": "Choose from: 'YouTube', 'Instagram', 'Facebook', 'Snapchat', 'TikTok', 'Display Network', 'Print', 'Website', 'In-store', 'Other', or leave empty if not specified",
+				"delivery_deadline": "Format as 'YYYY-MM-DD' if exact date is given, or leave empty if not specified",
+				"target_audience": "Verbatim from the brief, or leave empty if not specified"
 			}
 		]
 	},
@@ -358,21 +364,22 @@
 		"field": "normalizedDeliverables",
 		"example": [
 			{
-				"deliverable": "<asset type or description>",
-				"number": 1,
-				"client_name": "<client name>",
-				"asset_name": "<provided asset name or label>",
-				"asset_type": "<One of the following values: 'TV Spot' (may also appear as 'spot', 'OLV', 'Social Video', or 'TVC'), 'Static Banner', 'Social Static – In Feed', 'Social Static – Story', 'HTML Banner', 'Print', 'Retouching' (use when brief says 'image update' or 'print update' and refers to changes like color correction, cleanup, or part replacement), 'Radio Spot', 'Audio', 'Standard Banner HTML', 'Rich Media Banner', 'Other'>",
-				"duration": "<Choose from: '6 seconds', '10 seconds', '15 seconds', '30 seconds', 'Other', 'Not relevant'>",
-				"creative_base": "<Classify as 'Adaptation of an existing visual' if the brief mentions reusing, resizing, adapting, or working from an existing asset, reference, or master file. Classify as 'New creative' if the brief calls for a new concept, design, or no reference to prior work. If unclear or not applicable, use 'Other'>",
-				"changes_needed_on_creative_base": "<Modifications as stated in the brief. Example: 'Update product imagery and legal supers'>",
-				"asset_copy": "<Client provides final copy | Include exact copy | New copywriting requested | Not needed>",
-				"technical_specifications": "<Include exact dimensions, file formats, platform specs, safe zones, resolution, weight limits if provided>",
-				"channel": "<Choose from: 'YouTube', 'Instagram', 'Facebook', 'Snapchat', 'TikTok', 'Display Network', 'Print', 'Website', 'In-store', 'Other'>",
-				"delivery_deadline": "<Format as 'YYYY-MM-DD' if exact date is given>",
-				"target_audience": "<Verbatim target audience from the brief>",
-				"normalized_asset_type": "<the asset type as it occurs in the rate card>",
-				"normalization_reasoning": "<a justification for why normalized_asset_type was chosen to match asset_type>"
+				"deliverable": "exactly as received",
+				"number": "exactly as received",
+				"client_name": "exactly as received",
+				"asset_name": "exactly as received",
+				"asset_type": "exactly as received",
+				"placement": "exactly as received",
+				"duration": "exactly as received",
+				"creative_base": "exactly as received",
+				"changes_needed_on_creative_base": "exactly as received",
+				"asset_copy": "exactly as received",
+				"technical_specifications": "exactly as received",
+				"channel": "exactly as received",
+				"delivery_deadline": "exactly as received",
+				"target_audience": "exactly as received",
+				"normalized_asset_type": "The asset type as it occurs in the rate card",
+				"normalization_reasoning": "A justification for why normalized_asset_type was chosen to match asset_type"
 			}
 		]
 	},
@@ -382,9 +389,23 @@
 		"field": "complexity",
 		"example": [
 			{
-				"Client name": "<client name>",
-				"Asset type": "<asset name and type>",
-				"Description": "<your natural-language explanation of complexity and effort required>"
+				"deliverable": "exactly as received",
+				"number": "exactly as received",
+				"client_name": "exactly as received",
+				"asset_name": "exactly as received",
+				"asset_type": "exactly as received",
+				"placement": "exactly as received",
+				"duration": "exactly as received",
+				"creative_base": "exactly as received",
+				"changes_needed_on_creative_base": "exactly as received",
+				"asset_copy": "exactly as received",
+				"technical_specifications": "exactly as received",
+				"channel": "exactly as received",
+				"delivery_deadline": "exactly as received",
+				"target_audience": "exactly as received",
+				"normalized_asset_type": "exactly as received",
+				"complexity_tier": "Very Simple | Simple | Medium | Complex | Other",
+				"complexity_reasoning": "A justification for why the chosen `complexity_tier` was selected"
 			}
 		]
 	},
@@ -405,23 +426,24 @@
 		"field": "quote",
 		"example": [
 			{
-				"deliverable": "<asset type or description>",
-				"number": 1,
-				"client_name": "<client name>",
-				"asset_name": "<provided asset name or label>",
-				"asset_type": "<One of the following values: 'TV Spot' (may also appear as 'spot', 'OLV', 'Social Video', or 'TVC'), 'Static Banner', 'Social Static – In Feed', 'Social Static – Story', 'HTML Banner', 'Print', 'Retouching' (use when brief says 'image update' or 'print update' and refers to changes like color correction, cleanup, or part replacement), 'Radio Spot', 'Audio', 'Standard Banner HTML', 'Rich Media Banner', 'Other'>",
-				"duration": "<Choose from: '6 seconds', '10 seconds', '15 seconds', '30 seconds', 'Other', 'Not relevant'>",
-				"creative_base": "<Classify as 'Adaptation of an existing visual' if the brief mentions reusing, resizing, adapting, or working from an existing asset, reference, or master file. Classify as 'New creative' if the brief calls for a new concept, design, or no reference to prior work. If unclear or not applicable, return 'Other'>",
-				"changes_needed_on_creative_base": "<Modifications as stated in the brief. Example: 'Update product imagery and legal supers'>",
-				"asset_copy": "<Client provides final copy | Include exact copy | New copywriting requested | Not needed>",
-				"technical_specifications": "<Include exact dimensions, file formats, platform specs, safe zones, resolution, weight limits if provided. Else, use 'Not specified'>",
-				"channel": "<Choose from: 'YouTube', 'Instagram', 'Facebook', 'Snapchat', 'TikTok', 'Display Network', 'Print', 'Website', 'In-store', 'Other', 'Not specified'>",
-				"delivery_deadline": "<Format as 'YYYY-MM-DD' if exact date is given, or use 'TBD' or 'Not specified'>",
-				"target_audience": "<Verbatim from the brief, or 'Not specified'>",
-				"normalized_asset_type": "<the asset type as it occurs in the rate card>",
-				"complexity_tier": "<Very Simple | Simple | Medium | Complex | Other>",
-				"complexity_reasoning": "<a justification for why the chosen `complexity_tier` was selected>",
-				"rate": 123
+				"deliverable": "exactly as received",
+				"number": "exactly as received",
+				"client_name": "exactly as received",
+				"asset_name": "exactly as received",
+				"asset_type": "exactly as received",
+				"placement": "exactly as received",
+				"duration": "exactly as received",
+				"creative_base": "exactly as received",
+				"changes_needed_on_creative_base": "exactly as received",
+				"asset_copy": "exactly as received",
+				"technical_specifications": "exactly as received",
+				"channel": "exactly as received",
+				"delivery_deadline": "exactly as received",
+				"target_audience": "exactly as received",
+				"normalized_asset_type": "exactly as received",
+				"complexity_tier": "exactly as received",
+				"complexity_reasoning": "exactly as received",
+				"rate": "The corresponding rate for the deliverable, based on the rate card and the number of assets. Use a plain number, not a string."
 			}
 		]
 	},
@@ -461,17 +483,6 @@
 		"field": "endDate",
 		"example": "The end date of the project.",
 		"required": true
-	},
-	"finalQuoteExampleId": {
-		"type": "input",
-		"field": "finalQuoteExampleId",
-		"example": "The ID of the Google Drive file containing the final quote example.",
-		"required": true
-	},
-	"finalQuoteExample": {
-		"type": "data",
-		"dataSource": "mantra-final-quote-example",
-		"example": "The final quote example."
 	},
 	"finalQuote": {
 		"type": "output",

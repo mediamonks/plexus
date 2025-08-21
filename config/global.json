@@ -4,5 +4,8 @@
 	"platform": "google",
 	"embeddingPlatform": "google",
 	"waitForThreadUpdate": false,
-	"tempPath": "./temp/"
+	"tempPath": "./temp/",
+	"postback": {
+		"url": "http://localhost:4321"
+	}
 }
