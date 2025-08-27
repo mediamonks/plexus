@@ -1,12 +1,13 @@
 const DataSourceBehavior = require('../DataSourceBehavior');
-const { default: Storage, STORAGE_FILE_DATA_TYPE } = require('../../storage/Storage');
+const Storage = require('../../storage/Storage');
+const StorageFile = require('../../storage/StorageFile');
 const llm = require('../../../modules/llm');
 
 class DigestDataSourceTarget extends DataSourceBehavior {
 	async read() {
 		const text = this.getContents().join('\n\n');
 		
-		const systemInstructions = await Storage.get(STORAGE_FILE_DATA_TYPE.TEXT, `system-instructions/${this.id}-digest`).read();
+		const systemInstructions = await Storage.get(StorageFile.TYPE.DIGEST_INSTRUCTIONS, this.id).read();
 		
 		return await llm.query(text, {
 			systemInstructions,
@@ -16,7 +17,7 @@ class DigestDataSourceTarget extends DataSourceBehavior {
 	
 	async ingest() {
 		const contents = await this.read();
-		return Storage.get(STORAGE_FILE_DATA_TYPE.TEXT, this.id).ingest(contents);
+		return Storage.get(StorageFile.TYPE.UNSTRUCTURED_DATA, this.id).ingest(contents);
 	}
 	
 	async query() {

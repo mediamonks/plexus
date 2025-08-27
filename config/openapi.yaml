@@ -1,0 +1,203 @@
+swagger: "2.0"
+info:
+  title: plexus
+  description: Plexus Agentic Engine
+  version: 1.1.0
+schemes:
+  - https
+produces:
+  - application/json
+x-google-backend:
+  address: https://europe-west1-monks-plexus.cloudfunctions.net/api
+  path_translation: APPEND_PATH_TO_ADDRESS
+  protocol: h2
+  deadline: 300
+  jwt_audience: https://europe-west1-monks-plexus.cloudfunctions.net/api
+paths:
+  /api/invoke:
+    post:
+      summary: Invokes an agentic pipeline
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              threadId:
+                type: string
+                description: The ID of the conversation thread to continue
+              config:
+                type: object
+                description: Runtime configuration overrides.
+      responses:
+        "200":
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                description: Error message if applicable, otherwise null.
+              threadId:
+                type: string
+                format: uuid
+                description: Unique identifier for the thread.
+      operationId: POST /invoke
+    options:
+      summary: CORS preflight for /invoke
+      responses:
+        "204":
+          $ref: "#/responses/corsPreflightResponse"
+      operationId: OPTIONS /invoke
+  /api/fields/{field}:
+    parameters:
+      - name: field
+        description: The name of the field
+        type: string
+        in: path
+        required: true
+    get:
+      summary: Retrieve Field Options
+      description: Returns available options for a given field
+      responses:
+        "200":
+          description: Successful response
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: Field ID
+                label:
+                  type: string
+                  description: Field label
+                description:
+                  type: string
+                  description: Field description
+      operationId: GET /fields/{field}
+    options:
+      summary: CORS preflight for /fields/{field}
+      responses:
+        "204":
+          $ref: "#/responses/corsPreflightResponse"
+      operationId: OPTIONS /fields/{field}
+  /api/thread/{threadId}:
+    parameters:
+      - name: threadId
+        description: The ID of the thread to retrieve
+        type: string
+        in: path
+        required: true
+    get:
+      summary: Retrieve Conversation Thread
+      description: Retrieves a thread containing its conversation history and input
+        and output of the last interaction
+      responses:
+        "200":
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              history:
+                type: array
+                description: The conversation history.
+              context:
+                type: object
+                description: Context used for last generation.
+              copy:
+                type: string
+                description: Output copy of last generation.
+      operationId: GET /thread/{threadId}
+    options:
+      summary: CORS preflight for /thread/{threadId}
+      responses:
+        "204":
+          $ref: "#/responses/corsPreflightResponse"
+      operationId: OPTIONS /thread/{threadId}
+  /api/ingest/{namespace}:
+    parameters:
+      - name: namespace
+        description: The namespace for which to ingest data
+        type: string
+        in: path
+        required: true
+    post:
+      summary: Ingest data sources
+      description: Ingest all static data sources for the given namespace
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              config:
+                type: object
+                description: Runtime configuration overrides.
+      responses:
+        "200":
+          description: Successful response
+      operationId: POST /ingest/{namespace}
+    options:
+      summary: CORS preflight for /ingest/{namespace}
+      responses:
+        "204":
+          $ref: "#/responses/corsPreflightResponse"
+      operationId: OPTIONS /ingest/{namespace}
+  /api/config:
+    get:
+      summary: Retrieve Default Config
+      description: Returns default configuration
+      responses:
+        "200":
+          description: Successful response
+          schema:
+            type: object
+      operationId: GET /config
+    options:
+      summary: CORS preflight for /config
+      responses:
+        "204":
+          $ref: "#/responses/corsPreflightResponse"
+      operationId: OPTIONS /config
+  /api:
+    get:
+      summary: The API definition
+      responses:
+        "200":
+          description: Successful response
+      operationId: "GET "
+    options:
+      summary: "CORS preflight for "
+      responses:
+        "204":
+          $ref: "#/responses/corsPreflightResponse"
+      operationId: "OPTIONS "
+responses:
+  corsPreflightResponse:
+    description: CORS preflight response
+    headers:
+      Access-Control-Allow-Origin:
+        type: string
+        description: Allowed origin for CORS
+      Access-Control-Allow-Methods:
+        type: string
+        description: Allowed methods for CORS
+      Access-Control-Allow-Headers:
+        type: string
+        description: Allowed headers for CORS
+      Access-Control-Allow-Credentials:
+        type: boolean
+        description: Whether to allow credentials for CORS
+      Access-Control-Max-Age:
+        type: integer
+        description: Max age for caching the preflight response in seconds
+securityDefinitions:
+  api_key:
+    type: apiKey
+    name: x-api-key
+    in: header
+

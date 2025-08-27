@@ -2,7 +2,6 @@ const OpenAI = require('openai');
 const { ConfidentialClientApplication } = require('@azure/msal-node');
 const config = require('../utils/config');
 const History = require('../utils/History');
-const azureConfig = require('../../config/azure.json');
 
 const { AZURE_TENANT_ID, AZURE_CLIENT_ID, AZURE_CLIENT_SECRET } = process.env;
 
@@ -40,20 +39,18 @@ async function createOpenAIClient(baseURL) {
 		defaultHeaders: {
 			Authorization: `Bearer ${token}`,
 		},
-		defaultQuery: { 'api-version': azureConfig.apiVersion },
+		defaultQuery: { 'api-version': config.get('azure/apiVersion') },
 	});
 }
 
 async function createOpenAIChatCompletionClient(model) {
-	const deploymentName = model ?? config.get('model') ?? azureConfig.deploymentName;
-	config.set('model', deploymentName);
-	return createOpenAIClient(`${azureConfig.baseUrl}/openai/deployments/${deploymentName}`);
+	const deploymentName = model ?? config.get('azure/deploymentName');
+	return createOpenAIClient(`${config.get('azure/baseUrl')}/openai/deployments/${deploymentName}`);
 }
 
 async function createOpenAIEmbeddingsClient(model) {
-	model ??= config.get('embeddingModel') ?? azureConfig.embeddingModel;
-	config.set('embeddingModel', model);
-	return createOpenAIClient(`${azureConfig.baseUrl}/openai/deployments/${model}/embeddings?api-version=${azureConfig.embeddingApiVersion}`);
+	model ??= config.get('azure/embeddingModel');
+	return createOpenAIClient(`${config.get('azure/baseUrl')}/openai/deployments/${model}/embeddings?api-version=${config.get('azure/embeddingApiVersion')}`);
 }
 
 async function generateEmbeddings(text, model) {
@@ -88,7 +85,7 @@ async function query(prompt, {
 	
 	const response = await client.chat.completions.create({
 		messages,
-		model: config.get('model') ?? azureConfig.deploymentName, // TODO construct/retrieve deploymentName based on model selection?
+		model: config.get('model') ?? config.get('azure/deploymentName'), // TODO construct/retrieve deploymentName based on model selection?
 		max_tokens: maxTokens,
 		temperature,
 		response_format: structuredResponse ? { type: 'json_object' } : undefined,
@@ -101,5 +98,4 @@ module.exports = {
 	query,
 	generateQueryEmbeddings: generateEmbeddings,
 	generateDocumentEmbeddings: generateEmbeddings,
-	config: azureConfig, // TODO eliminate?
 };

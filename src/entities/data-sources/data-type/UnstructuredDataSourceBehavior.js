@@ -3,11 +3,19 @@ const DigestDataSourceTarget = require('../target/DigestDataSourceTarget');
 const FilesDataSourceTarget = require('../target/FilesDataSourceTarget');
 const RawTextDataSourceTarget = require('../target/RawTextDataSourceTarget');
 const VectorDataSourceTarget = require('../target/VectorDataSourceTarget');
-const { default: Storage, STORAGE_FILE_DATA_TYPE } = require('../../storage/Storage');
+const Storage = require('../../storage/Storage');
+const StorageFile = require('../../storage/StorageFile');
 const UnsupportedError = require('../../../utils/UnsupportedError');
 
 class UnstructuredDataSourceBehavior extends DataSourceBehavior {
 	_targetBehavior;
+	
+	static TARGET = {
+		RAW_UNSTRUCTURED: 'raw',
+		DIGEST: 'digest',
+		VECTOR_UNSTRUCTURED: 'vector',
+		FILES: 'files',
+	};
 	
 	get targetBehavior() {
 		if (!this._targetBehavior) {
@@ -28,8 +36,8 @@ class UnstructuredDataSourceBehavior extends DataSourceBehavior {
 		return this._targetBehavior;
 	}
 	
-	async getCachedData() {
-		return Storage.get(STORAGE_FILE_DATA_TYPE.TEXT, this.dataSource.id).read();
+	async getIngestedData() {
+		return Storage.get(StorageFile.TYPE.UNSTRUCTURED_DATA, this.dataSource.id).read();
 	}
 	
 	async read() {

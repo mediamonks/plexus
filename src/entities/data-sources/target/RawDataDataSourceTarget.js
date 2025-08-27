@@ -1,5 +1,6 @@
 const DataSourceBehavior = require('../DataSourceBehavior');
-const { STORAGE_FILE_DATA_TYPE, Storage } = require('../../storage/Storage');
+const Storage = require('../../storage/Storage');
+const StorageFile = require('../../storage/StorageFile');
 
 class RawDataDataSourceTarget extends DataSourceBehavior {
 	async read() {
@@ -9,7 +10,7 @@ class RawDataDataSourceTarget extends DataSourceBehavior {
 	
 	async ingest() {
 		const contents = await this.read();
-		return Storage.get(STORAGE_FILE_DATA_TYPE.DATA, this.id).ingest(contents.join('\n'));
+		return Storage.get(StorageFile.TYPE.STRUCTURED_DATA, this.id).ingest(contents.join('\n'));
 	}
 	
 	async query({ filter, limit, fields, sort } = {}) {

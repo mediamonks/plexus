@@ -1,5 +1,5 @@
 const { performance } = require('node:perf_hooks');
-const requestContext = require('./request-context');
+const RequestContext = require('./RequestContext');
 
 class Profiler {
 	static getReport() {
@@ -7,13 +7,13 @@ class Profiler {
 	}
 
 	static get _log() {
-		return requestContext.get()._perf ??= [];
+		return RequestContext.get('profiler', []);
 	}
 	
 	static log(label, start) {
 		const ms = performance.now() - start;
 		this._log.push({ [label]: ms });
-		if (process.env.NODE_ENV === 'dev') console.debug('[PERF]', label, ms);
+		if (process.env.NODE_ENV === 'dev') console.debug('[PERF]', `[${label}]`, ms);
 	}
 
 	static run(fn, args = [], label) {

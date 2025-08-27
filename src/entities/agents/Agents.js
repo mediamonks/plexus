@@ -1,10 +1,21 @@
 const Agent = require('./Agent');
-const requestContext = require('../../utils/request-context');
+const config = require('../../utils/config');
+const hash = require('../../utils/hash');
+const UnknownError = require('../../utils/UnknownError');
 
 class Agents {
-	static get(id) {
-		const agents = requestContext.get().agents ??= {};
-		return agents[id] ??= new Agent(id);
+	static _agents = {};
+	
+	static get(id, catalog) {
+		const configuration = config.get(`agents`);
+		
+		if (!configuration[id]) throw new UnknownError('agent', id, configuration);
+		
+		const agent = this._agents[hash(id, JSON.stringify(configuration[id]))] ??= new Agent(id, configuration[id]);
+		
+		agent.prepare(catalog);
+		
+		return agent;
 	}
 }
 

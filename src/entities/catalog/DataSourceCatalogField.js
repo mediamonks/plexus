@@ -1,5 +1,6 @@
 const CatalogField = require('./CatalogField');
 const DataSources = require('../data-sources/DataSources');
+const Debug = require('../../utils/Debug');
 
 class DataSourceCatalogField extends CatalogField {
 	get dataSourceId() {
@@ -24,7 +25,13 @@ class DataSourceCatalogField extends CatalogField {
 		};
 	}
 	
+	get dataSource() {
+		return DataSources.get(this.dataSourceId);
+	}
+	
 	async populate() {
+		Debug.log(`Populating data source field "${this.id}"`, 'Catalog');
+		
 		const promises = [];
 		
 		let input;
@@ -48,7 +55,7 @@ class DataSourceCatalogField extends CatalogField {
 		
 		await Promise.all(promises);
 		
-		this._value = DataSources.get(this.dataSourceId).query({ input, filter, ...this.queryParameters });
+		this._value = this.dataSource.query({ input, filter, ...this.queryParameters });
 	}
 }
 

@@ -6,12 +6,14 @@ const sheets = require('../../../services/sheets');
 const pdf = require('../../../utils/pdf');
 const UnsupportedError = require('../../../utils/UnsupportedError');
 const xlsx = require('../../../utils/xlsx');
+const Debug = require('../../../utils/Debug');
 
 const LLM_SUPPORTED_MIME_TYPES = [
 	'application/pdf',
 	'text/plain',
 	'application/json',
 	'image/png',
+	'image/jpeg',
 ];
 
 class DriveDataSourceItem extends DataSourceItem {
@@ -28,6 +30,10 @@ class DriveDataSourceItem extends DataSourceItem {
 	
 	get mimeType() {
 		return this._metadata.mimeType;
+	}
+	
+	get fileName() {
+		return this._metadata.name;
 	}
 	
 	detectDataType() {
@@ -47,41 +53,52 @@ class DriveDataSourceItem extends DataSourceItem {
 	}
 	
 	async getLocalFile() {
-		const { allowCache } = this.dataSource;
-		
 		const driveService = await drive();
 		
 		let metadata = this.metadata;
 		
 		if (LLM_SUPPORTED_MIME_TYPES.includes(this.mimeType))
-			return (allowCache ? driveService.cacheFile(metadata) : driveService.downloadFile(metadata));
+			return (this.allowCache ? driveService.cacheFile(metadata) : driveService.downloadFile(metadata));
 		
 		if (!this.mimeType.startsWith('application/vnd.google-apps.'))
-			metadata = await driveService.importFile(metadata, allowCache);
+			metadata = await driveService.importFile(metadata, this.allowCache);
 		
-		return driveService.exportFile(metadata, 'pdf', allowCache);
+		return driveService.exportFile(metadata, 'pdf', this.allowCache);
 	}
 	
 	async toText() {
 		const { metadata } = this;
 		
-		if (metadata.mimeType === 'application/vnd.google-apps.document') return await (await docs()).getMarkdown(metadata.id);
+		if (metadata.mimeType === 'application/vnd.google-apps.document') {
+			const docsService = await docs();
+			return await docsService.getMarkdown(metadata.id);
+		}
 		
 		const file = await this.getLocalFile();
 		
 		if (metadata.mimeType === 'application/pdf') return await pdf.getPdfText(file);
 		
-		if (metadata.mimeType === 'text/plain') return (await fs.readFile(file)).toString();
+		if (metadata.mimeType === 'text/plain') {
+			const buffer = await fs.readFile(file);
+			return buffer.toString();
+		}
+		
+		throw new UnsupportedError('mime type for text extraction', metadata.mimeType);
 	}
 	
 	async toData() {
 		const { metadata } = this;
 		
-		if (metadata.mimeType === 'application/vnd.google-apps.spreadsheet') return await (await sheets()).getData(metadata.id);
+		if (metadata.mimeType === 'application/vnd.google-apps.spreadsheet') {
+			const sheetsService = await sheets();
+			return await sheetsService.getData(metadata.id);
+		}
 		
 		const file = await this.getLocalFile();
 		
 		if (metadata.mimeType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') return await xlsx.getData(file);
+		
+		throw new UnsupportedError('mime type for data extraction', metadata.mimeType);
 	}
 }
 

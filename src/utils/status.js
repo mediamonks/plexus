@@ -8,7 +8,7 @@ function send(message, isRunning) {
 		method: 'POST',
 		headers: postback.headers,
 		body: JSON.stringify({ message, isRunning }),
-	}).then();
+	}).catch(() => undefined);
 }
 
 async function wrap(message, fn) {

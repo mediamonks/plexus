@@ -3,12 +3,20 @@ const FilesDataSourceTarget = require('../target/FilesDataSourceTarget');
 const ProfileDataSourceTarget = require('../target/ProfileDataSourceTarget');
 const RawDataDataSourceTarget = require('../target/RawDataDataSourceTarget');
 const VectorDataSourceTarget = require('../target/VectorDataSourceTarget');
-const { default: Storage, STORAGE_FILE_DATA_TYPE } = require('../../storage/Storage');
+const Storage = require('../../storage/Storage');
+const StorageFile = require('../../storage/StorageFile');
 const UnsupportedError = require('../../../utils/UnsupportedError');
 
 class StructuredDataSourceBehavior extends DataSourceBehavior {
 	_targetBehavior;
-
+	
+	static TARGET = {
+		RAW_STRUCTURED: 'raw',
+		PROFILE: 'profile',
+		VECTOR_STRUCTURED: 'vector',
+		FILES: 'files',
+	};
+	
 	get targetBehavior() {
 		if (!this._targetBehavior) {
 			const mapping = {
@@ -28,8 +36,8 @@ class StructuredDataSourceBehavior extends DataSourceBehavior {
 		return this._targetBehavior;
 	}
 	
-	async getCachedData() {
-		return Storage.get(STORAGE_FILE_DATA_TYPE.DATA, this.dataSource.id).read();
+	async getIngestedData() {
+		return Storage.get(StorageFile.TYPE.STRUCTURED_DATA, this.dataSource.id).read();
 	}
 	
 	async read() {

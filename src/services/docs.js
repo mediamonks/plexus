@@ -11,14 +11,14 @@ module.exports = async () => {
 	async function create(name, content, folderId) {
 		try {
 			const documentId = folderId
-				? await drive.files.create({
+				? await drive.files.run({
 					resource: {
 						name,
 						mimeType: 'application/vnd.google-apps.document',
 						parents: [folderId]
 					}
 				}).data.id
-				: (await docs.documents.create({ requestBody: { title: name } })).data.documentId;
+				: (await docs.documents.run({ requestBody: { title: name } })).data.documentId;
 			
 			await docs.documents.batchUpdate({
 				documentId,

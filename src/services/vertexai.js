@@ -4,20 +4,15 @@ const aiplatform = require('@google-cloud/aiplatform');
 const { VertexAI } = require('@google-cloud/vertexai');
 const mimeTypes = require('mime-types');
 const History = require('../utils/History');
-const vertexaiConfig = require('../../config/vertexai.json');
 const config = require('../utils/config');
 
-// const project = vertexaiConfig.project ?? config.get('projectId');
-// const location = vertexaiConfig.location ?? config.get('location');
-const { projectId: project, location } = config.get('vertexai');
-const delay = vertexaiConfig.quotaDelayMs ?? 0;
-let last;
-
+const { projectId: project, location, embeddingLocation } = config.get('vertexai', true);
 const vertexAI = new VertexAI({ project, location });
-
 const predictionServiceClient = new aiplatform.v1.PredictionServiceClient({
-	apiEndpoint: `${vertexaiConfig.embeddingLocation}-aiplatform.googleapis.com`,
+	apiEndpoint: `${embeddingLocation}-aiplatform.googleapis.com`,
 });
+
+let last;
 
 async function query(query, {
 	systemInstructions,
@@ -51,7 +46,7 @@ async function query(query, {
 	
 	let tools = [];
 	for (const datastoreId of datastoreIds) {
-		const datastore = `projects/${vertexaiConfig.project}/locations/${vertexaiConfig.datastoreLocation ?? 'global'}/collections/default_collection/dataStores/${datastoreId}`;
+		const datastore = `projects/${config.get('vertexai/projectId', true)}/locations/${config.get('vertexai/datastoreLocation', true) ?? 'global'}/collections/default_collection/dataStores/${datastoreId}`;
 		
 		tools.push({
 			retrieval: {
@@ -74,6 +69,7 @@ async function query(query, {
 	if (structuredResponse) generationConfig.responseMimeType = 'application/json';
 	
 	if (last) {
+		const delay = config.get('vertexai/quotaDelayMs', true) ?? 0;
 		while (last + delay > performance.now()) await new Promise(resolve => setTimeout(resolve, last + delay - performance.now()));
 		last = performance.now();
 	}
@@ -91,7 +87,7 @@ async function query(query, {
 async function generateEmbeddings(text, model, taskType) {
 	model ??= config.get('vertexai/embeddingModel');
 	
-	const endpoint = `projects/${project}/locations/${vertexaiConfig.embeddingLocation}/publishers/google/models/${model}`;
+	const endpoint = `projects/${project}/locations/${config.get('vertexai/embeddingLocation', true)}/publishers/google/models/${model}`;
 	const instances = [aiplatform.helpers.toValue({ content: text, task_type: taskType })];
 	
 	const [response] = await predictionServiceClient.predict({ endpoint, instances });
@@ -111,5 +107,4 @@ module.exports = {
 	query,
 	generateQueryEmbeddings,
 	generateDocumentEmbeddings,
-	config: vertexaiConfig,
 };

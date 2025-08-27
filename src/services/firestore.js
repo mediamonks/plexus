@@ -2,7 +2,7 @@ const { randomUUID } = require('node:crypto');
 const { Firestore } = require('@google-cloud/firestore');
 const config = require('../utils/config');
 // const firestoreConfig = { projectId: config.get('projectId'), ...require('../../config/firestore.json') };
-const firestoreConfig = config.get('firestore');
+const firestoreConfig = config.get('firestore', true);
 
 const firestore = new Firestore(firestoreConfig);
 

@@ -1,6 +1,7 @@
 const fs = require('node:fs');
 const mime = require('mime-types');
 const routes = require('../../config/routes.json');
+const RequestContext = require('../utils/RequestContext');
 
 function cors(req, res) {
 	res.set('Access-Control-Allow-Origin', req.get('origin') ?? req.get('host') ?? '*');
@@ -65,7 +66,8 @@ module.exports = async function router(req, res) {
 	const fn = require(`../handlers/${handler}.js`);
 	
 	try {
-		const response = await fn(variables, req.method === 'POST' ? req.body : req.query) ?? 'OK';
+		const payload = req.method === 'POST' ? req.body : req.query;
+		const response = await RequestContext.run({ payload }, () => fn(variables, payload)) ?? 'OK';
 		res.send(response);
 	} catch (error) {
 		res.status(500);
