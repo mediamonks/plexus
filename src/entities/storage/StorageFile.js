@@ -2,16 +2,29 @@ const fs = require('node:fs/promises');
 const path = require('node:path');
 const gcs = require('../../services/gcs');
 const config = require('../../utils/config');
+const Debug = require('../../utils/Debug');
 
 class StorageFile {
 	_name;
 	
-	constructor(name) {
+	constructor(name, type) {
 		this._name = name;
+		this._type = type;
+	}
+	
+	static TYPE = {
+		AGENT_INSTRUCTIONS: 'AGENT_INSTRUCTIONS',
+		DIGEST_INSTRUCTIONS: 'DIGEST_INSTRUCTIONS',
+		STRUCTURED_DATA: 'STRUCTURED_DATA',
+		UNSTRUCTURED_DATA: 'UNSTRUCTURED_DATA',
 	}
 	
 	get name() {
 		return this._name;
+	}
+	
+	get type() {
+		return this._type;
 	}
 	
 	get extension() {
@@ -22,16 +35,21 @@ class StorageFile {
 		return `${this.name}.${this.extension}`;
 	}
 	
-	get remotePath() {
-		return `${this.folder}/${this.fileName}`;
+	get typeBasedPath() {
+		return {
+			[this.constructor.TYPE.AGENT_INSTRUCTIONS]: 'instructions/agent',
+			[this.constructor.TYPE.DIGEST_INSTRUCTIONS]: 'instructions/digest',
+			[this.constructor.TYPE.STRUCTURED_DATA]: 'data/structured',
+			[this.constructor.TYPE.UNSTRUCTURED_DATA]: 'data/unstructured',
+		}[this.type];
 	}
 	
-	get folder() {
-		return this.constructor._folder;
+	get remotePath() {
+		return `${this.typeBasedPath}/${this.fileName}`;
 	}
 	
 	get localPath() {
-		return path.join(config.get('tempPath'), 'storage', this.folder, this.fileName);
+		return path.join(config.get('tempPath'), 'storage', ...this.typeBasedPath.split('/'), this.fileName);
 	}
 	
 	get uri() {
@@ -42,6 +60,7 @@ class StorageFile {
 		try {
 			await fs.access(this.localPath);
 		} catch (error) {
+			Debug.log(`Caching storage file "${this.remotePath}"`);
 			await gcs.download(this.uri, this.localPath);
 		}
 	}

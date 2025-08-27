@@ -2,7 +2,6 @@ const fs = require('node:fs/promises');
 const StorageFile = require('./StorageFile');
 
 class StorageTextFile extends StorageFile {
-	static _folder = 'text';
 	static _extension = 'txt'
 	
 	async read() {

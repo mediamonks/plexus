@@ -1,4 +1,11 @@
 class DataSourceItem {
+	_dataType;
+	
+	static DATA_TYPE = {
+		TEXT: 'text',
+		DATA: 'data',
+	}
+	
 	constructor(dataSource) {
 		this._dataSource = dataSource;
 	}
@@ -7,12 +14,16 @@ class DataSourceItem {
 		return this._dataSource;
 	}
 	
+	get allowCache() {
+		return this.dataSource.allowCache;
+	}
+	
 	async detectDataType() {
 		throw new Error('Cannot create instance of DataSourceItem');
 	}
 	
 	async getDataType() {
-		return this.dataSource.dataType ?? await this.detectDataType();
+		return this._dataType ??= this.dataSource.dataType ?? await this.detectDataType();
 	}
 	
 	async toText() {
@@ -25,8 +36,8 @@ class DataSourceItem {
 	
 	async getContent() {
 		return {
-			text: () => this.toText(),
-			data: () => this.toData(),
+			[this.constructor.DATA_TYPE.TEXT]: () => this.toText(),
+			[this.constructor.DATA_TYPE.DATA]: () => this.toData(),
 		}[await this.getDataType()]();
 	}
 }

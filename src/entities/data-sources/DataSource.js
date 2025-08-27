@@ -2,9 +2,7 @@ const StructuredDataSourceBehavior = require('./data-type/StructuredDataSourceBe
 const UnstructuredDataSourceBehavior = require('./data-type/UnstructuredDataSourceBehavior');
 const DriveDataSourceBehavior = require('./platform/DriveDataSourceBehavior');
 const GcsDataSourceBehavior = require('./platform/GcsDataSourceBehavior');
-const config = require('../../utils/config');
-const requestContext = require('../../utils/request-context');
-const UnknownError = require('../../utils/UnknownError');
+const RequestContext = require('../../utils/RequestContext');
 const UnsupportedError = require('../../utils/UnsupportedError');
 
 const GOOGLE_DRIVE_URI_PATTERN = /^https?:\/\/(?:drive|docs)\.google\.com\/(?:drive\/(folders)|(?:file|document|spreadsheets|presentation)\/d)\/([\w\-]+)/;
@@ -20,9 +18,15 @@ class DataSource {
 	_resolvedUri;
 	_target;
 	
-	constructor(id) {
+	constructor(id, configuration) {
 		this._id = id;
+		this._configuration = configuration;
 	}
+	
+	static get TARGET () {
+		return { ...StructuredDataSourceBehavior.TARGET, ...UnstructuredDataSourceBehavior.TARGET };
+	}
+	
 	get id() {
 		return this._id;
 	}
@@ -36,13 +40,6 @@ class DataSource {
 	}
 	
 	get configuration() {
-		if (!this._configuration) {
-			const dataSources = config.get('data-sources');
-			const configuration = dataSources[this.id];
-			if (!configuration) throw new UnknownError('data source', this.id, dataSources);
-			this._configuration = configuration;
-		}
-		
 		return this._configuration;
 	}
 	
@@ -51,7 +48,7 @@ class DataSource {
 	}
 	
 	get dataType() {
-		return this._dataType ??= this.type.split(':')[0];
+		return this._dataType ??= this.type.split(':')[0]; // TODO for backwards compatibilty
 	}
 	
 	get dataTypeBehavior() {
@@ -108,19 +105,19 @@ class DataSource {
 	}
 	
 	get target() {
-		return this._target ??= this.type.split(':')[1];
+		return this._target ??= this.type.split(':')[1]; // TODO for backwards compatibility
 	}
 	
 	get source() {
 		return this.configuration.source;
 	}
 	
-	get catalog() {
-		return requestContext.get().catalog;
-	}
-	
 	get isFolder() {
 		return this.configuration.folder;
+	}
+	
+	get allowCache() {
+		return this.configuration.cache ?? true;
 	}
 	
 	async getResolvedUri() {
@@ -131,7 +128,7 @@ class DataSource {
 			const matches = this.uri.match(/\{\w+}/g);
 			await Promise.all(matches.map(async match => {
 				const field = match.substring(1, match.length - 1);
-				const value = await this.catalog.get(field).getValue();
+				const value = await RequestContext.get('catalog').get(field).getValue();
 				this._resolvedUri = this._resolvedUri.replaceAll(match, value);
 			}));
 		}
@@ -139,14 +136,18 @@ class DataSource {
 		return this._resolvedUri;
 	}
 	
-	async getCachedData() {
-		return this._data ??= await this.dataTypeBehavior.getCachedData();
+	async getIngestedData() {
+		try {
+			return this._data ??= await this.dataTypeBehavior.getIngestedData();
+		} catch (error) {
+			throw new Error(`Data source "${this.id}" is not yet ingested`);
+		}
 	}
 	
 	async getItems() {
 		this._items ??= await this.platformBehavior.getItems();
 		
-		if (!this._items.length) throw new Error(`Datasource "${this.id}" contains no items`);
+		if (!this._items.length) throw new Error(`Data source "${this.id}" contains no items`);
 		
 		return this._items;
 	}
@@ -154,7 +155,7 @@ class DataSource {
 	async getData() {
 		if (this.isDynamic) return this._data ??= await this.read();
 		
-		return this.getCachedData();
+		return this.getIngestedData();
 	}
 	
 	async getContents() {

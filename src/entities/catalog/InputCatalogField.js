@@ -1,6 +1,7 @@
 const CatalogField = require('./CatalogField');
 const config = require('../../utils/config');
-const requestContext = require('../../utils/request-context');
+const Debug = require('../../utils/Debug');
+const RequestContext = require('../../utils/RequestContext');
 const UnknownError = require('../../utils/UnknownError');
 
 class InputCatalogField extends CatalogField {
@@ -15,7 +16,9 @@ class InputCatalogField extends CatalogField {
 	}
 	
 	async populate() {
-		let value = requestContext.get().payload[this.payloadField];
+		Debug.log(`Populating input field "${this.id}"`, 'Catalog');
+		
+		let value = RequestContext.get('payload')[this.payloadField];
 		
 		if (value === undefined) {
 			if (this.required) throw new Error(`Field "${this.payloadField}" must be provided in payload`);

@@ -1,39 +1,34 @@
-const DataStorageFile = require('./StorageDataFile');
-const TextStorageFile = require('./StorageTextFile');
+const StorageFile = require('./StorageFile');
+const StorageDataFile = require('./StorageDataFile');
+const StorageTextFile = require('./StorageTextFile');
 const UnsupportedError = require('../../utils/UnsupportedError');
-
-const STORAGE_FILE_DATA_TYPE = {
-	TEXT: 'text',
-	DATA: 'data',
-};
 
 class Storage {
 	static _storageFiles = {};
 	
-	static get(dataType, name) {
-		let instance = Storage._storageFiles[dataType]?.[name];
+	static get(type, name) {
+		let instance = Storage._storageFiles[type]?.[name];
 		
 		if (!instance) {
 			const mapping = {
-				[STORAGE_FILE_DATA_TYPE.TEXT]: TextStorageFile,
-				[STORAGE_FILE_DATA_TYPE.DATA]: DataStorageFile,
+				[StorageFile.TYPE.DIGEST_INSTRUCTIONS]: StorageTextFile,
+				[StorageFile.TYPE.AGENT_INSTRUCTIONS]: StorageTextFile,
+				[StorageFile.TYPE.STRUCTURED_DATA]: StorageDataFile,
+				[StorageFile.TYPE.UNSTRUCTURED_DATA]: StorageTextFile,
 			};
 			
-			const storageFileClass = mapping[dataType];
+			const storageFileClass = mapping[type];
 			
-			if (!storageFileClass) throw new UnsupportedError('storage file data type', dataType, mapping);
+			if (!storageFileClass) throw new UnsupportedError('storage file type', type, mapping);
+		
+			instance = new storageFileClass(name, type);
 			
-			instance = new storageFileClass();
-			
-			Storage._storageFiles[dataType] ??= {};
-			Storage._storageFiles[dataType][name] = instance;
+			Storage._storageFiles[type] ??= {};
+			Storage._storageFiles[type][name] = instance;
 		}
 		
 		return instance;
 	}
 }
 
-module.exports = {
-	default: Storage,
-	STORAGE_FILE_DATA_TYPE,
-};
+module.exports = Storage;

@@ -2,7 +2,7 @@
 	"/invoke": {
 		"methods": {
 			"post": {
-				"summary": "Invokes an agentic pipeline",
+				"summary": "Invokes an agent pipeline",
 				"handler": "invoke",
 				"payload": {
 					"languageId": {

@@ -2,7 +2,7 @@ const DataSourceBehavior = require('../DataSourceBehavior');
 const DriveDataSourceItem = require('./DriveDataSourceItem');
 const drive = require('../../../services/drive');
 
-const GOOGLE_DRIVE_URI_PATTERN = /^https?:\/\/(?:drive|docs)\.google\.com\/(?:drive\/(folders)|(?:file|document|spreadsheets|presentation)\/d)\/([\w\-]+)/;
+const GOOGLE_DRIVE_URI_PATTERN = /^https?:\/\/(?:drive|docs)\.google\.com\/(?:drive\/(?:u\/\d+\/)?(folders)|(?:file|document|spreadsheets|presentation)\/d)\/([\w\-]+)/;
 
 class DriveDataSourceBehavior extends DataSourceBehavior {
 	_id;
@@ -12,9 +12,9 @@ class DriveDataSourceBehavior extends DataSourceBehavior {
 		
 		const id = await this.getId();
 		
-		const isFolder = this.dataSource.folder ?? await driveService.isFolder(id);
+		const isFolder = this.dataSource.isFolder ?? await driveService.isFolder(id);
 		
-		if (isFolder) return driveService.listFolderContents(id);
+		if (isFolder) return await driveService.listFolderContents(id);
 		
 		return [await driveService.getFileMetadata(id)];
 	}
@@ -22,11 +22,11 @@ class DriveDataSourceBehavior extends DataSourceBehavior {
 	async getItems() {
 		const files = await this.getFiles();
 		
-		return files.map(source => new DriveDataSourceItem(this.dataSource, source));
+		return files.map(metadata => new DriveDataSourceItem(this.dataSource, metadata));
 	}
 	
 	async getId() {
-		if (!this._id) this._id = this.source; // TODO backwards compatibility
+		if (!this._id) this._id = this.source; // TODO for backwards compatibility
 		
 		if (!this._id) {
 			const uri = await this.getResolvedUri();

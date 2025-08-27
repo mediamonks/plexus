@@ -1,44 +1,24 @@
 const { v4: uuid } = require('uuid');
 const Catalog = require('../entities/catalog/Catalog');
-const requestContext = require('../utils/request-context');
-const Profiler = require('../utils/Profiler');
-const firestore = require('../services/firestore');
-const History = require('../utils/History');
 const config = require('../utils/config');
+const History = require('../utils/History');
+const RequestContext = require('../utils/RequestContext');
 
 module.exports = async function invoke() {
-	let { threadId } = requestContext.get().payload;
+	let { threadId } = RequestContext.get('payload');
 	
-	let history;
-	if (threadId) {
-		const thread = await Profiler.run(() => firestore.getDocument('threads', threadId), 'retrieve thread');
-		if (!thread) throw new Error('Error: Invalid threadId');
-		({ history } = thread);
-	}
-	requestContext.get().history = new History(history ?? []);
+	History.create(threadId);
 	
-	// const isFirstRun = !threadId;
-	threadId ??= uuid();
+	const output = config.get('output');
 	
-	const catalog = requestContext.get().catalog = new Catalog();
-	
-	const { output, waitForThreadUpdate } = config.get();
+	if (!output || !output.length) throw new Error('No output specified');
 	
 	const result = {};
-	try {
-		if (output) await Promise.all(output.map(outputField =>
-			catalog.get(outputField).getValue()
-				.then(value => result[outputField] = value)
-		));
-	} catch (error) {
-		throw error;
-	}
+	await Promise.all(output.map(async outputField => {
+		result[outputField] = await Catalog.instance.get(outputField).getValue();
+	}));
 	
-	const threadUpdate = firestore.updateDocument('threads', threadId, {
-		output: result,
-		history: requestContext.get().history.toJSON(),
-	});
-	if (waitForThreadUpdate) await threadUpdate;
+	History.instance.save(result);
 	
 	return result;
 };

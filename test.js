@@ -35,9 +35,9 @@ async function invoke(body) {
 				'validatedBriefInconsistencies'
 			]
 		},
-		'briefFolderUri': 'https://drive.google.com/drive/folders/1nTtdJqhNg-22ceFKrWzYQxR-LCBjtPzM',
+		'briefFolderUri': 'https://drive.google.com/drive/u/1/folders/1rKVJpWTn4KG5LbaEOkJj_dxHI7i7sNex',
 		'additionalInfo': [],
-		'now': '2025-07-30T09:52:23.637Z'
+		'now': new Date().toISOString()
 	});
 	
 	// await invoke({

@@ -1,0 +1,143 @@
+swagger: "2.0"
+info:
+  title: plexus
+  description: Plexus Agentic Engine
+  version: 1.1.0
+schemes:
+  - https
+produces:
+  - application/json
+x-google-backend:
+  address: https://europe-west1-monks-plexus.cloudfunctions.net/api
+  path_translation: APPEND_PATH_TO_ADDRESS
+  protocol: h2
+  deadline: 300
+  jwt_audience: https://europe-west1-monks-plexus.cloudfunctions.net/api
+paths:
+  /api/invoke:
+    post:
+      summary: Invokes an agentic pipeline
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              languageId:
+                type: string
+                description: The ID of the language to use
+                enum:
+                  - en-us
+                  - fr-fr
+                default: en-us
+              threadId:
+                type: string
+                description: The ID of the conversation thread to continue
+              config:
+                type: object
+                description: Runtime configuration overrides.
+      responses:
+        "200":
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                description: Error message if applicable, otherwise null.
+              threadId:
+                type: string
+                format: uuid
+                description: Unique identifier for the thread.
+  /api/fields/{field}:
+    parameters:
+      - name: field
+        description: The name of the field
+        type: string
+        in: path
+        required: true
+    get:
+      summary: Retrieve Field Options
+      description: Returns available options for a given field
+      responses:
+        "200":
+          description: Successful response
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: Field ID
+                label:
+                  type: string
+                  description: Field label
+                description:
+                  type: string
+                  description: Field description
+  /api/thread/{threadId}:
+    parameters:
+      - name: threadId
+        description: The ID of the thread to retrieve
+        type: string
+        in: path
+        required: true
+    get:
+      summary: Retrieve Conversation Thread
+      description: Retrieves a thread containing its conversation history and input
+        and output of the last interaction
+      responses:
+        "200":
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              history:
+                type: array
+                description: The conversation history.
+              context:
+                type: object
+                description: Context used for last generation.
+              copy:
+                type: string
+                description: Output copy of last generation.
+  /api/ingest/{namespace}:
+    parameters:
+      - name: namespace
+        description: The namespace for which to ingest data
+        type: string
+        in: path
+        required: true
+    post:
+      summary: Ingest data sources
+      description: Ingest all static data sources for the given namespace
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              config:
+                type: object
+                description: Runtime configuration overrides.
+      responses:
+        "200":
+          description: Successful response
+  /api/config:
+    get:
+      summary: Retrieve Default Config
+      description: Returns default configuration
+      responses:
+        "200":
+          description: Successful response
+          schema:
+            type: object
+securityDefinitions:
+  api_key:
+    type: apiKey
+    name: x-api-key
+    in: header
+

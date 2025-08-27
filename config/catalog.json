@@ -26,7 +26,7 @@
 		"example": "A description of the desired tone of voice."
 	},
 	"brandContext": {
-		"type": "search",
+		"type": "data",
 		"input": "userRequest",
 		"dataSource": "whitelabel-brandinfo",
 		"example": [
@@ -40,7 +40,7 @@
 		"example": "Summary of key brand voice and style rules."
 	},
 	"channelContext": {
-		"type": "query",
+		"type": "data",
 		"dataSource": "whitelabel-examples",
 		"limit": 3,
 		"filter": {
@@ -63,7 +63,7 @@
 		]
 	},
 	"productData": {
-		"type": "query",
+		"type": "data",
 		"dataSource": "whitelabel-products",
 		"limit": 1,
 		"filter": {

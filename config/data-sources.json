@@ -43,7 +43,8 @@
 		"platform": "drive",
 		"uri": "{briefFolderUri}",
 		"type": "data:files",
-		"cache": false
+		"folder": true,
+		"cache": true
 	},
 	"mantra-ratecard": {
 		"namespace": "mantra",
@@ -64,6 +65,7 @@
 		"platform": "drive",
 		"uri": "{historicalTimelinesFolderUri}",
 		"type": "data:files",
+		"folder": true,
 		"cache": true
 	},
 	"mantra-quote": {

@@ -1,14 +1,11 @@
 const OpenAI = require('openai');
 const config = require('../utils/config');
 const History = require('../utils/History');
-const openaiConfig = require('../../config/openai.json');
 
-const apiKey = process.env.OPENAI_API_KEY;
-const client = new OpenAI({ apiKey });
+const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 async function generateEmbeddings(input, model) {
-	model ??= config.get('embeddingModel') ?? openaiConfig.embeddingModel;
-	config.set('embeddingModel', model);
+	model ??= config.get('openai/embeddingModel');
 	
 	const response = await client.embeddings.create({ model, input });
 	
@@ -33,8 +30,7 @@ async function query(prompt, {
 	
 	if (systemInstructions) messages.unshift({ role: 'system', content: systemInstructions });
 	
-	model ??= config.get('model') ?? openaiConfig.model;
-	config.set('model', model);
+	model ??= config.get('openai/model');
 	
 	const response = await client.chat.completions.create({
 		messages,
@@ -51,5 +47,4 @@ module.exports = {
 	query,
 	generateQueryEmbeddings: generateEmbeddings,
 	generateDocumentEmbeddings: generateEmbeddings,
-	config: openaiConfig,
 };

@@ -2,11 +2,12 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { google } = require('googleapis');
 const mime = require('mime-types');
+const { Readable } = require('stream');
 const authenticate = require('./auth');
 const workspace = require('./workspace');
 const config = require('../utils/config');
+const Debug = require('../utils/Debug');
 const Profiler = require('../utils/Profiler');
-const { Readable } = require('stream');
 
 const tempPath = config.get('tempPath');
 // TODO download to sources/ directory just like gcs??
@@ -88,6 +89,8 @@ module.exports = async () => {
 	}
 	
 	async function downloadFile(file, destPath) {
+		Debug.log(`Downloading file "${file.name}"`, 'Google Drive');
+		
 		await workspace.quotaDelay();
 		
 		try {
@@ -96,7 +99,7 @@ module.exports = async () => {
 					{ responseType: 'stream' }
 			);
 			
-			destPath ??= path.join(DOWNLOAD_PATH, file.name);
+			destPath ??= path.join(DOWNLOAD_PATH, `${file.id}${path.extname(file.name)}`);
 			fs.mkdirSync(path.dirname(destPath), { recursive: true });
 			
 			const writeStream = fs.createWriteStream(destPath, { encoding: null });
@@ -179,7 +182,7 @@ module.exports = async () => {
 		
 		if (allowCache) console.debug('[Drive] Import', file.name, 'cache', existingFile ? 'hit' : 'miss');
 		if (existingFile && allowCache) return existingFile;
-		if (existingFile) await deleteFile(existingFile.id);
+		if (existingFile) await trashItem(existingFile.id);
 		
 		const conversionMap = {
 			'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'application/vnd.google-apps.spreadsheet',
@@ -194,6 +197,8 @@ module.exports = async () => {
 		if (!targetMimeType) {
 			throw new Error(`Cannot import file type ${file.mimeType}. Supported types: ${Object.keys(conversionMap).join(', ')}`);
 		}
+		
+		Debug.log(`Importing file "${file.name}"`, 'Google Drive');
 		
 		await workspace.quotaDelay(workspace.SERVICE.DRIVE, workspace.OPERATION.WRITE);
 		
@@ -230,6 +235,8 @@ module.exports = async () => {
 		const destPath = path.join(DOWNLOAD_PATH, `${file.id}.${type}`);
 		
 		if (allowCache && fs.existsSync(destPath)) return destPath;
+		
+		Debug.log(`Exporting file "${file.name}"`, 'Google Drive');
 		
 		await workspace.quotaDelay();
 		
@@ -338,11 +345,22 @@ module.exports = async () => {
 		return filePath;
 	}
 	
+	async function trashItem(id) {
+		await workspace.quotaDelay(workspace.SERVICE.DRIVE, workspace.OPERATION.WRITE);
+		
+		await drive.files.update({
+			fileId: id,
+			resource: { trashed: true },
+			supportsAllDrives: true,
+		});
+	}
+	
 	async function deleteFile(id) {
 		await workspace.quotaDelay(workspace.SERVICE.DRIVE, workspace.OPERATION.WRITE);
 		
 		await drive.files.delete({
-			fileId: id
+			fileId: id,
+			supportsAllDrives: true,
 		});
 	}
 	

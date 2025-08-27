@@ -1,12 +1,19 @@
-const requestContext = require('../../utils/request-context');
 const UnknownError = require('../../utils/UnknownError');
 
 class CatalogField {
+	_catalog;
 	_configuration;
 	_value;
 	
-	constructor(id) {
+	constructor(id, catalog) {
 		this._id = id;
+		this._catalog = catalog;
+	}
+	
+	static TYPE = {
+		INPUT: 'input',
+		OUTPUT: 'output',
+		DATA: 'data'
 	}
 	
 	get id() {
@@ -24,7 +31,15 @@ class CatalogField {
 	}
 	
 	get catalog() {
-		return requestContext.get().catalog;
+		return this._catalog;
+	}
+	
+	get type() {
+		return this.configuration.type;
+	}
+	
+	get example() {
+		return this.configuration.example;
 	}
 	
 	async populate() {

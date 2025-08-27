@@ -1,5 +1,6 @@
 const CatalogField = require('./CatalogField');
 const Agents = require('../agents/Agents');
+const Debug = require('../../utils/Debug');
 
 class OutputCatalogField extends CatalogField {
 	get outputField() {
@@ -19,7 +20,9 @@ class OutputCatalogField extends CatalogField {
 	}
 	
 	async populate() {
-		const result = await Agents.get(this.agentId).invoke();
+		Debug.log(`Populating output field "${this.id}"`, 'Catalog');
+		
+		const result = await Agents.get(this.agentId, this.catalog).invoke();
 		
 		const value = result[this.outputField];
 		

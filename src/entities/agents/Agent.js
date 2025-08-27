@@ -1,30 +1,33 @@
-const { default: Storage, STORAGE_FILE_DATA_TYPE } = require('../storage/Storage');
+const DataSourceItem = require('../data-sources/platform/DataSourceItem');
+const Storage = require('../storage/Storage');
+const StorageFile = require('../storage/StorageFile');
 const llm = require('../../modules/llm');
-const config = require('../../utils/config');
 const Debug = require('../../utils/Debug');
+const History = require('../../utils/History');
 const Profiler = require('../../utils/Profiler');
-const requestContext = require('../../utils/request-context');
 const status = require('../../utils/status');
-const UnknownError = require('../../utils/UnknownError');
+const CatalogField = require('../catalog/CatalogField');
+const INPUT_OUTPUT_TEMPLATE = require('node:fs')
+	.readFileSync('./data/input-output-template.txt', 'utf8')
+	.toString();
 
-const inputOutputTemplate = require('node:fs')
-		.readFileSync('./data/input-output-template.txt', 'utf8')
-		.toString();
-
-module.exports = class Agent {
+class Agent {
 	isReady = false;
+	_baseInstructions;
+	_catalog;
 	_configuration;
 	_context = {};
 	_displayName;
+	_files = [];
 	_invocation;
 	_ready;
-	_systemInstructions;
 	_temperature = 0;
-
-	constructor(id) {
+	
+	constructor(id, configuration) {
 		this._id = id;
+		this._configuration = configuration;
 		
-		this._ready = this.prepare();
+		this._ready = this._loadBaseInstructions();
 	}
 	
 	get id() {
@@ -32,115 +35,126 @@ module.exports = class Agent {
 	}
 	
 	get configuration() {
-		if (!this._configuration) {
-			const agentsConfig = config.get('agents');
-			const configuration = agentsConfig[this.id];
-			if (!configuration) throw new UnknownError('agent', this.id, agentsConfig);
-			this._configuration = configuration;
-		}
-		
 		return this._configuration;
 	}
 	
 	get displayName() {
-		this._displayName ??= this.id
+		return this._displayName ??= this.id
 				.split(/[-_\s]+/)
 				.map(word => word.charAt(0).toUpperCase() + word.slice(1))
 				.join('');
-		
-		return this._displayName;
 	}
 	
-	get systemInstructionsName() {
-		return this.id;
-	}
+	get instructions() {
+		const inputSchema = {};
+		for (const fieldId of this.configuration.context) {
+			inputSchema[fieldId] = this.catalog.get(fieldId).example;
+		}
+		
+		const outputSchema = {};
+		for (const field of this.catalog.fields) {
+			if (field.type !== CatalogField.TYPE.OUTPUT) continue;
+			
+			if (field.agentId !== this.id) continue;
+			
+			outputSchema[field.outputField] = field.example;
+		}
+		
+		const inputOutput = INPUT_OUTPUT_TEMPLATE
+				.replace(/\{input}/, JSON.stringify(inputSchema, undefined, 2))
+				.replace(/\{output}/, JSON.stringify(outputSchema, undefined, 2));
 	
-	// TODO remove dependency on catalogDefinition
-	get systemInstructions() {
-		const catalogConfig = this.catalog.configuration;
-		
-		const inputDescription = this.configuration.context
-				.reduce((result, key) => ({ ...result, [key]: catalogConfig[key].example }), {});
-		const outputDescription = Object.keys(catalogConfig)
-				.filter(key => catalogConfig[key].type === 'output' && catalogConfig[key].agent === this._id)
-				.reduce((result, key) => ({ ...result, [catalogConfig[key].field]: catalogConfig[key].example }), {});
-		const inputOutput = inputOutputTemplate
-				.replace(/\{input}/, JSON.stringify(inputDescription, undefined, 2))
-				.replace(/\{output}/, JSON.stringify(outputDescription, undefined, 2));
-		
-		return [this._systemInstructions, inputOutput].join('');
+		return [this._baseInstructions, inputOutput].join('');
 	}
 	
 	get catalog() {
-		return requestContext.get().catalog;
+		return this._catalog;
 	}
 	
-	async prepare() {
-		console.debug('[Agent] Preparing', this.displayName);
+	async _mapFiles(value) {
+		if (!(value instanceof Array) || !(value[0] instanceof DataSourceItem)) return value;
 		
-		const { context, temperature } = this.configuration;
-		const promises = [];
+		const files = await Promise.all(value.map(item => item.getLocalFile()));
 		
-		for (const contextField of context) {
-			this._context[contextField] = undefined;
-			promises.push(this.catalog.get(contextField).getValue().then(value => this._context[contextField] = value));
+		this._files.push(...files);
+		
+		return value.map(item => item.fileName);
+	}
+	
+	async _prepareContext(catalog) {
+		const { context } = this.configuration;
+		
+		await Promise.all(context.map(async contextField =>
+			this._context[contextField] = catalog.get(contextField).getValue()
+				.then(async value => {
+					this._context[contextField] = await this._mapFiles(value);
+					Debug.log(`Prepared context field "${contextField}" for agent "${this._id}"`, 'Agent');
+				})
+		));
+	}
+	
+	async _determineTemperature(catalog) {
+		const { temperature } = this.configuration;
+		
+		this._temperature = typeof temperature === 'string'
+				? await catalog.get(temperature).getValue()
+				: temperature
+		;
+	}
+	
+	async _loadBaseInstructions() {
+		if (this._baseInstructions) return;
+		
+		try {
+			this._baseInstructions = await Storage.get(StorageFile.TYPE.AGENT_INSTRUCTIONS, this.id).read();
+		} catch (error) {
+			throw new Error(`Missing instructions for agent "${this._id}"`)
 		}
+	}
+	
+	prepare(catalog) {
+		if (this._catalog === catalog) return;
 		
-		if (typeof temperature === 'string')
-			promises.push(this.catalog.get(temperature).getValue().then(value => this._temperature = value));
-		else
-			this._temperature = temperature;
+		Debug.log(`Preparing ${this.id}`, 'Agent');
 		
-		if (!this._systemInstructions) {
-			promises.push(
-				Storage.get(STORAGE_FILE_DATA_TYPE.TEXT, `system-instructions/${this.systemInstructionsName}-agent`).read()
-					.then(text => this._systemInstructions = text)
-					.catch(() => {
-						throw new Error(`Missing system instructions for agent "${this._id}"`)
-					}),
-			);
-		}
+		this._catalog = catalog;
 		
-		await Promise.all(promises);
-		
-		this.isReady = true;
-		
-		// Debug.log(`${this.displayName} Agent - context: ${JSON.stringify(this._context)}`);
+		this._ready = Promise.all([
+			this._ready,
+			this._prepareContext(catalog),
+			this._determineTemperature(catalog),
+		]).then(() => {
+			this.isReady = true;
+			Debug.log(`Completed preparation of ${this.id}`, 'Agent');
+		});
 	}
 	
 	async _invoke() {
-		const { required, useHistory, context } = this.configuration;
+		const { required, useHistory } = this.configuration;
 		
 		await this._ready;
 		
-		if (required) for (const requiredField of required)
-			if (this._context[requiredField] === undefined) return {};
+		Debug.log(`Invoking ${this.id}`, 'Agent');
 		
-		//TODO this is ugly
-		const catalogConfig = this.catalog.configuration;
-		const dataSources = config.get('data-sources');
-		const files = [];
-		for (const contextField of context) {
-			if (!catalogConfig[contextField].dataSource) continue;
-			if (dataSources[catalogConfig[contextField].dataSource].type.split(':')[1] !== 'files') continue;
-			files.push(...this._context[contextField].map(file => file.source));
-			this._context[contextField] = this._context[contextField].map(file => file.name);
-		}
+		if (required) for (const requiredField of required)	if (this._context[requiredField] === undefined) return {};
 		
-		// console.debug(`[${this._displayName}]\n\n${this.systemInstructions}\n\n${JSON.stringify(this._context, undefined, 2)}`);
+		Debug.dump(`agent ${this.id} instructions`, this.instructions);
+		Debug.dump(`agent ${this.id} prompt`, this._context);
 		
-		const response = await status.wrap(`Running ${this.displayName} agent`, () =>
+		const response = await status.wrap(`Running ${this.id} agent`, () =>
 			Profiler.run(() =>
 				llm.query(JSON.stringify(this._context, undefined, 2), {
-					systemInstructions: this.systemInstructions,
+					systemInstructions: this.instructions,
 					temperature: this._temperature,
-					history: useHistory && requestContext.get().history,
+					history: useHistory && History.instance,
 					structuredResponse: true,
-					files,
+					files: this._files,
 				}),
-				`${this.displayName} Agent - query`
+				`${this.id} Agent - query`
 			)
 		);
+		
+		Debug.dump(`agent ${this.id} response`, response);
 		
 		let output;
 		try {
@@ -149,9 +163,7 @@ module.exports = class Agent {
 			throw new Error(`Error: ${this.displayName} agent returned invalid JSON`);
 		}
 		
-		for (const key in output) {
-			Debug.log(`${this.displayName} - output ${key}: ${JSON.stringify(output[key])}`);
-		}
+		Debug.log(`Completed invocation of ${this.id}`, 'Agent');
 		
 		return output;
 	}
@@ -159,4 +171,6 @@ module.exports = class Agent {
 	async invoke() {
 		return this._invocation ??= this._invoke();
 	}
-};
+}
+
+module.exports = Agent;

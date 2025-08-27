@@ -22,6 +22,10 @@ class GcsDataSourceItem extends DataSourceItem {
 		return path.extname(this.uri).substring(1);
 	}
 	
+	get fileName() {
+		return path.basename(this.uri);
+	}
+	
 	detectDataType() {
 		return {
 			pdf: 'text',
@@ -31,7 +35,7 @@ class GcsDataSourceItem extends DataSourceItem {
 	}
 	
 	async getLocalFile() {
-		return gcs.cache(this.uri);
+		return this.allowCache ? await gcs.cache(this.uri) : gcs.download(this.uri);
 	}
 	
 	async toText() {
@@ -48,7 +52,8 @@ class GcsDataSourceItem extends DataSourceItem {
 	}
 	
 	async* toData() {
-		return jsonl.read(await this.getLocalFile());
+		const file = await this.getLocalFile();
+		return jsonl.read(file);
 	}
 }
 
