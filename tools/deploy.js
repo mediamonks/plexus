@@ -43,8 +43,8 @@ async function deployFunction({ name, entryPoint, timeout, env, minInstances, cp
 		.join(',');
 	
 	const serviceAccount = global.serviceAccount
-		&& (global.serviceAccount.includes('@') 
-			? global.serviceAccount 
+		&& (global.serviceAccount.includes('@')
+			? global.serviceAccount
 			: `${global.serviceAccount}@${global.project}.iam.gserviceaccount.com`);
 	
 	const buildServiceAccount = global.buildServiceAccount ?? `${projectNumber}-compute`;
@@ -79,8 +79,8 @@ async function deployFunction({ name, entryPoint, timeout, env, minInstances, cp
 
 async function updateGateway({ gateway, region, config, api, serviceAccount = global.serviceAccount }) {
 	serviceAccount = serviceAccount
-		&& (serviceAccount.includes('@') 
-			? serviceAccount 
+		&& (serviceAccount.includes('@')
+			? serviceAccount
 			: `${serviceAccount}@${global.project}.iam.gserviceaccount.com`);
 	
 	try {
