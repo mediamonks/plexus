@@ -1,21 +1,25 @@
 import DataSourceBehavior from '../DataSourceBehavior';
+import DataSourceItem from '../platform/DataSourceItem';
 import StructuredDataSourceBehavior from '../data-type/StructuredDataSourceBehavior';
 import Storage from '../../storage/Storage';
 import StorageFile from '../../storage/StorageFile';
-import { JsonObject } from '../../../types/common';
 
 class RawDataDataSourceTarget extends DataSourceBehavior {
-	async read(): Promise<AsyncGenerator<JsonObject>> {
-		const contents = await this.getContents();
-		return contents.flat();
+	static OutputData: typeof DataSourceItem.DataContent
+
+	async read(): Promise<typeof RawDataDataSourceTarget.OutputData> {
+		const contents = await this.getContents() as (typeof DataSourceItem.DataContent)[];
+
+		return contents.flat() as typeof RawDataDataSourceTarget.OutputData;
 	}
 	
 	async ingest(): Promise<void> {
 		const contents = await this.read();
+		
 		return Storage.get(StorageFile.TYPE.STRUCTURED_DATA, this.id).write(contents.join('\n'));
 	}
 	
-	async query({ filter, limit, fields, sort }: typeof StructuredDataSourceBehavior.QueryParameters = {}): Promise<any[]> {
+	async query({ filter, limit, fields, sort }: typeof StructuredDataSourceBehavior.QueryParameters = {}): Promise<typeof RawDataDataSourceTarget.OutputData> {
 		const data = this.getData();
 		
 		if (!filter && !limit && !fields && !sort) return data;

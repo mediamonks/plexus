@@ -1,31 +1,34 @@
+import DataSource from "./DataSource";
+import DataSourceItem from "./platform/DataSourceItem";
+
 class DataSourceBehavior {
-	_dataSource;
+	_dataSource: DataSource;
 	
-	constructor (dataSource: any) {
+	constructor (dataSource: DataSource) {
 		this._dataSource = dataSource;
 	}
 	
-	get dataSource() {
+	get dataSource(): DataSource {
 		return this._dataSource;
 	}
 	
-	get id() {
+	get id(): string {
 		return this.dataSource.id;
 	}
 	
-	get source() {
+	get source(): string {
 		return this.dataSource.source;
 	}
 	
-	get dataType() {
+	get dataType(): string {
 		return this.dataSource.dataType;
 	}
 	
-	get target() {
+	get target(): string {
 		return this.dataSource.target;
 	}
 	
-	get isFolder() {
+	get isFolder(): boolean {
 		return this.dataSource.isFolder;
 	}
 	
@@ -33,11 +36,11 @@ class DataSourceBehavior {
 		return this.dataSource.getData();
 	}
 	
-	async getContents(): Promise<AsyncIterable<any>> {
+	async getContents(): Promise<typeof DataSource.Contents> {
 		return this.dataSource.getContents();
 	}
 	
-	async getItems(): Promise<any> {
+	async getItems(): Promise<DataSourceItem[]> {
 		return this.dataSource.getItems();
 	}
 	

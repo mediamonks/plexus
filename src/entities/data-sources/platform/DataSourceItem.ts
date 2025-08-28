@@ -1,10 +1,18 @@
 import DataSource from '../DataSource';
 import { JsonObject, SpreadSheet, ValueOf } from '../../../types/common';
+import DriveDataSourceItem from './DriveDataSourceItem';
+import GcsDataSourceItem from './GcsDataSourceItem';
 
 export default class DataSourceItem {
 	_dataSource: DataSource;
 	_dataType: ValueOf<typeof DataSourceItem.DATA_TYPE>;
 	
+	static TextContent: typeof DriveDataSourceItem.TextContent | typeof GcsDataSourceItem.TextContent;
+
+	static DataContent: typeof DriveDataSourceItem.DataContent | typeof GcsDataSourceItem.DataContent;
+
+	static Content: typeof DataSourceItem.TextContent | typeof DataSourceItem.DataContent;
+
 	static DATA_TYPE = {
 		TEXT: 'text',
 		DATA: 'data',
@@ -14,11 +22,11 @@ export default class DataSourceItem {
 		this._dataSource = dataSource;
 	}
 	
-	get dataSource() {
+	get dataSource(): DataSource {
 		return this._dataSource;
 	}
 	
-	get allowCache() {
+	get allowCache(): boolean {
 		return this.dataSource.allowCache;
 	}
 
@@ -38,7 +46,7 @@ export default class DataSourceItem {
 		throw new Error('Cannot create instance of DataSourceItem');
 	}
 	
-	async getContent(): Promise<string | SpreadSheet | AsyncGenerator<JsonObject>> {
+	async getContent(): Promise<typeof DataSourceItem.Content> {
 		return {
 			[DataSourceItem.DATA_TYPE.TEXT]: () => this.toText(),
 			[DataSourceItem.DATA_TYPE.DATA]: () => this.toData(),

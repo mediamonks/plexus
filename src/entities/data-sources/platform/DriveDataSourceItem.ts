@@ -6,7 +6,8 @@ import sheets from '../../../services/sheets';
 import pdf from '../../../utils/pdf';
 import UnsupportedError from '../../../utils/UnsupportedError';
 import xlsx from '../../../utils/xlsx';
-import { SpreadSheet } from '../../../types/common';
+import { SpreadSheet, ValueOf } from '../../../types/common';
+import { drive_v2 } from 'googleapis';
 
 const LLM_SUPPORTED_MIME_TYPES = [
 	'application/pdf',
@@ -17,6 +18,10 @@ const LLM_SUPPORTED_MIME_TYPES = [
 ];
 
 export default class DriveDataSourceItem extends DataSourceItem {
+	static TextContent: string;
+
+	static DataContent: SpreadSheet;
+
 	_metadata;
 	
 	constructor(dataSource: any, metadata: any) {
@@ -24,7 +29,7 @@ export default class DriveDataSourceItem extends DataSourceItem {
 		this._metadata = metadata;
 	}
 	
-	get metadata() {
+	get metadata(): drive.FileMetaData {
 		return this._metadata;
 	}
 	
@@ -36,7 +41,7 @@ export default class DriveDataSourceItem extends DataSourceItem {
 		return this._metadata.name;
 	}
 	
-	detectDataType(): string {
+	detectDataType(): ValueOf<typeof DataSourceItem.DATA_TYPE> {
 		const mapping = {
 			'application/vnd.google-apps.document': 'text',
 			'application/pdf': 'text',
@@ -66,7 +71,7 @@ export default class DriveDataSourceItem extends DataSourceItem {
 		return driveService.exportFile(metadata, 'pdf', this.allowCache);
 	}
 	
-	async toText(): Promise<string> {
+	async toText(): Promise<typeof DriveDataSourceItem.TextContent> {
 		const { metadata } = this;
 		
 		if (metadata.mimeType === 'application/vnd.google-apps.document') {
@@ -86,7 +91,7 @@ export default class DriveDataSourceItem extends DataSourceItem {
 		throw new UnsupportedError('mime type for text extraction', metadata.mimeType);
 	}
 	
-	async toData(): Promise<SpreadSheet> {
+	async toData(): Promise<typeof DriveDataSourceItem.DataContent> {
 		const { metadata } = this;
 		
 		if (metadata.mimeType === 'application/vnd.google-apps.spreadsheet') {

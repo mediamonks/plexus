@@ -1,7 +1,9 @@
 import DataSourceBehavior from '../DataSourceBehavior';
 
 class ProfileDataSourceTarget extends DataSourceBehavior {
-	async read(): Promise<any> {
+	static DataType: void;
+	
+	async read(): Promise<typeof ProfileDataSourceTarget.DataType> {
 		throw new Error('Not implemented')
 	}
 	
@@ -9,7 +11,7 @@ class ProfileDataSourceTarget extends DataSourceBehavior {
 		throw new Error('Not implemented');
 	}
 	
-	async query(): Promise<any> {
+	async query(): Promise<typeof ProfileDataSourceTarget.DataType> {
 		throw new Error('Not implemented');
 	}
 }

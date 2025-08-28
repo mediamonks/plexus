@@ -1,18 +1,21 @@
 import fs from 'node:fs';
-import aiplatform from '@google-cloud/aiplatform';
-// TODO refactor to use genAI lib
-import { VertexAI } from '@google-cloud/vertexai';
+import { GoogleGenAI, Content, Part, GenerationConfig } from '@google/genai';
 import mimeTypes from 'mime-types';
-import History from '../utils/History';
 import config from '../utils/config';
+import History from '../utils/History';
 
-const { projectId: project, location, embeddingLocation } = config.get('vertexai', true);
-const vertexAI = new VertexAI({ project, location });
-const predictionServiceClient = new aiplatform.v1.PredictionServiceClient({
-	apiEndpoint: `${embeddingLocation}-aiplatform.googleapis.com`,
-});
+type Configuration = {
+	projectId: string;
+	location: string;
+	embeddingLocation: string;
+	model: string;
+};
 
-let last;
+const { projectId: project, location, embeddingLocation } = config.get('vertexai', true) as Configuration;
+
+const googleGenAi = new GoogleGenAI({ project, location });
+
+let last: number;
 
 async function query(query: string, {
 	systemInstructions,
@@ -33,7 +36,7 @@ async function query(query: string, {
 	model?: string;
 	files?: string[];
 }): Promise<string> {
-	const parts = [{ text: query }];
+	const parts: Part[] = [{ text: query }];
 	
 	for (const file of files) {
 		if (file.toLowerCase().startsWith('gs://')) {
@@ -48,7 +51,7 @@ async function query(query: string, {
 		}
 	}
 	
-	const contents = [
+	const contents: Content[] = [
 		...history.toVertexAi(),
 		{ role: 'user', parts }
 	];
@@ -66,42 +69,41 @@ async function query(query: string, {
 		});
 	}
 	
-	model ??= config.get('vertexai/model');
-	
-	const generativeModel = vertexAI.getGenerativeModel({ model });
-	
-	const generationConfig = {
-		temperature,
-		maxOutputTokens: maxTokens && Math.min(maxTokens, 8192)
-	};
-	
-	if (structuredResponse) generationConfig.responseMimeType = 'application/json';
+	model ??= config.get('vertexai/model') as string;
 	
 	if (last) {
-		const delay = config.get('vertexai/quotaDelayMs', true) ?? 0;
+		const delay = config.get('vertexai/quotaDelayMs', true) as number ?? 0;
 		while (last + delay > performance.now()) await new Promise(resolve => setTimeout(resolve, last + delay - performance.now()));
 		last = performance.now();
 	}
 	
-	const result = await generativeModel.generateContent({
+	const result = await googleGenAi.models.generateContent({
+		model,
 		contents,
-		systemInstruction: systemInstructions,
-		generationConfig,
-		tools,
+		config: {
+			systemInstruction: systemInstructions,
+			temperature,
+			maxOutputTokens: maxTokens && Math.min(maxTokens, 8192),
+			responseMimeType: structuredResponse && 'application/json',
+			tools,
+		},
 	});
-	
-	return result.response.candidates[0].content.parts[0].text;
+
+	return result.candidates[0].content.parts[0].text;
 }
 
 async function generateEmbeddings(text: string, model?: string, taskType?: string): Promise<number[]> {
-	model ??= config.get('vertexai/embeddingModel');
+	model ??= config.get('vertexai/embeddingModel') as string;
 	
-	const endpoint = `projects/${project}/locations/${config.get('vertexai/embeddingLocation', true)}/publishers/google/models/${model}`;
-	const instances = [aiplatform.helpers.toValue({ content: text, task_type: taskType })];
-	
-	const [response] = await predictionServiceClient.predict({ endpoint, instances });
-	
-	return response.predictions[0].structValue.fields.embeddings.structValue.fields.values.listValue.values.map(v => v.numberValue);
+	const result = await googleGenAi.models.embedContent({
+		model,
+		contents: text,
+		config: {
+			taskType,
+		}
+	});
+
+	return result.embeddings[0].values;
 }
 
 async function generateQueryEmbeddings(text: string, model?: string): Promise<number[]> {

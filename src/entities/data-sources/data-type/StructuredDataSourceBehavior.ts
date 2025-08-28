@@ -1,4 +1,6 @@
 import DataSourceBehavior from '../DataSourceBehavior';
+import DataSourceItem from '../platform/DataSourceItem';
+import DigestDataSourceTarget from '../target/DigestDataSourceTarget';
 import FilesDataSourceTarget from '../target/FilesDataSourceTarget';
 import ProfileDataSourceTarget from '../target/ProfileDataSourceTarget';
 import RawDataDataSourceTarget from '../target/RawDataDataSourceTarget';
@@ -9,8 +11,12 @@ import UnsupportedError from '../../../utils/UnsupportedError';
 import { JsonObject, JsonPrimitive } from '../../../types/common';
 
 export default class StructuredDataSourceBehavior extends DataSourceBehavior {
+	static InputData: typeof DataSourceItem.DataContent;
+
+	static OutputData: typeof DigestDataSourceTarget.OutputData;
+
 	_targetBehavior: RawDataDataSourceTarget | ProfileDataSourceTarget | VectorDataSourceTarget | FilesDataSourceTarget;
-	
+
 	static QueryParameters: {
 		input?: string;
 		filter?: { [key: string]: JsonPrimitive };
@@ -24,7 +30,7 @@ export default class StructuredDataSourceBehavior extends DataSourceBehavior {
 		PROFILE: 'profile',
 		VECTOR_STRUCTURED: 'vector',
 		FILES: 'files',
-	};
+	} as const;
 	
 	get targetBehavior() {
 		if (!this._targetBehavior) {
@@ -49,7 +55,7 @@ export default class StructuredDataSourceBehavior extends DataSourceBehavior {
 		return Storage.get(StorageFile.TYPE.STRUCTURED_DATA, this.dataSource.id).read();
 	}
 	
-	async read(): Promise<Iterable<JsonObject>> {
+	async read(): Promise<any> {
 		return this.targetBehavior.read();
 	}
 	

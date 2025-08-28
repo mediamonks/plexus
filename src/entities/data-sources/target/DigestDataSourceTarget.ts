@@ -4,10 +4,13 @@ import StorageFile from '../../storage/StorageFile';
 import llm from '../../../modules/llm';
 
 class DigestDataSourceTarget extends DataSourceBehavior {
-	static DataType: string;
+	static InputData: string;
+	static OutputData: string;
 
-	async read(): Promise<typeof DigestDataSourceTarget.DataType> {
-		const text = this.getContents().join('\n\n');
+	async read(): Promise<typeof DigestDataSourceTarget.OutputData> {
+		const contents = await this.getContents();
+		
+		const text = contents.join('\n\n');
 		
 		const systemInstructions = await Storage.get(StorageFile.TYPE.DIGEST_INSTRUCTIONS, this.id).read();
 		
@@ -19,10 +22,11 @@ class DigestDataSourceTarget extends DataSourceBehavior {
 	
 	async ingest(): Promise<void> {
 		const contents = await this.read();
-		return Storage.get(StorageFile.TYPE.UNSTRUCTURED_DATA, this.id).ingest(contents);
+
+		return Storage.get(StorageFile.TYPE.UNSTRUCTURED_DATA, this.id).write(contents);
 	}
 	
-	async query(): Promise<any> {
+	async query(): Promise<typeof DigestDataSourceTarget.OutputData> {
 		return this.getData();
 	}
 }

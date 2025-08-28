@@ -5,11 +5,13 @@ import RequestContext from '../../utils/RequestContext';
 import UnknownError from '../../utils/UnknownError';
 
 class DataSources {
-	static _configuration;
-	static _dataSources = {};
+	static Configuration: Record<string, typeof DataSource.Configuration>;
+
+	static _configuration: typeof DataSources.Configuration;
+	static _dataSources: Record<string, DataSource> = {};
 	
-	static get configuration() {
-		return config.get('data-sources');
+	static get configuration(): typeof DataSources.Configuration {
+		return config.get('data-sources') as typeof DataSources.Configuration;
 	}
 	
 	static get dataSources() {

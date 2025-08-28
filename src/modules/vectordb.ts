@@ -1,15 +1,16 @@
 import azure from '../services/azure';
 import openai from '../services/openai';
-import vertexai from '../services/vertexai';
+import google from '../services/google';
 import lancedb from '../services/lancedb';
 import config from '../utils/config';
 import Profiler from '../utils/Profiler';
+import { JsonObject } from '../types/common';
 import embeddingModels from '../../data/embedding-models.json';
 
 const EMBEDDING_PLATFORMS = {
 	azure,
 	openai,
-	google: vertexai,
+	google,
 };
 
 const _embeddings = {};
@@ -65,7 +66,7 @@ async function append(tableName: string, source: AsyncIterable<any>, searchField
 	await Promise.all(promises);
 }
 
-async function create(tableName: string, source: AsyncIterable<any>, { schema }: { schema?: any } = {}): Promise<void> {
+async function create(tableName: string, source: AsyncGenerator<JsonObject>, { schema }: { schema?: any } = {}): Promise<void> {
 	const promises = [];
 	let dimensions, tableCreated, internalTableName;
 	

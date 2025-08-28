@@ -3,9 +3,10 @@ import UnstructuredDataSourceBehavior from './data-type/UnstructuredDataSourceBe
 import DataSourceItem from './platform/DataSourceItem';
 import DriveDataSourceBehavior from './platform/DriveDataSourceBehavior';
 import GcsDataSourceBehavior from './platform/GcsDataSourceBehavior';
+import DigestDataSourceTarget from './target/DigestDataSourceTarget';
 import RequestContext from '../../utils/RequestContext';
 import UnsupportedError from '../../utils/UnsupportedError';
-import DataSourceBehavior from './DataSourceBehavior';
+import { ValueOf } from '../../types/common';
 
 const GOOGLE_DRIVE_URI_PATTERN = /^https?:\/\/(?:drive|docs)\.google\.com\/(?:drive\/(folders)|(?:file|document|spreadsheets|presentation)\/d)\/([\w\-]+)/;
 
@@ -13,13 +14,14 @@ class DataSource {
 	_id: string;
 	_configuration: typeof DataSource.Configuration;
 	_data;
-	_dataType: 'text' | 'data';
-	_dataTypeBehavior: DataSourceBehavior;
+	_dataType: ValueOf<typeof DataSourceItem.DATA_TYPE>;
+	_dataTypeBehavior: typeof DataSource.DataTypeBehavior;
 	_isDynamic: boolean;
 	_items: DataSourceItem[];
-	_platformBehavior: DataSourceBehavior;
+	_platform: ValueOf<typeof DataSource.PLATFORM>;
+	_platformBehavior: typeof DataSource.PlatformBehavior;
 	_resolvedUri: string;
-	_target;
+	_target: ValueOf<typeof DataSource.TARGET>;
 
 	static Configuration: {
 		type: string;
@@ -28,107 +30,140 @@ class DataSource {
 		cache?: boolean;
 		platform?: string;
 		uri?: string;
+		namespace?: string;
 	};
+
+	static Contents: (typeof DataSourceItem.Content)[];
+
+	static DataTypeBehavior: UnstructuredDataSourceBehavior | StructuredDataSourceBehavior; // TODO replace with interface?
+
+	static PlatformBehavior: DriveDataSourceBehavior | GcsDataSourceBehavior; // TODO replace with interface?
+
+	static IngestedData: typeof DigestDataSourceTarget.OutputData;
 	
 	constructor(id: string, configuration: any) {
 		this._id = id;
 		this._configuration = configuration;
 	}
 	
-	static get TARGET () {
-		return { ...StructuredDataSourceBehavior.TARGET, ...UnstructuredDataSourceBehavior.TARGET };
-	}
+	static PLATFORM = {
+		DRIVE: 'drive',
+		GCS: 'gcs',
+	} as const;
 	
-	get id() {
+	static get TARGET (): typeof StructuredDataSourceBehavior.TARGET & typeof UnstructuredDataSourceBehavior.TARGET {
+		return { ...StructuredDataSourceBehavior.TARGET, ...UnstructuredDataSourceBehavior.TARGET };
+	};
+	
+	get id(): string {
 		return this._id;
 	}
 	
-	get uri() {
+	get uri(): string {
 		return this.configuration.uri;
 	}
 	
-	get isDynamic() {
+	get isDynamic(): boolean {
 		return this._isDynamic ??= this.uri ? /\{\w+}/.test(this.uri) : this.source.startsWith(':'); // TODO for backwards compatibility
 	}
 	
-	get configuration() {
+	get configuration(): typeof DataSource.Configuration {
 		return this._configuration;
 	}
 	
-	get type() {
+	get type(): string {
 		return this.configuration.type;
 	}
 	
-	get dataType() {
-		return this._dataType ??= this.type.split(':')[0]; // TODO for backwards compatibilty
+	get dataType(): ValueOf<typeof DataSourceItem.DATA_TYPE> {
+		if (this._dataType) return this._dataType;
+
+		const dataType = this.type.split(':')[0]; // TODO for backwards compatibility
+
+		if (!Object.values(DataSourceItem.DATA_TYPE).includes(dataType as ValueOf<typeof DataSourceItem.DATA_TYPE>))
+			 throw new UnsupportedError('data source data type', dataType, DataSourceItem.DATA_TYPE);
+
+		return this._dataType = dataType as ValueOf<typeof DataSourceItem.DATA_TYPE>;
 	}
 	
-	get dataTypeBehavior() {
-		if (!this._dataTypeBehavior) {
-			const mapping = {
-				text: UnstructuredDataSourceBehavior,
-				data: StructuredDataSourceBehavior,
-			};
-			
-			const dataTypeBehaviorClass = mapping[this.dataType];
+	get dataTypeBehavior(): typeof DataSource.DataTypeBehavior {
+		if (this._dataTypeBehavior) return this._dataTypeBehavior;
+
+		// TODO support mixed/unknown
+		const mapping = {
+			[DataSourceItem.DATA_TYPE.TEXT]: UnstructuredDataSourceBehavior,
+			[DataSourceItem.DATA_TYPE.DATA]: StructuredDataSourceBehavior,
+		};
 		
-			if (!dataTypeBehaviorClass) throw new UnsupportedError('data source data type', this.dataType, mapping);
-			
-			this._dataTypeBehavior = new dataTypeBehaviorClass(this);
-		}
+		const dataTypeBehaviorClass = mapping[this.dataType];
+	
+		if (!dataTypeBehaviorClass) throw new UnsupportedError('data source data type', this.dataType, mapping);
 		
-		return this._dataTypeBehavior;
+		return this._dataTypeBehavior = new dataTypeBehaviorClass(this);
 	}
 	
-	get platform() {
-		if (!this._platform) this._platform = this.configuration.platform;
+	get platform(): ValueOf<typeof DataSource.PLATFORM> {
+		if (this._platform) return this._platform;
+
+		const mapping = {
+			[DataSource.PLATFORM.DRIVE]: GOOGLE_DRIVE_URI_PATTERN,
+			[DataSource.PLATFORM.GCS]: /^gs:\/\//
+		};
 		
-		if (!this._platform) {
-			if (this.isDynamic) throw new Error('Property `platform` must be explicitly set for dynamic data sources');
+		if (this.configuration.platform) {
+			if (!mapping[this.configuration.platform])
+				throw new UnsupportedError('data source platform', this.configuration.platform, DataSource.PLATFORM);
 			
-			const mapping = {
-				drive: GOOGLE_DRIVE_URI_PATTERN,
-				gcs: /^gs:\/\//
-			};
-			
-			this._platform = Object.keys(mapping).find(platform => mapping[platform].test(this.uri));
-			
-			if (!this._platform) throw new UnsupportedError('data source URI', this.uri, mapping);
+			return this._platform = this.configuration.platform as ValueOf<typeof DataSource.PLATFORM>;
 		}
+		
+		if (this.isDynamic) throw new Error('Property `platform` must be explicitly set for dynamic data sources');
+		
+		this._platform = Object.keys(mapping)
+			.find(platform => mapping[platform].test(this.uri)) as ValueOf<typeof DataSource.PLATFORM>;
+		
+		if (!this._platform) throw new UnsupportedError('data source URI', this.uri, mapping);
 		
 		return this._platform;
 	}
 	
-	get platformBehavior() {
-		if (!this._platformBehavior) {
-			const mapping = {
-				drive: DriveDataSourceBehavior,
-				gcs: GcsDataSourceBehavior,
-			};
-			
-			const platformBehaviorClass = mapping[this.platform];
+	get platformBehavior(): typeof DataSource.PlatformBehavior {
+		if (this._platformBehavior) return this._platformBehavior;
+
+		const mapping = {
+			[DataSource.PLATFORM.DRIVE]: DriveDataSourceBehavior,
+			[DataSource.PLATFORM.GCS]: GcsDataSourceBehavior,
+		};
 		
-			if (!platformBehaviorClass) throw new UnsupportedError('data source platform', this.platform, mapping);
-			
-			this._platformBehavior = new platformBehaviorClass(this);
-		}
+		const platformBehaviorClass = mapping[this.platform];
+	
+		if (!platformBehaviorClass) throw new UnsupportedError('data source platform', this.platform, mapping);
+		
+		this._platformBehavior = new platformBehaviorClass(this);
 		
 		return this._platformBehavior;
 	}
 	
-	get target() {
-		return this._target ??= this.type.split(':')[1]; // TODO for backwards compatibility
+	get target(): ValueOf<typeof DataSource.TARGET> {
+		if (this._target) return this._target;
+
+		const target = this.type.split(':')[1]; // TODO for backwards compatibility
+
+		if (!Object.values(DataSource.TARGET).includes(target as ValueOf<typeof DataSource.TARGET>))
+			 throw new UnsupportedError('data source target', target, DataSource.TARGET);
+
+		return this._target = target as ValueOf<typeof DataSource.TARGET>;
 	}
 	
-	get source() {
+	get source(): string {
 		return this.configuration.source;
 	}
 	
-	get isFolder() {
+	get isFolder(): boolean {
 		return this.configuration.folder;
 	}
 	
-	get allowCache() {
+	get allowCache(): boolean {
 		return this.configuration.cache ?? true;
 	}
 	
@@ -148,7 +183,7 @@ class DataSource {
 		return this._resolvedUri;
 	}
 	
-	async getIngestedData(): Promise<any> {
+	async getIngestedData(): Promise<typeof DigestDataSourceTarget.OutputData> {
 		try {
 			return this._data ??= await this.dataTypeBehavior.getIngestedData();
 		} catch (error) {
@@ -170,7 +205,7 @@ class DataSource {
 		return this.getIngestedData();
 	}
 	
-	async getContents(): Promise<any[]> {
+	async getContents(): Promise<typeof DataSource.Contents> {
 		const items = await this.getItems();
 		
 		return await Promise.all(items.map(item => item.getContent()));
