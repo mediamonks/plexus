@@ -1,8 +1,7 @@
-require('dotenv').config();
+import 'dotenv/config'
+import router from './src/modules/router';
 
 process.env.NODE_ENV = 'dev';
-
-const router = require('./src/modules/router');
 
 async function invoke(body) {
 	let response;

@@ -3,6 +3,7 @@
 	"version": "1.1.0",
 	"description": "Plexus Agentic Engine",
 	"main": "index.js",
+	"type": "module",
 	"scripts": {
 		"auth": "gcloud auth application-default login --scopes=https://www.googleapis.com/auth/drive,https://www.googleapis.com/auth/cloud-platform; gcloud auth application-default set-quota-project monks-plexus",
 		"generate-openapi": "node tools/generate-openapi.js $npm_config_env gateway > config/openapi.yaml; node tools/generate-openapi.js $npm_config_env > public/openapi.yaml",
@@ -29,6 +30,8 @@
 		"@google-cloud/tasks": "^5.5.2",
 		"@google-cloud/vertexai": "^1.9.3",
 		"@lancedb/lancedb": "^0.16.0",
+		"@langchain/core": "^0.3.72",
+		"apache-arrow": "^21.0.0",
 		"dotenv": "^16.4.7",
 		"google-auth-library": "^10.2.1",
 		"googleapis": "^152.0.0",
@@ -37,8 +40,10 @@
 		"mime-types": "^2.1.35",
 		"open": "^10.1.2",
 		"openai": "^4.82.0",
-		"pdf-parse": "^1.1.1",
+		"pdf-parse": "1.1.0",
+		"ts-node": "^10.9.2",
 		"turndown": "^7.2.0",
+		"typescript": "^5.9.2",
 		"uuid": "^11.1.0",
 		"xlsx": "^0.18.5"
 	},
