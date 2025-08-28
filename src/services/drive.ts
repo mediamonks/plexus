@@ -10,20 +10,21 @@ import config from '../utils/config';
 import Debug from '../utils/Debug';
 import Profiler from '../utils/Profiler';
 
-const tempPath = config.get('tempPath');
-// TODO download to sources/ directory just like gcs??
+const tempPath = config.get('tempPath') as string;
 const DOWNLOAD_PATH = path.join(tempPath, 'download', 'drive');
 const TEMP_FOLDER_ID = '1GAohqXcRbIyu-Nk86GQxfRBAKAJtq_6y';
+
+export type FileMetaData = drive_v3.Schema$File;
 
 export default async () => {
 	const auth = await authenticate();
 	const drive = google.drive({ version: 'v3', auth });
 	
-	async function createFile(name, folderId, mimeType, body, mediaMimeType) {
+	async function createFile(name: string, folderId: string, mimeType: string, body: Buffer | Readable | string, mediaMimeType?: string) {
 		await workspace.quotaDelay(workspace.SERVICE.DRIVE, workspace.OPERATION.WRITE);
 		
 		const response = await drive.files.create({
-			resource: {
+			requestBody: {
 				name,
 				parents: [folderId],
 				mimeType,
@@ -64,7 +65,7 @@ export default async () => {
 		
 		try {
 			const folder = await drive.files.create({
-				resource: fileMetadata,
+				requestBody: fileMetadata,
 				fields: 'id, name, webViewLink',
 				supportsAllDrives: true
 			});
@@ -165,7 +166,7 @@ export default async () => {
 
 		const downloadableFiles = files.filter(file => !file.mimeType.startsWith('application/vnd.google-apps.'));
 
-		return await Promise.all(downloadableFiles.map(downloadFile));
+		return await Promise.all(downloadableFiles.map(file => downloadFile(file)));
 	}
 	
 	async function exportFolderContents(folderId, type) {
@@ -228,7 +229,7 @@ export default async () => {
 		};
 	}
 	
-	async function exportFile(file, type, allowCache) {
+	async function exportFile(file: drive_v3.Schema$File, type: string, allowCache = false) {
 		const mimeType = mime.lookup(type);
 		
 		if (!mimeType) throw new Error(`Cannot export file type ${type}. Supported types: ${Object.keys(mime.types).join(', ')}`);
@@ -280,7 +281,7 @@ export default async () => {
 		await workspace.quotaDelay(workspace.SERVICE.DRIVE, workspace.OPERATION.WRITE);
 		
 		const response = await drive.files.create({
-			resource: {
+			requestBody: {
 				name,
 				mimeType: 'application/vnd.google-apps.shortcut',
 				shortcutDetails: {
@@ -351,7 +352,7 @@ export default async () => {
 		
 		await drive.files.update({
 			fileId: id,
-			resource: { trashed: true },
+			requestBody: { trashed: true },
 			supportsAllDrives: true,
 		});
 	}

@@ -15,7 +15,7 @@ export default class UnstructuredDataSourceBehavior extends DataSourceBehavior {
 		DIGEST: 'digest',
 		VECTOR_UNSTRUCTURED: 'vector',
 		FILES: 'files',
-	};
+	} as const;
 	
 	get targetBehavior() {
 		if (!this._targetBehavior) {

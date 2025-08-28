@@ -1,25 +1,29 @@
 import DataSourceBehavior from '../DataSourceBehavior';
+import DataSourceItem from '../platform/DataSourceItem';
 import StructuredDataSourceBehavior from '../data-type/StructuredDataSourceBehavior';
 import vectordb from '../../../modules/vectordb';
-import { JsonObject } from '../../../types/common';
+import { JsonObject, SpreadSheet } from '../../../types/common';
 
 class VectorDataSourceTarget extends DataSourceBehavior {
-	async read(): Promise<() => AsyncGenerator<JsonObject>> {
-		const contents = this.getContents();
-		
-		return async function* () {
+	static OutputData: AsyncGenerator<JsonObject>;
+
+	async read(): Promise<typeof VectorDataSourceTarget.OutputData> {
+		const contents = await this.getContents() as (typeof DataSourceItem.DataContent)[];
+
+		return (async function* () {
 			for await (const data of contents) {
+				if (!(Symbol.asyncIterator in data)) throw new Error('Unsupported input data for vector target data source: must be JSONL');
 				for await (const record of data) {
 					yield { ...record, vector: await vectordb.generateDocumentEmbeddings(record) };
 				}
 			}
-		};
+		})();
 	}
 	
 	async ingest(): Promise<void> {
 		// TODO support incremental ingesting
 		await vectordb.drop(this.id);
-		await vectordb.create(this.id, this.read());
+		await vectordb.create(this.id, await this.read());
 	}
 	
 	async query({ input, limit, filter, fields }: typeof StructuredDataSourceBehavior.QueryParameters): Promise<any> {

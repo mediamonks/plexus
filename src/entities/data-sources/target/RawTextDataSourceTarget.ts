@@ -3,13 +3,15 @@ import Storage from '../../storage/Storage';
 import StorageFile from '../../storage/StorageFile';
 
 class RawTextDataSourceTarget extends DataSourceBehavior {
+	static OutputData: string;
+	
 	async read(): Promise<string> {
 		return this.getContents().join('\n\n');
 	}
 	
 	async ingest(): Promise<void> {
 		const contents = await this.read();
-		return Storage.get(StorageFile.TYPE.UNSTRUCTURED_DATA, this.id).ingest(contents);
+		return Storage.get(StorageFile.TYPE.UNSTRUCTURED_DATA, this.id).write(contents);
 	}
 	
 	async query(): Promise<any> {

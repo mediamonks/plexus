@@ -1,7 +1,11 @@
 import DataSourceBehavior from '../DataSourceBehavior';
+import DataSourceItem from '../platform/DataSourceItem';
 
 class FilesDataSourceTarget extends DataSourceBehavior {
-	async read(): Promise<any[]> {
+	static InputData: DataSourceItem[];
+	static OutputData: DataSourceItem[];
+
+	async read(): Promise<typeof FilesDataSourceTarget.OutputData> {
 		return this.getItems();
 	}
 	
@@ -10,7 +14,7 @@ class FilesDataSourceTarget extends DataSourceBehavior {
 		return console.warn(`Not ingesting files target data source "${this.id}"`);
 	}
 	
-	async query(): Promise<any> {
+	async query(): Promise<typeof FilesDataSourceTarget.OutputData> {
 		return this.getData();
 	}
 }

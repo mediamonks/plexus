@@ -5,33 +5,38 @@ import gcs from '../../../services/gcs';
 import jsonl from '../../../utils/jsonl';
 import pdf from '../../../utils/pdf';
 import UnsupportedError from '../../../utils/UnsupportedError';
-import { JsonObject } from '../../../types/common';
+import { JsonObject, ValueOf } from '../../../types/common';
 
-class GcsDataSourceItem extends DataSourceItem {
-	_uri;
+export default class GcsDataSourceItem extends DataSourceItem {
+	static TextContent: string;
+
+	static DataContent: AsyncGenerator<JsonObject>;
+
+	_uri: string;
 	
 	constructor(dataSource: any, uri: string) {
 		super(dataSource);
+
 		this._uri = uri;
 	}
 	
-	get uri() {
+	get uri(): string {
 		return this._uri;
 	}
 	
-	get extension() {
+	get extension(): string {
 		return path.extname(this.uri).substring(1);
 	}
 	
-	get fileName() {
+	get fileName(): string {
 		return path.basename(this.uri);
 	}
 	
-	detectDataType(): string {
+	detectDataType(): ValueOf<typeof DataSourceItem.DATA_TYPE> {
 		return {
-			pdf: 'text',
-			txt: 'text',
-			jsonl: 'data',
+			pdf: DataSourceItem.DATA_TYPE.TEXT,
+			txt: DataSourceItem.DATA_TYPE.TEXT,
+			jsonl: DataSourceItem.DATA_TYPE.DATA,
 		}[this.extension];
 	}
 	
@@ -39,7 +44,7 @@ class GcsDataSourceItem extends DataSourceItem {
 		return this.allowCache ? await gcs.cache(this.uri) : gcs.download(this.uri);
 	}
 	
-	async toText(): Promise<string> {
+	async toText(): Promise<typeof GcsDataSourceItem.TextContent> {
 		const file = await this.getLocalFile();
 		
 		const mapping = {
@@ -52,10 +57,8 @@ class GcsDataSourceItem extends DataSourceItem {
 		return await mapping[this.extension]();
 	}
 	
-	async toData(): Promise<AsyncGenerator<JsonObject>> {
+	async toData(): Promise<typeof GcsDataSourceItem.DataContent> {
 		const file = await this.getLocalFile();
 		return jsonl.read(file);
 	}
 }
-
-export default GcsDataSourceItem;

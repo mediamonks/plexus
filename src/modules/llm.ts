@@ -1,6 +1,6 @@
 import azure from '../services/azure';
 import openai from '../services/openai';
-import google from '../services/vertexai';
+import google from '../services/google';
 import config from '../utils/config';
 
 const PLATFORMS = {
