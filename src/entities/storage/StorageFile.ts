@@ -4,20 +4,23 @@ import gcs from '../../services/gcs';
 import config from '../../utils/config';
 import Debug from '../../utils/Debug';
 
-class StorageFile {
-	_name;
-	
-	constructor(name: string, type: string) {
-		this._name = name;
-		this._type = type;
-	}
-	
+export default abstract class StorageFile<T> {
+	_name: string;
+	_type: string;
+
+	abstract readonly _extension: string;
+
 	static TYPE = {
 		AGENT_INSTRUCTIONS: 'AGENT_INSTRUCTIONS',
 		DIGEST_INSTRUCTIONS: 'DIGEST_INSTRUCTIONS',
 		STRUCTURED_DATA: 'STRUCTURED_DATA',
 		UNSTRUCTURED_DATA: 'UNSTRUCTURED_DATA',
 	} as const
+	
+	constructor(name: string, type: string) {
+		this._name = name;
+		this._type = type;
+	}
 	
 	get name() {
 		return this._name;
@@ -27,8 +30,8 @@ class StorageFile {
 		return this._type;
 	}
 	
-	get extension() {
-		return this.constructor._extension;
+	get extension(): string {
+		return this._extension;
 	}
 	
 	get fileName() {
@@ -37,10 +40,10 @@ class StorageFile {
 	
 	get typeBasedPath() {
 		return {
-			[this.constructor.TYPE.AGENT_INSTRUCTIONS]: 'instructions/agent',
-			[this.constructor.TYPE.DIGEST_INSTRUCTIONS]: 'instructions/digest',
-			[this.constructor.TYPE.STRUCTURED_DATA]: 'data/structured',
-			[this.constructor.TYPE.UNSTRUCTURED_DATA]: 'data/unstructured',
+			[StorageFile.TYPE.AGENT_INSTRUCTIONS]: 'instructions/agent',
+			[StorageFile.TYPE.DIGEST_INSTRUCTIONS]: 'instructions/digest',
+			[StorageFile.TYPE.STRUCTURED_DATA]: 'data/structured',
+			[StorageFile.TYPE.UNSTRUCTURED_DATA]: 'data/unstructured',
 		}[this.type];
 	}
 	
@@ -49,14 +52,14 @@ class StorageFile {
 	}
 	
 	get localPath() {
-		return path.join(config.get('tempPath'), 'storage', ...this.typeBasedPath.split('/'), this.fileName);
+		return path.join(config.get('tempPath') as string, 'storage', ...this.typeBasedPath.split('/'), this.fileName);
 	}
 	
 	get uri() {
 		return `gs://${config.get('storage.bucket')}/${this.remotePath}`;
 	}
 	
-	async cache(): Promise<void> {
+	protected async cache(): Promise<void> {
 		try {
 			await fs.access(this.localPath);
 		} catch (error) {
@@ -65,12 +68,14 @@ class StorageFile {
 		}
 	}
 	
-	async write(contents: string): Promise<void> {
+	abstract read(): Promise<T>;
+
+	abstract write(data: T): Promise<void>;
+
+	protected async writeText(text: string): Promise<void> {
 		await Promise.all([
-			gcs.write(this.uri, contents),
+			gcs.write(this.uri, text),
 			fs.unlink(this.localPath).catch(),
 		]);
 	}
 }
-
-export default StorageFile;

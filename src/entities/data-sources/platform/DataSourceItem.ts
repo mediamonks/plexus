@@ -14,8 +14,8 @@ export default class DataSourceItem {
 	static Content: typeof DataSourceItem.TextContent | typeof DataSourceItem.DataContent;
 
 	static DATA_TYPE = {
-		TEXT: 'text',
-		DATA: 'data',
+		UNSTRUCTURED: 'text',
+		STRUCTURED: 'data',
 	} as const;
 	
 	constructor(dataSource: any) {
@@ -48,8 +48,8 @@ export default class DataSourceItem {
 	
 	async getContent(): Promise<typeof DataSourceItem.Content> {
 		return {
-			[DataSourceItem.DATA_TYPE.TEXT]: () => this.toText(),
-			[DataSourceItem.DATA_TYPE.DATA]: () => this.toData(),
+			[DataSourceItem.DATA_TYPE.UNSTRUCTURED]: () => this.toText(),
+			[DataSourceItem.DATA_TYPE.STRUCTURED]: () => this.toData(),
 		}[this.dataType]();
 	}
 }

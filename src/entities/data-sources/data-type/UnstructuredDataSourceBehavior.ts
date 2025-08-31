@@ -1,13 +1,14 @@
+import IDataTypeDataSourceBehavior from './IDataTypeDataSourceBehavior';
 import DataSourceBehavior from '../DataSourceBehavior';
-import DigestDataSourceTarget from '../target/DigestDataSourceTarget';
-import FilesDataSourceTarget from '../target/FilesDataSourceTarget';
-import RawTextDataSourceTarget from '../target/RawTextDataSourceTarget';
-import VectorDataSourceTarget from '../target/VectorDataSourceTarget';
+import DigestTargetDataSourceBehavior from '../target/DigestTargetDataSourceBehavior';
+import FilesDataSourceTarget from '../target/FilesTargetDataSourceBehavior';
+import RawTextTargetDataSourceBehavior from '../target/RawTextTargetDataSourceBehavior';
+import VectorTargetDataSourceBehavior from '../target/VectorTargetDataSourceBehavior';
 import Storage from '../../storage/Storage';
 import StorageFile from '../../storage/StorageFile';
 import UnsupportedError from '../../../utils/UnsupportedError';
 
-export default class UnstructuredDataSourceBehavior extends DataSourceBehavior {
+export default class UnstructuredDataSourceBehavior extends DataSourceBehavior implements IDataTypeDataSourceBehavior {
 	_targetBehavior;
 	
 	static TARGET = {
@@ -20,9 +21,9 @@ export default class UnstructuredDataSourceBehavior extends DataSourceBehavior {
 	get targetBehavior() {
 		if (!this._targetBehavior) {
 			const mapping = {
-				raw: RawTextDataSourceTarget,
-				digest: DigestDataSourceTarget,
-				vector: VectorDataSourceTarget,
+				raw: RawTextTargetDataSourceBehavior,
+				digest: DigestTargetDataSourceBehavior,
+				vector: VectorTargetDataSourceBehavior,
 				files: FilesDataSourceTarget,
 			};
 			

@@ -1,28 +1,26 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
 
-class RequestContext {
-	static _localMock = {};
-	static _asyncLocalStorage;
+export default class RequestContext {
+	static _localMock: Record<string, unknown> = {};
+	static _asyncLocalStorage: AsyncLocalStorage<Record<string, unknown>>;
 	
-	static run(data: any, fn: () => any): any {
+	static run<T>(data: Record<string, unknown>, fn: () => T): T {
 		return this.asyncLocalStorage.run(data, fn);
 	}
 	
-	static get asyncLocalStorage() {
-		return this._asyncLocalStorage ??= new AsyncLocalStorage();
+	static get asyncLocalStorage(): AsyncLocalStorage<Record<string, unknown>> {
+		return this._asyncLocalStorage ??= new AsyncLocalStorage<Record<string, unknown>>();
 	}
 	
-	static get keys() {
+	static get keys(): Record<string, unknown> {
 		return this.asyncLocalStorage.getStore() ?? this._localMock;
 	}
 	
-	static get(key: string, defaultValue?: any): any {
+	static get(key: string, defaultValue?: unknown): unknown {
 		return this.keys[key] ??= defaultValue;
 	}
 	
-	static set(key: string, value: any): any {
+	static set(key: string, value: unknown): void {
 		this.keys[key] = value;
 	}
 }
-
-export default RequestContext;

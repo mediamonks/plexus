@@ -34,9 +34,9 @@ export default class GcsDataSourceItem extends DataSourceItem {
 	
 	detectDataType(): ValueOf<typeof DataSourceItem.DATA_TYPE> {
 		return {
-			pdf: DataSourceItem.DATA_TYPE.TEXT,
-			txt: DataSourceItem.DATA_TYPE.TEXT,
-			jsonl: DataSourceItem.DATA_TYPE.DATA,
+			pdf: DataSourceItem.DATA_TYPE.UNSTRUCTURED,
+			txt: DataSourceItem.DATA_TYPE.UNSTRUCTURED,
+			jsonl: DataSourceItem.DATA_TYPE.STRUCTURED,
 		}[this.extension];
 	}
 	

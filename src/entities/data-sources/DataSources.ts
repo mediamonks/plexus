@@ -4,7 +4,7 @@ import hash from '../../utils/hash';
 import RequestContext from '../../utils/RequestContext';
 import UnknownError from '../../utils/UnknownError';
 
-class DataSources {
+export default class DataSources {
 	static Configuration: Record<string, typeof DataSource.Configuration>;
 
 	static _configuration: typeof DataSources.Configuration;
@@ -14,11 +14,11 @@ class DataSources {
 		return config.get('data-sources') as typeof DataSources.Configuration;
 	}
 	
-	static get dataSources() {
-		return RequestContext.get('dataSources', {});
+	static get dataSources(): Record<string, DataSource> {
+		return RequestContext.get('dataSources', {}) as Record<string, DataSource>;
 	}
 	
-	static get ids() {
+	static get ids(): string[] {
 		return Object.keys(this.configuration);
 	}
 	
@@ -46,5 +46,3 @@ class DataSources {
 		}));
 	}
 }
-
-export default DataSources;

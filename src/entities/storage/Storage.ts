@@ -3,12 +3,12 @@ import StorageDataFile from './StorageDataFile';
 import StorageTextFile from './StorageTextFile';
 import UnsupportedError from '../../utils/UnsupportedError';
 
-class Storage {
+export default class Storage {
 	static _storageFiles = {};
 	
 	static get(type: typeof StorageFile.TYPE.STRUCTURED_DATA, name: string): StorageDataFile;
 	static get(type: typeof StorageFile.TYPE.DIGEST_INSTRUCTIONS | typeof StorageFile.TYPE.AGENT_INSTRUCTIONS | typeof StorageFile.TYPE.UNSTRUCTURED_DATA, name: string): StorageTextFile;
-	static get(type: string, name: string): StorageFile | StorageDataFile | StorageTextFile {
+	static get(type: string, name: string): StorageDataFile | StorageTextFile {
 		let instance = Storage._storageFiles[type]?.[name];
 		
 		if (!instance) {
@@ -32,5 +32,3 @@ class Storage {
 		return instance;
 	}
 }
-
-export default Storage;

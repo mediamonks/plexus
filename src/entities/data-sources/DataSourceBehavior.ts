@@ -1,7 +1,7 @@
 import DataSource from "./DataSource";
 import DataSourceItem from "./platform/DataSourceItem";
 
-class DataSourceBehavior {
+export default class DataSourceBehavior {
 	_dataSource: DataSource;
 	
 	constructor (dataSource: DataSource) {
@@ -31,7 +31,7 @@ class DataSourceBehavior {
 	get isFolder(): boolean {
 		return this.dataSource.isFolder;
 	}
-	
+
 	async getData(): Promise<any> {
 		return this.dataSource.getData();
 	}
@@ -49,4 +49,3 @@ class DataSourceBehavior {
 	}
 }
 
-export default DataSourceBehavior;

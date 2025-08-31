@@ -3,11 +3,11 @@ import Storage from '../../storage/Storage';
 import StorageFile from '../../storage/StorageFile';
 import llm from '../../../modules/llm';
 
-class DigestDataSourceTarget extends DataSourceBehavior {
-	static InputData: string;
+export default class DigestTargetDataSourceBehavior extends DataSourceBehavior {
+	static InputData: string[];
 	static OutputData: string;
 
-	async read(): Promise<typeof DigestDataSourceTarget.OutputData> {
+	async read(): Promise<typeof DigestTargetDataSourceBehavior.OutputData> {
 		const contents = await this.getContents();
 		
 		const text = contents.join('\n\n');
@@ -26,9 +26,7 @@ class DigestDataSourceTarget extends DataSourceBehavior {
 		return Storage.get(StorageFile.TYPE.UNSTRUCTURED_DATA, this.id).write(contents);
 	}
 	
-	async query(): Promise<typeof DigestDataSourceTarget.OutputData> {
+	async query(): Promise<typeof DigestTargetDataSourceBehavior.OutputData> {
 		return this.getData();
 	}
 }
-
-export default DigestDataSourceTarget;

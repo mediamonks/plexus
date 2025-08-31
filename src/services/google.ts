@@ -28,7 +28,7 @@ async function query(query: string, {
 	files = [],
 }: {
 	systemInstructions?: string;
-	history?: any;
+	history?: History;
 	temperature?: number;
 	maxTokens?: number | null;
 	datastoreIds?: string[];
