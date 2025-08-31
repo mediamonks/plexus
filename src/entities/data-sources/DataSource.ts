@@ -1,25 +1,33 @@
+import IDataTypeDataSourceBehavior from './data-type/IDataTypeDataSourceBehavior';
 import StructuredDataSourceBehavior from './data-type/StructuredDataSourceBehavior';
 import UnstructuredDataSourceBehavior from './data-type/UnstructuredDataSourceBehavior';
+import IDataSourcePlatformBehavior from './platform/IPlatformDataSourceBehavior';
 import DataSourceItem from './platform/DataSourceItem';
 import DriveDataSourceBehavior from './platform/DriveDataSourceBehavior';
 import GcsDataSourceBehavior from './platform/GcsDataSourceBehavior';
-import DigestDataSourceTarget from './target/DigestDataSourceTarget';
+import DigestTargetDataSourceBehavior from './target/DigestTargetDataSourceBehavior';
+import FilesTargetDataSourceBehavior from './target/FilesTargetDataSourceBehavior';
+import ProfileTargetDataSourceBehavior from './target/ProfileTargetDataSourceBehavior';
+import RawDataDataSourceTarget from './target/RawDataTargetDataSourceBehavior';
+import RawTextTargetDataSourceBehavior from './target/RawTextTargetDataSourceBehavior';
+import VectorTargetDataSourceBehavior from './target/VectorTargetDataSourceBehavior';
 import RequestContext from '../../utils/RequestContext';
 import UnsupportedError from '../../utils/UnsupportedError';
-import { ValueOf } from '../../types/common';
+import { ValueOf, JsonObject } from '../../types/common';
+import Catalog from '../catalog/Catalog';
 
 const GOOGLE_DRIVE_URI_PATTERN = /^https?:\/\/(?:drive|docs)\.google\.com\/(?:drive\/(folders)|(?:file|document|spreadsheets|presentation)\/d)\/([\w\-]+)/;
 
-class DataSource {
+export default class DataSource {
 	_id: string;
 	_configuration: typeof DataSource.Configuration;
 	_data;
 	_dataType: ValueOf<typeof DataSourceItem.DATA_TYPE>;
-	_dataTypeBehavior: typeof DataSource.DataTypeBehavior;
+	_dataTypeBehavior: IDataTypeDataSourceBehavior;
 	_isDynamic: boolean;
 	_items: DataSourceItem[];
 	_platform: ValueOf<typeof DataSource.PLATFORM>;
-	_platformBehavior: typeof DataSource.PlatformBehavior;
+	_platformBehavior: IDataSourcePlatformBehavior;
 	_resolvedUri: string;
 	_target: ValueOf<typeof DataSource.TARGET>;
 
@@ -30,18 +38,26 @@ class DataSource {
 		cache?: boolean;
 		platform?: string;
 		uri?: string;
+		searchField?: string;
 		namespace?: string;
 	};
 
 	static Contents: (typeof DataSourceItem.Content)[];
 
-	static DataTypeBehavior: UnstructuredDataSourceBehavior | StructuredDataSourceBehavior; // TODO replace with interface?
+	static DataTypeBehavior: IDataTypeDataSourceBehavior;
 
-	static PlatformBehavior: DriveDataSourceBehavior | GcsDataSourceBehavior; // TODO replace with interface?
+	static PlatformBehavior: IDataSourcePlatformBehavior;
 
-	static IngestedData: typeof DigestDataSourceTarget.OutputData;
+	static IngestedData: typeof DigestTargetDataSourceBehavior.OutputData;
+
+	static OutputData: typeof DigestTargetDataSourceBehavior.OutputData
+		| typeof FilesTargetDataSourceBehavior.OutputData
+		| typeof ProfileTargetDataSourceBehavior.OutputData
+		| typeof RawDataDataSourceTarget.OutputData
+		| typeof RawTextTargetDataSourceBehavior.OutputData
+		| typeof VectorTargetDataSourceBehavior.OutputData;
 	
-	constructor(id: string, configuration: any) {
+	constructor(id: string, configuration: typeof DataSource.Configuration) {
 		this._id = id;
 		this._configuration = configuration;
 	}
@@ -91,9 +107,9 @@ class DataSource {
 
 		// TODO support mixed/unknown
 		const mapping = {
-			[DataSourceItem.DATA_TYPE.TEXT]: UnstructuredDataSourceBehavior,
-			[DataSourceItem.DATA_TYPE.DATA]: StructuredDataSourceBehavior,
-		};
+			[DataSourceItem.DATA_TYPE.UNSTRUCTURED]: UnstructuredDataSourceBehavior,
+			[DataSourceItem.DATA_TYPE.STRUCTURED]: StructuredDataSourceBehavior,
+		} as const;
 		
 		const dataTypeBehaviorClass = mapping[this.dataType];
 	
@@ -136,7 +152,7 @@ class DataSource {
 		};
 		
 		const platformBehaviorClass = mapping[this.platform];
-	
+
 		if (!platformBehaviorClass) throw new UnsupportedError('data source platform', this.platform, mapping);
 		
 		this._platformBehavior = new platformBehaviorClass(this);
@@ -166,6 +182,10 @@ class DataSource {
 	get allowCache(): boolean {
 		return this.configuration.cache ?? true;
 	}
+
+	get searchField(): string {
+		return this.configuration.searchField;
+	}
 	
 	async getResolvedUri(): Promise<string> {
 		if (!this.isDynamic) return this.uri;
@@ -175,7 +195,10 @@ class DataSource {
 			const matches = this.uri.match(/\{\w+}/g);
 			await Promise.all(matches.map(async match => {
 				const field = match.substring(1, match.length - 1);
-				const value = await RequestContext.get('catalog').get(field).getValue();
+				const value = (await RequestContext.get('catalog') as Catalog).get(field).getValue();
+
+				if (typeof value !== 'string') throw new Error(`Unable to use non-string value "${value}" of catalog field "${field}" in dynamic uri of data source "${this.id}"`);
+
 				this._resolvedUri = this._resolvedUri.replaceAll(match, value);
 			}));
 		}
@@ -183,10 +206,11 @@ class DataSource {
 		return this._resolvedUri;
 	}
 	
-	async getIngestedData(): Promise<typeof DigestDataSourceTarget.OutputData> {
+	async getIngestedData(): Promise<typeof DataSource.OutputData> {
 		try {
-			return this._data ??= await this.dataTypeBehavior.getIngestedData();
+			return await this.dataTypeBehavior.getIngestedData();
 		} catch (error) {
+			// TODO this could technically be just a warning, because getData() can handle it
 			throw new Error(`Data source "${this.id}" is not yet ingested`);
 		}
 	}
@@ -199,10 +223,14 @@ class DataSource {
 		return this._items;
 	}
 	
-	async getData(): Promise<any> {
-		if (this.isDynamic) return this._data ??= await this.read();
-		
-		return this.getIngestedData();
+	async getData(): Promise<typeof DataSource.OutputData> {
+		if (this._data) return this._data;
+
+		if (!this.isDynamic) this._data = await this.getIngestedData();
+
+		if (!this._data) this._data = await this.read();
+
+		return this._data;
 	}
 	
 	async getContents(): Promise<typeof DataSource.Contents> {
@@ -211,7 +239,7 @@ class DataSource {
 		return await Promise.all(items.map(item => item.getContent()));
 	}
 	
-	async read(): Promise<any> {
+	async read(): Promise<typeof DataSource.OutputData> {
 		return this.dataTypeBehavior.read();
 	}
 	
@@ -221,9 +249,7 @@ class DataSource {
 		return this.dataTypeBehavior.ingest();
 	}
 	
-	async query(parameters: any): Promise<any> {
+	async query(parameters: typeof StructuredDataSourceBehavior.QueryParameters): Promise<typeof DataSource.OutputData> {
 		return this.dataTypeBehavior.query(parameters);
 	}
 }
-
-export default DataSource;

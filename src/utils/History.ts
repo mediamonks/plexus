@@ -4,17 +4,19 @@ import config from './config';
 import Profiler from './Profiler';
 import RequestContext from './RequestContext';
 
-class History {
-	_history = [];
-	_threadId;
-	_ready;
+export default class History {
+	_history: { role: string; parts: { text: string }[] }[] = [];
+	_threadId: string;
+	_ready: Promise<void>;
 	
 	static get instance() {
-		return RequestContext.get('history');
+		return RequestContext.get('history') as History;
 	}
 	
 	static create(threadId?: string): History {
-		return RequestContext.set('history', new this(threadId));
+		const history = new this(threadId);
+		RequestContext.set('history', history);
+		return history;
 	}
 	
 	constructor (threadId?: string) {
@@ -92,5 +94,3 @@ class History {
 		return { role: last.role, content: last.parts[0].text };
 	}
 }
-
-export default History;

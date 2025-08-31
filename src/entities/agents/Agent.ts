@@ -16,13 +16,6 @@ const INPUT_OUTPUT_TEMPLATE = fs
 	.readFileSync('./data/input-output-template.txt', 'utf8')
 	.toString();
 
-type AgentConfiguration = {
-	context: string[];
-	required?: string[];
-	useHistory?: boolean;
-	temperature?: number | string;
-}
-
 export default class Agent {
 	isReady: boolean = false;
 	_baseInstructions: string;
@@ -54,8 +47,8 @@ export default class Agent {
 		return this._id;
 	}
 	
-	get configuration(): AgentConfiguration {
-		return this._configuration as AgentConfiguration;
+	get configuration(): typeof Agent.Configuration {
+		return this._configuration as typeof Agent.Configuration;
 	}
 	
 	get displayName(): string {

@@ -1,7 +1,7 @@
 import { performance } from 'node:perf_hooks';
 import RequestContext from './RequestContext';
 
-class Profiler {
+export default class Profiler {
 	static getReport(): any[] {
 		return this._log;
 	}
@@ -32,5 +32,3 @@ class Profiler {
 		return retval;
 	}
 }
-
-export default Profiler;

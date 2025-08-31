@@ -1,25 +1,27 @@
+import IDataTypeDataSourceBehavior from './IDataTypeDataSourceBehavior';
 import DataSourceBehavior from '../DataSourceBehavior';
 import DataSourceItem from '../platform/DataSourceItem';
-import DigestDataSourceTarget from '../target/DigestDataSourceTarget';
-import FilesDataSourceTarget from '../target/FilesDataSourceTarget';
-import ProfileDataSourceTarget from '../target/ProfileDataSourceTarget';
-import RawDataDataSourceTarget from '../target/RawDataDataSourceTarget';
-import VectorDataSourceTarget from '../target/VectorDataSourceTarget';
+import ITargetDataSourceBehavior from '../target/ITargetDataSourceBehavior';
+import DigestTargetDataSourceBehavior from '../target/DigestTargetDataSourceBehavior';
+import FilesDataSourceTarget from '../target/FilesTargetDataSourceBehavior';
+import ProfileTargetDataSourceBehavior from '../target/ProfileTargetDataSourceBehavior';
+import RawDataDataSourceTarget from '../target/RawDataTargetDataSourceBehavior';
+import VectorTargetDataSourceBehavior from '../target/VectorTargetDataSourceBehavior';
 import Storage from '../../storage/Storage';
 import StorageFile from '../../storage/StorageFile';
 import UnsupportedError from '../../../utils/UnsupportedError';
 import { JsonObject, JsonPrimitive } from '../../../types/common';
 
-export default class StructuredDataSourceBehavior extends DataSourceBehavior {
+export default class StructuredDataSourceBehavior extends DataSourceBehavior implements IDataTypeDataSourceBehavior {
 	static InputData: typeof DataSourceItem.DataContent;
 
-	static OutputData: typeof DigestDataSourceTarget.OutputData;
+	static OutputData: typeof DigestTargetDataSourceBehavior.OutputData;
 
-	_targetBehavior: RawDataDataSourceTarget | ProfileDataSourceTarget | VectorDataSourceTarget | FilesDataSourceTarget;
+	_targetBehavior: RawDataDataSourceTarget | ProfileTargetDataSourceBehavior | VectorTargetDataSourceBehavior | FilesDataSourceTarget;
 
 	static QueryParameters: {
 		input?: string;
-		filter?: { [key: string]: JsonPrimitive };
+		filter?: { [key: string]: string };
 		limit?: number;
 		fields?: string[];
 		sort?: string
@@ -32,12 +34,12 @@ export default class StructuredDataSourceBehavior extends DataSourceBehavior {
 		FILES: 'files',
 	} as const;
 	
-	get targetBehavior() {
+	get targetBehavior(): ITargetDataSourceBehavior {
 		if (!this._targetBehavior) {
 			const mapping = {
 				raw: RawDataDataSourceTarget,
-				profile: ProfileDataSourceTarget,
-				vector: VectorDataSourceTarget,
+				profile: ProfileTargetDataSourceBehavior,
+				vector: VectorTargetDataSourceBehavior,
 				files: FilesDataSourceTarget,
 			};
 			
