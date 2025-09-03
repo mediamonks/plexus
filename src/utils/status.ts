@@ -1,7 +1,8 @@
 import config from './config';
+import { Configuration } from '../types/common';
 
 function send(message: string, isRunning?: boolean): void {
-	const postback = config.get('postback');
+	const postback = config.get('postback') as Configuration['postback'];
 	if (!postback?.url) return;
 	
 	fetch(postback.url, {

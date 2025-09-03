@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import mime from 'mime-types';
 import config from '../utils/config.js';
 import RequestContext from '../utils/RequestContext';
+import { RequestPayload } from '../types/common.js';
 
 const routes = config.get('routes');
 
@@ -69,7 +70,7 @@ export default async function router(req: any, res: any): Promise<void> {
 	const fn = handlerModule.default;
 	
 	try {
-		const payload = req.method === 'POST' ? req.body : req.query;
+		const payload: RequestPayload = req.method === 'POST' ? req.body : req.query;
 		const response = await RequestContext.run({ payload }, () => fn(variables, payload)) ?? 'OK';
 		res.send(response);
 	} catch (error) {

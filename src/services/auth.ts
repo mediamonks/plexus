@@ -1,4 +1,4 @@
-import { GoogleAuth } from 'google-auth-library';
+import { GoogleAuth, GoogleAuthOptions } from 'google-auth-library';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
@@ -13,7 +13,7 @@ export default async function authenticate(): Promise<any> {
 	
 	const serviceAccountKeyPath = path.join(__dirname, '../../auth/mantra.json');
 	
-	let authOptions = {
+	const authOptions: GoogleAuthOptions = {
 		scopes: [
 			'https://www.googleapis.com/auth/drive',
 			'https://www.googleapis.com/auth/spreadsheets',

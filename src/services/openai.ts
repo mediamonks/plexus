@@ -5,7 +5,7 @@ import History from '../utils/History';
 const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 async function generateEmbeddings(input: string, model?: string): Promise<number[]> {
-	model ??= config.get('openai/embeddingModel');
+	model ??= config.get('openai/embeddingModel') as string;
 	
 	const response = await client.embeddings.create({ model, input });
 	
@@ -38,7 +38,7 @@ async function query(prompt: string, {
 	
 	if (systemInstructions) messages.unshift({ role: 'system', content: systemInstructions });
 	
-	model ??= config.get('openai/model');
+	model ??= config.get('openai/model') as string;
 	
 	const response = await client.chat.completions.create({
 		messages,

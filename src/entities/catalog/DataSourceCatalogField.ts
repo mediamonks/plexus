@@ -73,6 +73,16 @@ export default class DataSourceCatalogField extends CatalogField {
 		
 		await Promise.all(promises);
 		
-		this._value = await this.dataSource.query({ input, filter, ...this.queryParameters });
+		const value = await this.dataSource.query({ input, filter, ...this.queryParameters });
+
+		let result;
+		if (value instanceof Object && Symbol.asyncIterator in value) {
+			result = [];
+			for await (const item of value) result.push(item);
+		} else {
+			result = value;
+		}
+
+		this._value = result;
 	}
 }

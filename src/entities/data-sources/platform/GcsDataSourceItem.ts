@@ -12,7 +12,7 @@ export default class GcsDataSourceItem extends DataSourceItem {
 
 	static DataContent: AsyncGenerator<JsonObject>;
 
-	_uri: string;
+	_uri: string;;;;
 	
 	constructor(dataSource: any, uri: string) {
 		super(dataSource);

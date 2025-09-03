@@ -39,7 +39,7 @@ async function createOpenAIClient(baseURL: string): Promise<OpenAI> {
 		defaultHeaders: {
 			Authorization: `Bearer ${token}`,
 		},
-		defaultQuery: { 'api-version': config.get('azure/apiVersion') },
+		defaultQuery: { 'api-version': config.get('azure/apiVersion') as string },
 	});
 }
 
@@ -49,7 +49,7 @@ async function createOpenAIChatCompletionClient(model?: string): Promise<OpenAI>
 }
 
 async function createOpenAIEmbeddingsClient(model?: string): Promise<OpenAI> {
-	model ??= config.get('azure/embeddingModel');
+	model ??= config.get('azure/embeddingModel') as string;
 	return createOpenAIClient(`${config.get('azure/baseUrl')}/openai/deployments/${model}/embeddings?api-version=${config.get('azure/embeddingApiVersion')}`);
 }
 
@@ -57,6 +57,7 @@ async function generateEmbeddings(text: string, model?: string): Promise<number[
 	const client = await createOpenAIEmbeddingsClient(model);
 	
 	const response = await client.embeddings.create({
+		model,
 		input: text,
 	});
 	
@@ -93,7 +94,7 @@ async function query(prompt: string, {
 	
 	const response = await client.chat.completions.create({
 		messages,
-		model: config.get('model') ?? config.get('azure/deploymentName'), // TODO construct/retrieve deploymentName based on model selection?
+		model: config.get('azure/deploymentName') as string, // TODO construct/retrieve deploymentName based on model selection?
 		max_tokens: maxTokens,
 		temperature,
 		response_format: structuredResponse ? { type: 'json_object' } : undefined,

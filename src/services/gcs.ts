@@ -49,11 +49,12 @@ async function getFiles(uri: string): Promise<any[]> {
 	const prefix = getPath(uri);
 	
 	const [files] = await getBucket(uri).getFiles({ prefix });
+
 	return files.filter(file => file.name !== `${prefix}/`);
 }
 
 async function list(uri: string): Promise<string[]> {
-	return getFiles(uri).map(file => file.cloudStorageURI);
+	return (await getFiles(uri)).map(file => file.cloudStorageURI);
 }
 
 async function download(uri: string, destination?: string): Promise<string> {
@@ -66,15 +67,13 @@ async function download(uri: string, destination?: string): Promise<string> {
 	return destination;
 }
 
-async function downloadAll(uri: string, destination: string): Promise<void> {
+async function downloadAll(uri: string, destination?: string): Promise<void> {
 	const files = await getFiles(uri);
-	await Promise.all(files.map(file => download(file.cloudStorageURI, path.join(destination, file.name))));
+	await Promise.all(files.map(file => download(file.cloudStorageURI, destination && path.join(destination, file.name))));
 }
 
-async function cache(uri: string): Promise<string> {
-	let destination;
-	
-	destination = path.join(config.get('tempPath'), 'download', 'gcs', file.replace(/^gs:\/\//, ''));
+async function cache(uri: string, destination?: string): Promise<string> {
+	destination ??= path.join(config.get('tempPath') as string, 'download', 'gcs', uri.replace(/^gs:\/\//, ''));
 	
 	try {
 		await fs.access(destination);
@@ -85,26 +84,14 @@ async function cache(uri: string): Promise<string> {
 	return destination;
 }
 
-async function cacheAll(uri: string, destination: string): Promise<string[]> {
+async function cacheAll(uri: string, destination?: string): Promise<string[]> {
 	const files = await getFiles(uri);
-	return Promise.all(files.map(file => cache(file.cloudStorageURI, path.join(destination, file.name))));
+	return Promise.all(files.map(file => cache(file.cloudStorageURI, destination && path.join(destination, file.name))));
 }
 
 function isFolder(uri: string): boolean {
 	return uri.endsWith('/');
 }
-
-export {
-	read,
-	write,
-	upload,
-	list,
-	download,
-	downloadAll,
-	cache,
-	cacheAll,
-	isFolder,
-};
 
 export default {
 	read,

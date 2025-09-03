@@ -41,13 +41,12 @@
 		}
 	},
 	"/fields/{field}": {
-		"parameters": [
-			{
-				"name": "field",
+		"parameters": {
+			"field": {
 				"description": "The name of the field",
 				"type": "string"
 			}
-		],
+		},
 		"methods": {
 			"get": {
 				"summary": "Retrieve Field Options",
@@ -77,13 +76,12 @@
 		}
 	},
 	"/thread/{threadId}": {
-		"parameters": [
-			{
-				"name": "threadId",
+		"parameters": {
+			"threadId": {
 				"description": "The ID of the thread to retrieve",
 				"type": "string"
 			}
-		],
+		},
 		"methods": {
 			"get": {
 				"summary": "Retrieve Conversation Thread",
@@ -110,13 +108,12 @@
 		}
 	},
 	"/ingest/{namespace}": {
-		"parameters": [
-			{
-				"name": "namespace",
+		"parameters": {
+			"namespace": {
 				"description": "The namespace for which to ingest data",
 				"type": "string"
 			}
-		],
+		},
 		"methods": {
 			"post": {
 				"summary": "Ingest data sources",

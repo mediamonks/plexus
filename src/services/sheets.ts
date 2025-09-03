@@ -46,7 +46,7 @@ export default async () => {
 		
 		await sheets.spreadsheets.batchUpdate({
 			spreadsheetId,
-			resource: { requests },
+			requestBody: { requests },
 		});
 	}
 	
@@ -57,7 +57,7 @@ export default async () => {
 			spreadsheetId,
 			range: `${TAB_NAME}!B${rowNumber}`,
 			valueInputOption: 'RAW',
-			resource: {
+			requestBody: {
 				values: [rowData],
 			},
 		});
@@ -111,7 +111,7 @@ export default async () => {
 				spreadsheetId: metadata.id,
 				range: `${TAB_NAME}!A1`,
 				valueInputOption: 'USER_ENTERED',
-				resource: {
+				requestBody: {
 					values: data
 				}
 			});

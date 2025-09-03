@@ -1,9 +1,15 @@
 import { performance } from 'node:perf_hooks';
 import lancedb from '@lancedb/lancedb';
 import config from '../utils/config';
+import { JsonObject } from '../types/common';
+
+type Configuration = {
+	databaseUri: string;
+	rateLimitDelayMs?: number;
+};
 
 // const lancedbConfig = require('../../config/lancedb.json');
-const lancedbConfig = config.get('lancedb');
+const lancedbConfig = config.get('lancedb') as Configuration;
 
 let _db;
 const db = async () => _db ??= await lancedb.connect(lancedbConfig.databaseUri);
@@ -70,7 +76,7 @@ async function upsert(tableName: string, records: any[]): Promise<void> {
 		.execute(records);
 }
 
-async function search(tableName: string, embeddings: number[], { limit = 3, filter, fields }: { limit?: number; filter?: any; fields?: string[] }): Promise<any[]> {
+async function search(tableName: string, embeddings: number[], { limit = 3, filter, fields }: { limit?: number; filter?: any; fields?: string[] }): Promise<JsonObject[]> {
 	const table = await getTable(tableName);
 	
 	let vectorQuery = await table.vectorSearch(embeddings);
@@ -81,15 +87,15 @@ async function search(tableName: string, embeddings: number[], { limit = 3, filt
 		Object.keys(filter).map(key => `${key} = '${filter[key]}'`).join(' AND ')
 	);
 	
-	const results = await vectorQuery
+	return await vectorQuery
 		.distanceType('cosine')
 		.limit(limit)
-		.toArray()
+		.toArray();
+
+	// const resultArray = [];
+	// for await(const item of results) resultArray.push(item);
 	
-	const resultArray = [];
-	for await(const item of results) resultArray.push(item);
-	
-	return resultArray;
+	// return resultArray;
 }
 
 async function ensureTableExists(name: string, schema: any): Promise<void> {

@@ -20,7 +20,7 @@ export default async () => {
 	const auth = await authenticate();
 	const drive = google.drive({ version: 'v3', auth });
 	
-	async function createFile(name: string, folderId: string, mimeType: string, body: Buffer | Readable | string, mediaMimeType?: string) {
+	async function createFile(name: string, folderId: string, mimeType: string, body?: Buffer | Readable | string, mediaMimeType?: string) {
 		await workspace.quotaDelay(workspace.SERVICE.DRIVE, workspace.OPERATION.WRITE);
 		
 		const response = await drive.files.create({
