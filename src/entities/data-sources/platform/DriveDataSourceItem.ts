@@ -1,13 +1,12 @@
 import fs from 'node:fs/promises';
 import DataSourceItem from './DataSourceItem';
 import docs from '../../../services/docs';
-import drive from '../../../services/drive';
+import drive, { FileMetaData } from '../../../services/drive';
 import sheets from '../../../services/sheets';
 import pdf from '../../../utils/pdf';
 import UnsupportedError from '../../../utils/UnsupportedError';
 import xlsx from '../../../utils/xlsx';
 import { SpreadSheet, ValueOf } from '../../../types/common';
-import { drive_v2 } from 'googleapis';
 
 const LLM_SUPPORTED_MIME_TYPES = [
 	'application/pdf',
@@ -22,14 +21,14 @@ export default class DriveDataSourceItem extends DataSourceItem {
 
 	static DataContent: SpreadSheet;
 
-	_metadata;
-	
+	_metadata;;
+
 	constructor(dataSource: any, metadata: any) {
 		super(dataSource);
 		this._metadata = metadata;
 	}
 	
-	get metadata(): drive.FileMetaData {
+	get metadata(): FileMetaData {
 		return this._metadata;
 	}
 	

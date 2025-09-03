@@ -11,7 +11,7 @@ export default class DataSourceItem {
 
 	static DataContent: typeof DriveDataSourceItem.DataContent | typeof GcsDataSourceItem.DataContent;
 
-	static Content: typeof DataSourceItem.TextContent | typeof DataSourceItem.DataContent;
+	static Content: typeof DataSourceItem.TextContent | typeof DataSourceItem.DataContent;;
 
 	static DATA_TYPE = {
 		UNSTRUCTURED: 'text',

@@ -5,7 +5,7 @@ import llm from '../../../modules/llm';
 
 export default class DigestTargetDataSourceBehavior extends DataSourceBehavior {
 	static InputData: string[];
-	static OutputData: string;
+	static OutputData: string;;
 
 	async read(): Promise<typeof DigestTargetDataSourceBehavior.OutputData> {
 		const contents = await this.getContents();

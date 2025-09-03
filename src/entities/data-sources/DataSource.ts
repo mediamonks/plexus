@@ -1,3 +1,4 @@
+import Catalog from '../catalog/Catalog';
 import IDataTypeDataSourceBehavior from './data-type/IDataTypeDataSourceBehavior';
 import StructuredDataSourceBehavior from './data-type/StructuredDataSourceBehavior';
 import UnstructuredDataSourceBehavior from './data-type/UnstructuredDataSourceBehavior';
@@ -5,6 +6,7 @@ import IDataSourcePlatformBehavior from './platform/IPlatformDataSourceBehavior'
 import DataSourceItem from './platform/DataSourceItem';
 import DriveDataSourceBehavior from './platform/DriveDataSourceBehavior';
 import GcsDataSourceBehavior from './platform/GcsDataSourceBehavior';
+import ITargetDataSourceBehavior from './target/ITargetDataSourceBehavior';
 import DigestTargetDataSourceBehavior from './target/DigestTargetDataSourceBehavior';
 import FilesTargetDataSourceBehavior from './target/FilesTargetDataSourceBehavior';
 import ProfileTargetDataSourceBehavior from './target/ProfileTargetDataSourceBehavior';
@@ -13,8 +15,7 @@ import RawTextTargetDataSourceBehavior from './target/RawTextTargetDataSourceBeh
 import VectorTargetDataSourceBehavior from './target/VectorTargetDataSourceBehavior';
 import RequestContext from '../../utils/RequestContext';
 import UnsupportedError from '../../utils/UnsupportedError';
-import { ValueOf, JsonObject } from '../../types/common';
-import Catalog from '../catalog/Catalog';
+import { ValueOf } from '../../types/common';
 
 const GOOGLE_DRIVE_URI_PATTERN = /^https?:\/\/(?:drive|docs)\.google\.com\/(?:drive\/(folders)|(?:file|document|spreadsheets|presentation)\/d)\/([\w\-]+)/;
 
@@ -170,6 +171,10 @@ export default class DataSource {
 
 		return this._target = target as ValueOf<typeof DataSource.TARGET>;
 	}
+
+	get targetBehavior(): ITargetDataSourceBehavior {
+		return this.dataTypeBehavior.targetBehavior;
+	}
 	
 	get source(): string {
 		return this.configuration.source;
@@ -240,16 +245,16 @@ export default class DataSource {
 	}
 	
 	async read(): Promise<typeof DataSource.OutputData> {
-		return this.dataTypeBehavior.read();
+		return this.targetBehavior.read();
 	}
 	
 	async ingest(): Promise<void> {
 		if (this.isDynamic) return console.warn(`Not ingesting dynamic data source "${this.id}"`);
 		
-		return this.dataTypeBehavior.ingest();
+		return this.targetBehavior.ingest();
 	}
 	
 	async query(parameters: typeof StructuredDataSourceBehavior.QueryParameters): Promise<typeof DataSource.OutputData> {
-		return this.dataTypeBehavior.query(parameters);
+		return this.targetBehavior.query(parameters);
 	}
 }

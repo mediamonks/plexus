@@ -4,12 +4,13 @@ import InputCatalogField from './InputCatalogField';
 import OutputCatalogField from './OutputCatalogField';
 import UnknownError from '../../utils/UnknownError';
 import { JsonField } from '../../types/common';
+import DataSourceItem from '../data-sources/platform/DataSourceItem';
 
 export default class CatalogField {
 	_id: string;
 	_catalog: Catalog;
 	_configuration: typeof CatalogField.Configuration;
-	_value: JsonField;
+	_value: JsonField | DataSourceItem[];
 
 	static Configuration: typeof DataSourceCatalogField.Configuration
 		| typeof InputCatalogField.Configuration
@@ -56,7 +57,7 @@ export default class CatalogField {
 		throw new Error('Cannot create instance of CatalogField');
 	}
 	
-	async getValue(): Promise<JsonField> {
+	async getValue(): Promise<JsonField | DataSourceItem[]> {
 		if (this._value === undefined) await this.populate();
 		
 		return this._value;

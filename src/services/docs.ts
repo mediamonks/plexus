@@ -14,15 +14,20 @@ export default async (): Promise<{
 	
 	async function create(name: string, content: string, folderId?: string): Promise<string> {
 		try {
-			const documentId = folderId
-				? await drive.files.run({
-					resource: {
+			let documentId;
+			if (folderId) {
+				const response = await drive.files.create({
+					requestBody: {
 						name,
 						mimeType: 'application/vnd.google-apps.document',
 						parents: [folderId]
 					}
-				}).data.id
-				: (await docs.documents.run({ requestBody: { title: name } })).data.documentId;
+				});
+				documentId = response.data.id;
+			} else {
+				const response = await docs.documents.create({ requestBody: { title: name } });
+				documentId = response.data.documentId;
+			}
 			
 			await docs.documents.batchUpdate({
 				documentId,
@@ -35,6 +40,7 @@ export default async (): Promise<{
 					}]
 				}
 			});
+
 			return documentId;
 		} catch (error) {
 			throw new Error(`Failed to create document "${name}": ${error.message}`);
@@ -47,7 +53,7 @@ export default async (): Promise<{
 			mimeType: 'text/plain'
 		});
 		
-		return response.data.trim();
+		return (response.data as string).trim();
 	}
 	
 	async function getMarkdown(documentId: string): Promise<string> {

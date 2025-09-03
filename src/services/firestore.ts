@@ -1,8 +1,8 @@
 import { randomUUID } from 'node:crypto';
-import { Firestore } from '@google-cloud/firestore';
+import { Firestore, Settings } from '@google-cloud/firestore';
 import config from '../utils/config';
-// const firestoreConfig = { projectId: config.get('projectId'), ...require('../../config/firestore.json') };
-const firestoreConfig = config.get('firestore', true);
+
+const firestoreConfig = config.get('firestore', true) as Settings;
 
 const firestore = new Firestore(firestoreConfig);
 

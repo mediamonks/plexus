@@ -8,7 +8,7 @@ export default class FilesTargetDataSourceBehavior extends DataSourceBehavior im
 
 	async read(): Promise<typeof FilesTargetDataSourceBehavior.OutputData> {
 		return this.getItems();
-	}
+	};
 	
 	async ingest(): Promise<void> {
 		// TODO ingest by copying files to own gcs

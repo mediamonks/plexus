@@ -1,9 +1,10 @@
 import ITargetDataSourceBehavior from './ITargetDataSourceBehavior';
 import DataSourceBehavior from '../DataSourceBehavior';
+import { JsonObject } from '../../../types/common';
 
 export default class ProfileTargetDataSourceBehavior extends DataSourceBehavior implements ITargetDataSourceBehavior {
 	static InputData: void;
-	static OutputData: void;
+	static OutputData: JsonObject;;
 	
 	async read(): Promise<typeof ProfileTargetDataSourceBehavior.OutputData> {
 		throw new Error('Not implemented');

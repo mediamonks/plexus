@@ -37,7 +37,7 @@ export default class OutputCatalogField extends CatalogField {
 	async populate(): Promise<void> {
 		Debug.log(`Populating output field "${this.id}"`, 'Catalog');
 		
-		const result = await Agents.get(this.agentId, this.catalog).invoke() as Record<string, unknown>;
+		const result = await Agents.get(this.agentId, this.catalog).invoke() as Record<string, JsonField>;
 		
 		const value = result[this.outputField];
 		

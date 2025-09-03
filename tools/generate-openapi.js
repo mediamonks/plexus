@@ -116,7 +116,11 @@ function getPaths(routes) {
 		
 		if (routeConfig.hidden) continue;
 		
-		const parameters = routeConfig.parameters && routeConfig.parameters.map(param => ({ ...param, in: 'path', required: true }));
+		let parameters;
+		if (routeConfig.parameters) {
+			const parameterNames = Object.keys(routeConfig.parameters);
+			parameters = parameterNames.map(name => ({ ...routeConfig.parameters[name], name, in: 'path', required: true }));
+		}
 		
 		const methods = getMethods(routeConfig);
 		

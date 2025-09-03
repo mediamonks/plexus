@@ -1,5 +1,6 @@
 import IDataTypeDataSourceBehavior from './IDataTypeDataSourceBehavior';
 import DataSourceBehavior from '../DataSourceBehavior';
+import DataSourceItem from '../platform/DataSourceItem';
 import DigestTargetDataSourceBehavior from '../target/DigestTargetDataSourceBehavior';
 import FilesDataSourceTarget from '../target/FilesTargetDataSourceBehavior';
 import RawTextTargetDataSourceBehavior from '../target/RawTextTargetDataSourceBehavior';
@@ -9,7 +10,14 @@ import StorageFile from '../../storage/StorageFile';
 import UnsupportedError from '../../../utils/UnsupportedError';
 
 export default class UnstructuredDataSourceBehavior extends DataSourceBehavior implements IDataTypeDataSourceBehavior {
-	_targetBehavior;
+	static InputData: typeof DataSourceItem.TextContent;
+
+	static OutputData: typeof RawTextTargetDataSourceBehavior.OutputData
+		| typeof DigestTargetDataSourceBehavior.OutputData
+		| typeof VectorTargetDataSourceBehavior.OutputData
+		| typeof FilesDataSourceTarget.OutputData;
+	
+	_targetBehavior;;
 	
 	static TARGET = {
 		RAW_UNSTRUCTURED: 'raw',
@@ -39,17 +47,5 @@ export default class UnstructuredDataSourceBehavior extends DataSourceBehavior i
 	
 	async getIngestedData(): Promise<string> {
 		return Storage.get(StorageFile.TYPE.UNSTRUCTURED_DATA, this.dataSource.id).read();
-	}
-	
-	async read(): Promise<any> {
-		return this.targetBehavior.read();
-	}
-	
-	async ingest(): Promise<void> {
-		return this.targetBehavior.ingest();
-	}
-	
-	async query(parameters: any): Promise<any> {
-		return this.targetBehavior.query(parameters);
 	}
 }

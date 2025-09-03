@@ -5,7 +5,7 @@ import StorageFile from '../../storage/StorageFile';
 
 export default class RawTextTargetDataSourceBehavior extends DataSourceBehavior implements ITargetDataSourceBehavior {
 	static InputData: string[];
-	static OutputData: string;
+	static OutputData: string;;
 	
 	async read(): Promise<typeof RawTextTargetDataSourceBehavior.OutputData> {
 		const contents = await this.getContents() as typeof RawTextTargetDataSourceBehavior.InputData;

@@ -1,14 +1,14 @@
 import { createRequire } from 'node:module';
 import RequestContext from './RequestContext';
 import global from '../../config/global.json';
-import { JsonField } from '../types/common';
+import { Configuration, JsonField, RequestPayload } from '../types/common';
 
 const require = createRequire(import.meta.url);
 const modules = ['agents', 'azure', 'catalog', 'data-sources', 'firestore', 'input-fields', 'lancedb', 'openai', 'routes', 'storage', 'vertexai'];
-let _config;
+let _config: Configuration;
 
-function getRequestConfig(): any {
-	return RequestContext.keys.payload?.config ?? {};
+function getRequestConfig(): Configuration {
+	return (RequestContext.keys.payload as RequestPayload)?.config ?? {};
 }
 
 function createStaticConfig(): any {

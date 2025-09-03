@@ -27,7 +27,7 @@ async function generateEmbeddings(text: string, { forDocument = false }: { forDo
 	const embeddings = Profiler.run(forDocument
 			? EMBEDDING_PLATFORMS[platform].generateDocumentEmbeddings
 			: EMBEDDING_PLATFORMS[platform].generateQueryEmbeddings,
-		[text]);
+		[text]) as number[];
 	
 	_embeddings[platform] ??= {};
 	_embeddings[platform][text] ??= embeddings;
@@ -77,7 +77,7 @@ async function create(tableName: string, source: AsyncGenerator<JsonObject>, { s
 				return lancedb.append(internalTableName, [data]);
 			}
 			
-			dimensions = data.vector.length;
+			dimensions = (data.vector as number[]).length;
 			internalTableName = getTableName(tableName, dimensions);
 			tableCreated = schema
 				? createEmpty(internalTableName, schema).then(() => lancedb.append(internalTableName, [data]))
@@ -95,12 +95,12 @@ async function createEmpty(tableName: string, schema: any): Promise<void> {
 	await lancedb.createTable(getTableName(tableName), [], schema);
 }
 
-async function search(tableName: string, embeddings: number[], { limit, filter, fields }: { limit?: number; filter?: any; fields?: string[] } = {}): Promise<any[]> {
+async function search(tableName: string, embeddings: number[], { limit, filter, fields }: { limit?: number; filter?: any; fields?: string[] } = {}): Promise<JsonObject[]> {
 	return await Profiler.run(() => lancedb.search(getTableName(tableName), embeddings, { limit, filter, fields }), `vectordb search ${tableName}`);
 }
 
 function getEmbeddingPlatform(): string {
-	const embeddingPlatform = config.get('embeddingPlatform');
+	const embeddingPlatform = config.get('embeddingPlatform') as string;
 	
 	if (!EMBEDDING_PLATFORMS[embeddingPlatform]) throw new Error(`Invalid embedding platform selection: "${embeddingPlatform}". Must be one of: ${Object.keys(EMBEDDING_PLATFORMS).join(', ')}`);
 	
@@ -122,7 +122,7 @@ async function ensureTableExists(tableName: string, schema: any): Promise<any> {
 	return lancedb.ensureTableExists(getTableName(tableName), schema);
 }
 
-async function ingest(tableName: string, source: AsyncIterable<any>, searchField: string = 'text', { schema, excludeSearchField }: { schema?: any; excludeSearchField?: boolean } = {}): Promise<void> {
+async function ingest(tableName: string, source: AsyncIterable<any>, searchField: string = 'text', { excludeSearchField }: { excludeSearchField?: boolean } = {}): Promise<void> {
 	const promises = [];
 	let dimensions;
 	
@@ -137,7 +137,8 @@ async function ingest(tableName: string, source: AsyncIterable<any>, searchField
 			const record = { ...data, vector };
 			
 			dimensions = vector.length;
-			return lancedb.append(getTableName(tableName, dimensions), [record], schema);
+
+			return lancedb.append(getTableName(tableName, dimensions), [record]);
 		})());
 	}
 	

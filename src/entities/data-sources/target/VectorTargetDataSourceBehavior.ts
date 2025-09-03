@@ -7,7 +7,7 @@ import vectordb from '../../../modules/vectordb';
 import { JsonObject } from '../../../types/common';
 
 export default class VectorTargetDataSourceBehavior extends DataSourceBehavior implements ITargetDataSourceBehavior {
-	static OutputData: AsyncGenerator<JsonObject>;
+	static OutputData: AsyncGenerator<JsonObject>;;
 
 	private async* textToChunks(text: string) {
 		const splitter = new RecursiveCharacterTextSplitter({
@@ -72,7 +72,7 @@ export default class VectorTargetDataSourceBehavior extends DataSourceBehavior i
 		await vectordb.create(this.id, data);
 	}
 	
-	async query({ input, limit, filter, fields }: typeof StructuredDataSourceBehavior.QueryParameters): Promise<any> {
+	async query({ input, limit, filter, fields }: typeof StructuredDataSourceBehavior.QueryParameters): Promise<JsonObject[]> {
 		const embeddings = await vectordb.generateQueryEmbeddings(input);
 		
 		return {
