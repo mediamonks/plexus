@@ -11,10 +11,10 @@ export type ValueOf<T> = T[keyof T];
 
 export type SpreadSheet = { sheets: { title: string; rows: any[] }[] };
 
+// TODO this needs a bit of thinking about
 export type RequestPayload = {
 	config?: JsonObject;
-	fields?: JsonObject;
-};
+} & JsonObject;
 
 export type RouteMethodConfiguration = {
 	summary: string;
@@ -62,10 +62,25 @@ export type Configuration = {
 		baseUrl: string;
 	};
 	catalog?: typeof Catalog.Configuration;
+	drive?: {
+		tempFolderId: string;
+	};
 	'data-sources'?: typeof DataSources.Configuration;
 	firestore?: {
 		databaseId: string;
 		ignoreUndefinedProperties?: boolean;
+	};
+	genai?: {
+		projectId?: string;
+		location?: string;
+		model?: string;
+		embeddingModel?: string;
+		embeddingLocation?: string;
+		quotaDelayMs?: number;
+		safetySettings?: {
+			category: string;
+			threshold: string;
+		}[];
 	};
 	'input-fields'?: Record<string, { id: string; label: string; }>;
 	lancedb?: {
@@ -90,15 +105,5 @@ export type Configuration = {
 	}>;
 	storage?: {
 		bucket: string;
-	};
-	vertexai?: {
-		model: string;
-		embeddingModel: string;
-		embeddingLocation?: string;
-		quotaDelayMs?: number;
-		safetySettings?: {
-			category: string;
-			threshold: string;
-		}[];
 	};
 };

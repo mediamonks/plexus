@@ -1,8 +1,8 @@
 import fs from 'node:fs';
 import mime from 'mime-types';
-import config from '../utils/config.js';
+import config from '../utils/config';
 import RequestContext from '../utils/RequestContext';
-import { RequestPayload } from '../types/common.js';
+import { RequestPayload } from '../types/common';
 
 const routes = config.get('routes');
 
@@ -66,7 +66,7 @@ export default async function router(req: any, res: any): Promise<void> {
 	if (routes[matchPath].file) return await sendFile(routes[matchPath].file, res);
 	
 	const handler = routes[matchPath]?.methods?.[req.method.toLowerCase()]?.handler;
-	const handlerModule = await import(`../handlers/${handler}.js`);
+	const handlerModule = await import(`../handlers/${handler}`);
 	const fn = handlerModule.default;
 	
 	try {

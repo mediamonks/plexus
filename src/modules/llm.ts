@@ -1,13 +1,13 @@
 import azure from '../services/azure';
 import openai from '../services/openai';
-import google from '../services/google';
+import genai from '../services/genai';
 import config from '../utils/config';
 import History from '../utils/History';
 
 const PLATFORMS = {
 	azure,
 	openai,
-	google,
+	google: genai,
 };
 
 type Configuration = {

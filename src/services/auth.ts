@@ -1,10 +1,8 @@
 import { GoogleAuth, GoogleAuthOptions } from 'google-auth-library';
 import path from 'path';
 import fs from 'fs';
-import { fileURLToPath } from 'url';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+declare const __dirname: string;
 
 let client;
 
@@ -28,4 +26,3 @@ export default async function authenticate(): Promise<any> {
 	
 	return client = await authClient.getClient();
 }
-

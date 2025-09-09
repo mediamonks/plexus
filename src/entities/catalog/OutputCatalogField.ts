@@ -2,6 +2,7 @@ import CatalogField from './CatalogField';
 import Agents from '../agents/Agents';
 import Debug from '../../utils/Debug';
 import { JsonField } from '../../types/common';
+import DataSourceItem from '../data-sources/platform/DataSourceItem';
 
 export default class OutputCatalogField extends CatalogField {
 	static Configuration: {
@@ -34,7 +35,7 @@ export default class OutputCatalogField extends CatalogField {
 		return !!this.configuration.required;
 	}
 	
-	async populate(): Promise<void> {
+	async populate(): Promise<JsonField | DataSourceItem[]> {
 		Debug.log(`Populating output field "${this.id}"`, 'Catalog');
 		
 		const result = await Agents.get(this.agentId, this.catalog).invoke() as Record<string, JsonField>;
@@ -43,7 +44,7 @@ export default class OutputCatalogField extends CatalogField {
 		
 		if (value === undefined) throw new Error(`Agent "${this.agentId}" failed to output field "${this.outputField}"`);
 		
-		this._value = value;
+		return this._value = value;
 	}
 }
 

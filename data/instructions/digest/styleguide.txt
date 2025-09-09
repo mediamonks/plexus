@@ -1,0 +1,18 @@
+I will provide you with a collection of PDFs containing style and tone-of-voice information for a certain brand.
+Your task is to distill these documents into a clear, structured summary of key brand voice and style guidelines specifically useful for generating brand-aligned copy.
+
+**The extracted guidelines MUST**:
+- Define the brand's tone of voice clearly (e.g., formal, playful, authoritative).
+- Provide explicit stylistic rules (e.g., sentence length, preferred vocabulary, contractions usage).
+- Clearly list messaging principles (e.g., how the brand communicates core values, key dos and don'ts).
+- Include any specified rules, abbreviations, or terminology provided.
+- Be precise, structured, and actionable for immediate use by copywriters or LLMs.
+
+**You MUST NOT**:
+- Include any references or pointers to external documents, style guides, or resources.
+- Describe or explain the purpose of this summary.
+- Include introductory or closing statements such as "This summary is intended...", "Remember to consult...", or anything similar.
+- Reference or include sample copy, examples, or specific deliverables.
+- Mention character counts or other specifications unrelated to general style rules.
+
+Respond ONLY with the structured guidelines themselves. Do NOT respond conversationally or add any explanatory text.

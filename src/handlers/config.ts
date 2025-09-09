@@ -1,4 +1,4 @@
-import config from '../utils/config.js';
-import { JsonObject } from '../types/common.js';
+import config from '../utils/config';
+import { JsonObject } from '../types/common';
 
 export default async (): Promise<JsonObject> => config.get() as JsonObject;

@@ -200,7 +200,8 @@ export default class DataSource {
 			const matches = this.uri.match(/\{\w+}/g);
 			await Promise.all(matches.map(async match => {
 				const field = match.substring(1, match.length - 1);
-				const value = (await RequestContext.get('catalog') as Catalog).get(field).getValue();
+				const catalog = RequestContext.get('catalog') as Catalog;
+				const value = await catalog.get(field).getValue();
 
 				if (typeof value !== 'string') throw new Error(`Unable to use non-string value "${value}" of catalog field "${field}" in dynamic uri of data source "${this.id}"`);
 
@@ -215,8 +216,8 @@ export default class DataSource {
 		try {
 			return await this.dataTypeBehavior.getIngestedData();
 		} catch (error) {
-			// TODO this could technically be just a warning, because getData() can handle it
-			throw new Error(`Data source "${this.id}" is not yet ingested`);
+			console.warn(`Data source "${this.id}" is not yet ingested`);
+			// throw new Error(`Data source "${this.id}" is not yet ingested`);
 		}
 	}
 	
