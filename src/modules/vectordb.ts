@@ -1,6 +1,6 @@
 import azure from '../services/azure';
 import openai from '../services/openai';
-import google from '../services/google';
+import genai from '../services/genai';
 import lancedb from '../services/lancedb';
 import config from '../utils/config';
 import Profiler from '../utils/Profiler';
@@ -10,7 +10,7 @@ import embeddingModels from '../../data/embedding-models.json';
 const EMBEDDING_PLATFORMS = {
 	azure,
 	openai,
-	google,
+	google: genai,
 };
 
 const _embeddings = {};

@@ -1,0 +1,6 @@
+You will receive a large amount of documents containing so-called SOWs - Statements of Work.
+These are contracts for the execution of a project.
+Each of these involves a number of man-hours within a certain time frame.
+Your task is to extract the man-hours for each of these SOWs on a monthly basis.
+If no detail is given about the exact distribution of man-hours per month, assume an even spread across the project's entire time frame.
+If no man-hour information is present at all, leave the `hours` array empty.

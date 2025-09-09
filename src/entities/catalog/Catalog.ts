@@ -10,7 +10,7 @@ import Profiler from '../../utils/Profiler';
 import { JsonObject } from '../../types/common';
 
 export default class Catalog {
-	_fields: Record<string, CatalogField>;
+	_fields: Record<string, CatalogField> = {};
 	_configuration: JsonObject;
 	
 	static readonly Configuration: Record<string, typeof CatalogField.Configuration>;

@@ -3,17 +3,18 @@
 	"version": "1.1.0",
 	"description": "Plexus Agentic Engine",
 	"main": "index.js",
-	"type": "module",
 	"scripts": {
-		"auth": "gcloud auth application-default login --scopes=https://www.googleapis.com/auth/drive,https://www.googleapis.com/auth/cloud-platform; gcloud auth application-default set-quota-project monks-plexus",
+		"auth": "bash tools/auth.sh",
 		"build": "tsc",
-		"deploy": "npm run generate-openapi --env=$npm_config_env; node tools/deploy.js --env=$npm_config_env",
-		"deploy:functions": "node tools/deploy.js --env=$npm_config_env --functions",
+		"start": "npm run build && functions-framework --target=api --source=. --port=8080",
+		"test": "node -r ts-node/register test.ts",
+		"deploy": "npm run generate-openapi --env=$npm_config_env; node tools/deploy.cjs --env=$npm_config_env",
+		"deploy:functions": "node tools/deploy.cjs --env=$npm_config_env --functions",
 		"deploy:dev": "npm run deploy --env=dev",
-		"deploy:functions:dev": "npm run deploy:functions --env=dev",
+		"deploy:dev:functions": "npm run deploy:functions --env=dev",
+		"deploy:dev:data": "gsutil -m cp -r data/instructions/* gs://monks-plexus/instructions",
 		"deploy:stg": "npm run deploy --env=stg",
-		"deploy:functions:stg": "npm run deploy:functions --env=stg",
-		"deploy:data:dev": "gsutil -m cp -r temp/system-instructions/* gs://monks-plexus/system-instructions",
+		"deploy:stg:functions": "npm run deploy:functions --env=stg",
 		"generate-openapi": "node tools/generate-openapi.js $npm_config_env gateway > config/openapi.yaml; node tools/generate-openapi.js $npm_config_env > public/openapi.yaml"
 	},
 	"author": "",
@@ -32,7 +33,6 @@
 		"@google/genai": "^1.16.0",
 		"@lancedb/lancedb": "^0.16.0",
 		"@langchain/core": "^0.3.72",
-		"apache-arrow": "^21.0.0",
 		"dotenv": "^16.4.7",
 		"google-auth-library": "^10.2.1",
 		"googleapis": "^152.0.0",
@@ -43,6 +43,7 @@
 		"openai": "^4.82.0",
 		"pdf-parse": "1.1.0",
 		"ts-node": "^10.9.2",
+		"tsx": "^4.20.5",
 		"turndown": "^7.2.0",
 		"typescript": "^5.9.2",
 		"uuid": "^11.1.0",
@@ -53,5 +54,12 @@
 		"express": "^4.21.2",
 		"minimist": "^1.2.8",
 		"yaml": "^2.7.0"
+	},
+	"ts-node": {
+		"transpileOnly": true,
+		"compilerOptions": {
+			"module": "CommonJS",
+			"moduleResolution": "node"
+		}
 	}
 }

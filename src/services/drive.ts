@@ -11,8 +11,8 @@ import Debug from '../utils/Debug';
 import Profiler from '../utils/Profiler';
 
 const tempPath = config.get('tempPath') as string;
-const DOWNLOAD_PATH = path.join(tempPath, 'download', 'drive');
-const TEMP_FOLDER_ID = '1GAohqXcRbIyu-Nk86GQxfRBAKAJtq_6y';
+const downloadPath = path.join(tempPath, 'download', 'drive');
+const tempFolderId = config.get('drive.tempFolderId') as string;
 
 export type FileMetaData = drive_v3.Schema$File;
 
@@ -101,7 +101,7 @@ export default async () => {
 					{ responseType: 'stream' }
 			);
 			
-			destPath ??= path.join(DOWNLOAD_PATH, `${file.id}${path.extname(file.name)}`);
+			destPath ??= path.join(downloadPath, `${file.id}${path.extname(file.name)}`);
 			fs.mkdirSync(path.dirname(destPath), { recursive: true });
 			
 			const writeStream = fs.createWriteStream(destPath, { encoding: null });
@@ -160,7 +160,7 @@ export default async () => {
 	}
 	
 	async function downloadFolderContents(folderId) {
-		fs.mkdirSync(DOWNLOAD_PATH, { recursive: true });
+		fs.mkdirSync(downloadPath, { recursive: true });
 
 		const files = await listFolderContents(folderId);
 
@@ -170,7 +170,7 @@ export default async () => {
 	}
 	
 	async function exportFolderContents(folderId, type) {
-		fs.mkdirSync(DOWNLOAD_PATH, { recursive: true });
+		fs.mkdirSync(downloadPath, { recursive: true });
 		
 		const files = await listFolderContents(folderId);
 		
@@ -179,7 +179,7 @@ export default async () => {
 	
 	async function importFile(file, allowCache) {
 		const newName = `imported-${file.id}`;
-		const cacheContents = await listFolderContents(TEMP_FOLDER_ID);
+		const cacheContents = await listFolderContents(tempFolderId);
 		const existingFile = cacheContents.find(cacheFile => cacheFile.name === newName);
 		
 		if (allowCache) console.debug('[Drive] Import', file.name, 'cache', existingFile ? 'hit' : 'miss');
@@ -217,7 +217,7 @@ export default async () => {
 		
 		const importedFile = await createFile(
 			newName,
-			TEMP_FOLDER_ID,
+			tempFolderId,
 			targetMimeType,
 			buffer,
 			file.mimeType,
@@ -234,7 +234,7 @@ export default async () => {
 		
 		if (!mimeType) throw new Error(`Cannot export file type ${type}. Supported types: ${Object.keys(mime.types).join(', ')}`);
 		
-		const destPath = path.join(DOWNLOAD_PATH, `${file.id}.${type}`);
+		const destPath = path.join(downloadPath, `${file.id}.${type}`);
 		
 		if (allowCache && fs.existsSync(destPath)) return destPath;
 		
@@ -252,7 +252,7 @@ export default async () => {
 			throw new Error(`Error exporting file "${file.name}": ${error.message}`);
 		}
 		
-		fs.mkdirSync(DOWNLOAD_PATH, { recursive: true });
+		fs.mkdirSync(downloadPath, { recursive: true });
 		
 		const writeStream = fs.createWriteStream(destPath);
 		
@@ -337,8 +337,8 @@ export default async () => {
 	
 	// TODO abstract common file cache logic (see gcs.js)
 	async function cacheFile(metadata) {
-		const filePath = path.join(DOWNLOAD_PATH, `${metadata.id}.${mime.extension(metadata.mimeType)}`);
-		fs.mkdirSync(DOWNLOAD_PATH, { recursive: true });
+		const filePath = path.join(downloadPath, `${metadata.id}.${mime.extension(metadata.mimeType)}`);
+		fs.mkdirSync(downloadPath, { recursive: true });
 		try {
 			fs.accessSync(filePath);
 		} catch (error) {

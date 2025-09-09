@@ -4,6 +4,7 @@ import Debug from '../../utils/Debug';
 import DataSource from '../data-sources/DataSource';
 import StructuredDataSourceBehavior from '../data-sources/data-type/StructuredDataSourceBehavior';
 import { JsonField, JsonObject } from '../../types/common';
+import DataSourceItem from '../data-sources/platform/DataSourceItem';
 
 export default class DataSourceCatalogField extends CatalogField {
 	static Configuration: {
@@ -48,7 +49,7 @@ export default class DataSourceCatalogField extends CatalogField {
 		return DataSources.get(this.dataSourceId);
 	}
 	
-	async populate(): Promise<void> {
+	async populate(): Promise<JsonField | DataSourceItem[]> {
 		Debug.log(`Populating data source field "${this.id}"`, 'Catalog');
 		
 		const promises = [];
@@ -82,7 +83,8 @@ export default class DataSourceCatalogField extends CatalogField {
 		} else {
 			result = value;
 		}
-
-		this._value = result;
+		
+		// TODO do we need to assign to this._value here?
+		return this._value = result;
 	}
 }

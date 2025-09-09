@@ -10,7 +10,7 @@ export default class CatalogField {
 	_id: string;
 	_catalog: Catalog;
 	_configuration: typeof CatalogField.Configuration;
-	_value: JsonField | DataSourceItem[];
+	_value: Promise<JsonField | DataSourceItem[]> | JsonField | DataSourceItem[];
 
 	static Configuration: typeof DataSourceCatalogField.Configuration
 		| typeof InputCatalogField.Configuration
@@ -53,13 +53,11 @@ export default class CatalogField {
 		return this.configuration.example;
 	}
 	
-	async populate(): Promise<void> {
+	async populate(): Promise<JsonField | DataSourceItem[]> {
 		throw new Error('Cannot create instance of CatalogField');
 	}
 	
 	async getValue(): Promise<JsonField | DataSourceItem[]> {
-		if (this._value === undefined) await this.populate();
-		
-		return this._value;
+		return this._value ??= this.populate();
 	}
 }

@@ -1,10 +1,10 @@
-import { createRequire } from 'node:module';
 import RequestContext from './RequestContext';
 import global from '../../config/global.json';
 import { Configuration, JsonField, RequestPayload } from '../types/common';
 
-const require = createRequire(import.meta.url);
-const modules = ['agents', 'azure', 'catalog', 'data-sources', 'firestore', 'input-fields', 'lancedb', 'openai', 'routes', 'storage', 'vertexai'];
+declare const require: NodeJS.Require;
+
+const modules = ['agents', 'azure', 'catalog', 'data-sources', 'drive', 'firestore', 'genai', 'input-fields', 'lancedb', 'openai', 'routes', 'storage'];
 let _config: Configuration;
 
 function getRequestConfig(): Configuration {

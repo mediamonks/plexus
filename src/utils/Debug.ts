@@ -28,6 +28,7 @@ export default class Debug {
 	static _formatData(data: JsonField): [string | number | boolean] | [string, number] {
 		switch (typeof data) {
 			case 'string':
+				data = data.replace(/\n/g, '\\n');
 				if (data.length <= 100) return [data];
 				return [data.substring(0, 99) + '…', data.length];
 			case 'number':
