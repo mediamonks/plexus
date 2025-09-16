@@ -13,6 +13,7 @@ import ProfileTargetDataSourceBehavior from './target/ProfileTargetDataSourceBeh
 import RawDataDataSourceTarget from './target/RawDataTargetDataSourceBehavior';
 import RawTextTargetDataSourceBehavior from './target/RawTextTargetDataSourceBehavior';
 import VectorTargetDataSourceBehavior from './target/VectorTargetDataSourceBehavior';
+import ErrorLog from '../../utils/ErrorLog';
 import RequestContext from '../../utils/RequestContext';
 import UnsupportedError from '../../utils/UnsupportedError';
 import { ValueOf } from '../../types/common';
@@ -50,8 +51,6 @@ export default class DataSource {
 	static readonly DataTypeBehavior: IDataTypeDataSourceBehavior;
 
 	static readonly PlatformBehavior: IDataSourcePlatformBehavior;
-
-	static readonly IngestedData: typeof DigestTargetDataSourceBehavior.OutputData;
 
 	static readonly OutputData: typeof DigestTargetDataSourceBehavior.OutputData
 		| typeof FilesTargetDataSourceBehavior.OutputData
@@ -100,7 +99,7 @@ export default class DataSource {
 		const dataType = this.configuration.dataType ?? this.type.split(':')[0]; // TODO for backwards compatibility
 
 		if (!Object.values(DataSourceItem.DATA_TYPE).includes(dataType as ValueOf<typeof DataSourceItem.DATA_TYPE>)) {
-			throw new UnsupportedError('data source data type', dataType, DataSourceItem.DATA_TYPE);
+			ErrorLog.throw(new UnsupportedError('data source data type', dataType, DataSourceItem.DATA_TYPE));
 		}
 
 		return this._dataType = dataType as ValueOf<typeof DataSourceItem.DATA_TYPE>;
@@ -117,7 +116,7 @@ export default class DataSource {
 		
 		const dataTypeBehaviorClass = mapping[this.dataType];
 	
-		if (!dataTypeBehaviorClass) throw new UnsupportedError('data source data type', this.dataType, mapping);
+		if (!dataTypeBehaviorClass) ErrorLog.throw(new UnsupportedError('data source data type', this.dataType, mapping));
 		
 		return this._dataTypeBehavior = new dataTypeBehaviorClass(this);
 	}
@@ -132,7 +131,7 @@ export default class DataSource {
 		
 		if (this.configuration.platform) {
 			if (!mapping[this.configuration.platform])
-				throw new UnsupportedError('data source platform', this.configuration.platform, DataSource.PLATFORM);
+				ErrorLog.throw(new UnsupportedError('data source platform', this.configuration.platform, DataSource.PLATFORM));
 			
 			return this._platform = this.configuration.platform as ValueOf<typeof DataSource.PLATFORM>;
 		}
@@ -142,7 +141,7 @@ export default class DataSource {
 		this._platform = Object.keys(mapping)
 			.find(platform => mapping[platform].test(this.uri)) as ValueOf<typeof DataSource.PLATFORM>;
 		
-		if (!this._platform) throw new UnsupportedError('data source URI', this.uri, mapping);
+		if (!this._platform) ErrorLog.throw(new UnsupportedError('data source URI', this.uri, mapping));
 		
 		return this._platform;
 	}
@@ -157,7 +156,7 @@ export default class DataSource {
 		
 		const platformBehaviorClass = mapping[this.platform];
 
-		if (!platformBehaviorClass) throw new UnsupportedError('data source platform', this.platform, mapping);
+		if (!platformBehaviorClass) ErrorLog.throw(new UnsupportedError('data source platform', this.platform, mapping));
 		
 		this._platformBehavior = new platformBehaviorClass(this);
 		
@@ -170,7 +169,7 @@ export default class DataSource {
 		const target = this.configuration.target ?? this.type.split(':')[1]; // TODO for backwards compatibility
 
 		if (!Object.values(DataSource.TARGET).includes(target as ValueOf<typeof DataSource.TARGET>)) {
-			throw new UnsupportedError('data source target', target, DataSource.TARGET);
+			ErrorLog.throw(new UnsupportedError('data source target', target, DataSource.TARGET));
 		}
 
 		return this._target = target as ValueOf<typeof DataSource.TARGET>;

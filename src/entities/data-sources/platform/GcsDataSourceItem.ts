@@ -2,6 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import DataSourceItem from './DataSourceItem';
 import gcs from '../../../services/gcs';
+import ErrorLog from '../../../utils/ErrorLog';
 import jsonl from '../../../utils/jsonl';
 import pdf from '../../../utils/pdf';
 import UnsupportedError from '../../../utils/UnsupportedError';
@@ -52,7 +53,7 @@ export default class GcsDataSourceItem extends DataSourceItem {
 			txt: async () => (await fs.readFile(file)).toString()
 		};
 		
-		if (!mapping[this.extension]) throw new UnsupportedError('file type', this.extension, mapping);
+		if (!mapping[this.extension]) ErrorLog.throw(new UnsupportedError('file type', this.extension, mapping));
 		
 		return await mapping[this.extension]();
 	}

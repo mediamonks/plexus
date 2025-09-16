@@ -1,5 +1,6 @@
 import DataSource from './DataSource';
 import config from '../../utils/config';
+import ErrorLog from '../../utils/ErrorLog';
 import hash from '../../utils/hash';
 import RequestContext from '../../utils/RequestContext';
 import UnknownError from '../../utils/UnknownError';
@@ -26,7 +27,7 @@ export default class DataSources {
 		
 		const dataSourceConfiguration = this.configuration[id];
 		
-		if (!dataSourceConfiguration) throw new UnknownError('data source', id, this.configuration);
+		if (!dataSourceConfiguration) ErrorLog.throw(new UnknownError('data source', id, this.configuration));
 		
 		const key = hash(id, JSON.stringify(dataSourceConfiguration));
 		

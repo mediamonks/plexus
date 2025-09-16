@@ -1,6 +1,7 @@
 import StorageFile from './StorageFile';
 import StorageDataFile from './StorageDataFile';
 import StorageTextFile from './StorageTextFile';
+import ErrorLog from '../../utils/ErrorLog';
 import UnsupportedError from '../../utils/UnsupportedError';
 
 export default class Storage {
@@ -21,7 +22,7 @@ export default class Storage {
 			
 			const storageFileClass = mapping[type];
 			
-			if (!storageFileClass) throw new UnsupportedError('storage file type', type, mapping);
+			if (!storageFileClass) ErrorLog.throw(new UnsupportedError('storage file type', type, mapping));
 		
 			instance = new storageFileClass(name, type);
 			

@@ -3,6 +3,7 @@ import DataSourceItem from './DataSourceItem';
 import docs from '../../../services/docs';
 import drive, { FileMetaData } from '../../../services/drive';
 import sheets from '../../../services/sheets';
+import ErrorLog from '../../../utils/ErrorLog';
 import pdf from '../../../utils/pdf';
 import UnsupportedError from '../../../utils/UnsupportedError';
 import xlsx from '../../../utils/xlsx';
@@ -52,7 +53,7 @@ export default class DriveDataSourceItem extends DataSourceItem {
 		
 		const dataType = mapping[this.mimeType];
 		
-		if (!dataType) throw new UnsupportedError('Google Drive data source mime type', this.mimeType, mapping);
+		if (!dataType) ErrorLog.throw(new UnsupportedError('Google Drive data source mime type', this.mimeType, mapping));
 		
 		return dataType;
 	}
@@ -83,7 +84,7 @@ export default class DriveDataSourceItem extends DataSourceItem {
 			return await docsService.getMarkdown(metadata.id);
 		}
 		
-		const file = await this.getLocalFile();
+		const file = (await this.getLocalFile()) as string;
 		
 		if (metadata.mimeType === 'application/pdf') return await pdf.getPdfText(file);
 		
@@ -92,7 +93,7 @@ export default class DriveDataSourceItem extends DataSourceItem {
 			return buffer.toString();
 		}
 		
-		throw new UnsupportedError('mime type for text extraction', metadata.mimeType);
+		ErrorLog.throw(new UnsupportedError('mime type for text extraction', metadata.mimeType));
 	}
 	
 	public async toData(): Promise<typeof DriveDataSourceItem.DataContent> {
@@ -107,6 +108,6 @@ export default class DriveDataSourceItem extends DataSourceItem {
 		
 		if (metadata.mimeType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') return await xlsx.getData(file);
 		
-		throw new UnsupportedError('mime type for data extraction', metadata.mimeType);
+		ErrorLog.throw(new UnsupportedError('mime type for data extraction', metadata.mimeType));
 	}
 }

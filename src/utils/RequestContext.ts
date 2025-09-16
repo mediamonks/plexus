@@ -3,10 +3,11 @@ import { AsyncLocalStorage } from 'node:async_hooks';
 type RequestState = Record<string, unknown>;
 
 export default class RequestContext {
-	private static readonly _localMock: RequestState = {};
+	private static _localMock: RequestState = {};
 	private static _asyncLocalStorage: AsyncLocalStorage<RequestState>;
 	
 	public static run<T>(data: RequestState, fn: () => T): T {
+		this._localMock = {};
 		return this.asyncLocalStorage.run(data, fn);
 	}
 	

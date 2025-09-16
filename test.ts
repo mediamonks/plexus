@@ -49,9 +49,43 @@ async function invoke(body) {
 
 (async function () {
 	await invoke({
-		"config": require('./config/test.json'),
+		"config": {
+			"agents": {
+				"hello": {
+					"instructions": "You will receive a list of names and should respond by saying \"Hello {name}!\" once for every name you encounter.\nRespond with nothing else.\n\n---\n\n### **Input Format (JSON)**\n{\n  \"names\": [\n    \"John\",\n    \"Pete\"\n  ]\n}\n\n### **Output Format (JSON)**\n{\n  \"helloString\": \"the output string\"\n}",
+					"context": [
+						"names"
+					],
+					"useHistory": true
+				}
+			},
+			"catalog": {
+				"names": {
+					"type": "input",
+					"field": "names",
+					"required": true,
+					"example": [
+						"John",
+						"Pete"
+					]
+				},
+				"helloString": {
+					"type": "output",
+					"agent": "hello",
+					"field": "helloString",
+					"example": "Hello John! Hello Pete!"
+				}
+			},
+			"output": [
+				"helloString"
+			]
+		},
 		"fields": {
-			"name": "Luis"
+			"names": [
+				"Luis",
+				"Maria",
+				"Carlos"
+			]
 		}
 	});
 }());

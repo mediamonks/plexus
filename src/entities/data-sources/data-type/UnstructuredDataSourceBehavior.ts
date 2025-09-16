@@ -7,6 +7,7 @@ import RawTextTargetDataSourceBehavior from '../target/RawTextTargetDataSourceBe
 import VectorTargetDataSourceBehavior from '../target/VectorTargetDataSourceBehavior';
 import Storage from '../../storage/Storage';
 import StorageFile from '../../storage/StorageFile';
+import ErrorLog from '../../../utils/ErrorLog';
 import UnsupportedError from '../../../utils/UnsupportedError';
 
 export default class UnstructuredDataSourceBehavior extends DataSourceBehavior implements IDataTypeDataSourceBehavior {
@@ -37,7 +38,7 @@ export default class UnstructuredDataSourceBehavior extends DataSourceBehavior i
 			
 			const targetBehaviorClass = mapping[this.target];
 			
-			if (!targetBehaviorClass) throw new UnsupportedError('unstructured data source target', this.target, mapping);
+			if (!targetBehaviorClass) ErrorLog.throw(new UnsupportedError('unstructured data source target', this.target, mapping));
 			
 			this._targetBehavior = new targetBehaviorClass(this);
 		}

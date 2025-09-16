@@ -8,8 +8,9 @@ import RawDataDataSourceTarget from '../target/RawDataTargetDataSourceBehavior';
 import VectorTargetDataSourceBehavior from '../target/VectorTargetDataSourceBehavior';
 import Storage from '../../storage/Storage';
 import StorageFile from '../../storage/StorageFile';
+import ErrorLog from '../../../utils/ErrorLog';
 import UnsupportedError from '../../../utils/UnsupportedError';
-import { JsonObject, JsonPrimitive } from '../../../types/common';
+import { JsonObject } from '../../../types/common';
 
 export default class StructuredDataSourceBehavior extends DataSourceBehavior implements IDataTypeDataSourceBehavior {
 	static readonly InputData: typeof DataSourceItem.DataContent;
@@ -47,7 +48,7 @@ export default class StructuredDataSourceBehavior extends DataSourceBehavior imp
 			
 			const targetBehaviorClass = mapping[this.target];
 			
-			if (!targetBehaviorClass) throw new UnsupportedError('structured data source target', this.target, mapping);
+			if (!targetBehaviorClass) ErrorLog.throw(new UnsupportedError('structured data source target', this.target, mapping));
 			
 			this._targetBehavior = new targetBehaviorClass(this);
 		}

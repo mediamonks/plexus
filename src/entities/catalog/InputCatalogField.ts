@@ -1,10 +1,11 @@
 import CatalogField from './CatalogField';
+import DataSourceItem from '../data-sources/platform/DataSourceItem';
 import config from '../../utils/config';
 import Debug from '../../utils/Debug';
+import ErrorLog from '../../utils/ErrorLog';
 import RequestContext from '../../utils/RequestContext';
 import UnknownError from '../../utils/UnknownError';
-import { JsonField, RequestPayload } from '../../types/common';
-import DataSourceItem from '../data-sources/platform/DataSourceItem';
+import { JsonField, RequestPayload, Configuration } from '../../types/common';
 
 export default class InputCatalogField extends CatalogField {
 	static readonly Configuration: {
@@ -31,7 +32,9 @@ export default class InputCatalogField extends CatalogField {
 	protected async populate(): Promise<JsonField | DataSourceItem[]> {
 		Debug.log(`Populating input field "${this.id}"`, 'Catalog');
 		
-		let value = (RequestContext.get('payload') as RequestPayload).fields?.[this.payloadField];
+		const payload = RequestContext.get('payload') as RequestPayload;
+		
+		let value = payload.fields?.[this.payloadField] as string;
 		
 		if (value === undefined) {
 			if (this.required) throw new Error(`Field "${this.payloadField}" must be provided in payload`);
@@ -39,11 +42,11 @@ export default class InputCatalogField extends CatalogField {
 			return;
 		}
 		
-		const inputFields = config.get('input-fields');
+		const inputFields = config.get('input-fields') as Configuration['input-fields'];
 		const fieldValues = inputFields[this.payloadField];
 		
 		if (fieldValues) {
-			if (!(value in fieldValues)) throw new UnknownError(`value for ${this.payloadField}`, value, fieldValues);
+			if (!(value in fieldValues)) ErrorLog.throw(new UnknownError(`value for ${this.payloadField}`, value as string, fieldValues));
 			value = fieldValues[value].description ?? fieldValues[value].label;
 		}
 		
