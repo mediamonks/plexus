@@ -10,8 +10,8 @@ import Profiler from '../../utils/Profiler';
 import { JsonObject } from '../../types/common';
 
 export default class Catalog {
-	_fields: Record<string, CatalogField> = {};
-	_configuration: JsonObject;
+	private readonly _fields: Record<string, CatalogField> = {};
+	private _configuration: typeof Catalog.Configuration;
 	
 	static readonly Configuration: Record<string, typeof CatalogField.Configuration>;
 	
@@ -20,7 +20,7 @@ export default class Catalog {
 	}
 	
 	get configuration(): JsonObject {
-		return this._configuration ??= config.get('catalog') as JsonObject;
+		return this._configuration ??= config.get('catalog') as typeof Catalog.Configuration;
 	}
 	
 	get fields(): CatalogField[] {

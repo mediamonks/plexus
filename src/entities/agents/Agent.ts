@@ -5,6 +5,8 @@ import DataSourceItem from '../data-sources/platform/DataSourceItem';
 import Storage from '../storage/Storage';
 import StorageFile from '../storage/StorageFile';
 import llm from '../../modules/llm';
+import gcs from '../../services/gcs';
+import config from '../../utils/config';
 import Debug from '../../utils/Debug';
 import History from '../../utils/History';
 import Profiler from '../../utils/Profiler';
@@ -17,48 +19,50 @@ const INPUT_OUTPUT_TEMPLATE = fs
 	.toString();
 
 export default class Agent {
-	isReady: boolean = false;
-	_baseInstructions: string;
-	_catalog: Catalog;
-	_configuration: JsonObject;
-	_context: Record<string, Promise<void> | JsonField> = {};
-	_displayName: string;
-	_files: string[] = [];
-	_id: string;
-	_invocation: Promise<JsonObject>;
-	_ready: Promise<void>;
-	_temperature: number  = 0;
+	public isReady: boolean = false;
+	private _baseInstructions: string;
+	private _catalog: Catalog;
+	private readonly _configuration: typeof Agent.Configuration;
+	private readonly _context: Record<string, Promise<void> | JsonField> = {};
+	private _displayName: string;
+	private readonly _files: string[] = [];
+	private readonly _id: string;
+	private _invocation: Promise<JsonObject>;
+	private _ready: Promise<void>;
+	private _temperature: number  = 0;
 
-	static Configuration: {
-		context: string[];
-		required?: string[];
-		useHistory?: boolean;
-		temperature?: number | string;
+	static readonly Configuration: {
+		readonly context: readonly string[];
+		readonly instructions?: string;
+		readonly required?: readonly string[];
+		readonly useHistory?: boolean;
+		readonly temperature?: number | string;
+		readonly paginationRule?: string;
 	};
 	
-	constructor(id: string, configuration: JsonObject) {
+	public constructor(id: string, configuration: typeof Agent.Configuration) {
 		this._id = id;
 		this._configuration = configuration;
 		
 		this._ready = this._loadBaseInstructions();
 	}
 	
-	get id(): string {
+	public get id(): string {
 		return this._id;
 	}
 	
-	get configuration(): typeof Agent.Configuration {
+	public get configuration(): typeof Agent.Configuration {
 		return this._configuration as typeof Agent.Configuration;
 	}
 	
-	get displayName(): string {
+	public get displayName(): string {
 		return this._displayName ??= this.id
 				.split(/[-_\s]+/)
 				.map(word => word.charAt(0).toUpperCase() + word.slice(1))
 				.join('');
 	}
 	
-	get instructions(): string {
+	public get instructions(): string {
 		const inputSchema = {};
 		for (const fieldId of this.configuration.context) {
 			inputSchema[fieldId] = this.catalog.get(fieldId).example;
@@ -77,14 +81,14 @@ export default class Agent {
 				.replace(/\{input}/, JSON.stringify(inputSchema, undefined, 2))
 				.replace(/\{output}/, JSON.stringify(outputSchema, undefined, 2));
 	
-		return [this._baseInstructions, inputOutput].join('');
+		return [this._baseInstructions, this.configuration.paginationRule, inputOutput].join('\n\n');
 	}
 	
-	get catalog(): Catalog {
+	public get catalog(): Catalog {
 		return this._catalog;
 	}
 	
-	async _mapFiles(value: JsonField | DataSourceItem[]): Promise<JsonField> {
+	private async _mapFiles(value: JsonField | DataSourceItem[]): Promise<JsonField> {
 		if (!(value instanceof Array) || !(value[0] instanceof DataSourceItem)) return value as JsonField;
 		
 		const files = await Promise.all(value.map(item => item.getLocalFile()));
@@ -94,7 +98,7 @@ export default class Agent {
 		return value.map(item => item.fileName);
 	}
 	
-	async _prepareContext(catalog: Catalog): Promise<void> {
+	private async _prepareContext(catalog: Catalog): Promise<void> {
 		const { context } = this.configuration;
 		
 		await Promise.all(context.map(async contextField =>
@@ -106,7 +110,7 @@ export default class Agent {
 		));
 	}
 	
-	async _determineTemperature(catalog: Catalog): Promise<void> {
+	private async _determineTemperature(catalog: Catalog): Promise<void> {
 		const { temperature } = this.configuration;
 		
 		this._temperature = typeof temperature === 'string'
@@ -115,17 +119,23 @@ export default class Agent {
 		;
 	}
 	
-	async _loadBaseInstructions(): Promise<void> {
+	private async _loadBaseInstructions(): Promise<void> {
 		if (this._baseInstructions) return;
 		
 		try {
-			this._baseInstructions = await Storage.get(StorageFile.TYPE.AGENT_INSTRUCTIONS, this.id).read();
+			if (this.configuration.instructions) {
+				this._baseInstructions = await gcs.read(this.configuration.instructions);
+			} else if (config.get('instructionsPath')) {
+				this._baseInstructions = await gcs.read(`${config.get('instructionsPath')}/${this.id}.txt`);
+			} else {
+				this._baseInstructions = await Storage.get(StorageFile.TYPE.AGENT_INSTRUCTIONS, this.id).read();
+			}
 		} catch (error) {
 			throw new Error(`Missing instructions for agent "${this._id}"`)
 		}
 	}
 	
-	prepare(catalog: Catalog): void {
+	public prepare(catalog: Catalog): void {
 		if (this._catalog === catalog) return;
 		
 		Debug.log(`Preparing ${this.id}`, 'Agent');
@@ -142,7 +152,7 @@ export default class Agent {
 		});
 	}
 	
-	async _invoke(): Promise<JsonObject> {
+	private async _invoke(): Promise<JsonObject> {
 		const { required, useHistory } = this.configuration;
 		
 		await this._ready;
@@ -153,6 +163,7 @@ export default class Agent {
 		
 		Debug.dump(`agent ${this.id} instructions`, this.instructions);
 		Debug.dump(`agent ${this.id} prompt`, this._context);
+		Debug.dump(`agent ${this.id} files`, this._files);
 		
 		const response = await status.wrap(`Running ${this.id} agent`, () =>
 			Profiler.run(() =>
@@ -181,7 +192,11 @@ export default class Agent {
 		return output;
 	}
 	
-	async invoke(): Promise<JsonObject> {
+	public async invoke(): Promise<JsonObject> {
 		return this._invocation ??= this._invoke();
+	}
+	
+	public get files(): readonly string[] {
+		return this._files;
 	}
 }

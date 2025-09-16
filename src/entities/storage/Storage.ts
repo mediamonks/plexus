@@ -4,11 +4,11 @@ import StorageTextFile from './StorageTextFile';
 import UnsupportedError from '../../utils/UnsupportedError';
 
 export default class Storage {
-	static _storageFiles = {};
+	private static readonly _storageFiles = {};
 	
-	static get(type: typeof StorageFile.TYPE.STRUCTURED_DATA, name: string): StorageDataFile;
-	static get(type: typeof StorageFile.TYPE.DIGEST_INSTRUCTIONS | typeof StorageFile.TYPE.AGENT_INSTRUCTIONS | typeof StorageFile.TYPE.UNSTRUCTURED_DATA, name: string): StorageTextFile;
-	static get(type: string, name: string): StorageDataFile | StorageTextFile {
+	public static get(type: typeof StorageFile.TYPE.STRUCTURED_DATA, name: string): StorageDataFile;
+	public static get(type: typeof StorageFile.TYPE.DIGEST_INSTRUCTIONS | typeof StorageFile.TYPE.AGENT_INSTRUCTIONS | typeof StorageFile.TYPE.UNSTRUCTURED_DATA, name: string): StorageTextFile;
+	public static get(type: string, name: string): StorageDataFile | StorageTextFile {
 		let instance = Storage._storageFiles[type]?.[name];
 		
 		if (!instance) {

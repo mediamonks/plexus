@@ -1,4 +1,5 @@
 {
+	"instructionsPath": "gs://monks-mantra/instructions",
 	"agents": {
 		"gap-identification": {
 			"context": [

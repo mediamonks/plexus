@@ -5,32 +5,35 @@ import Profiler from './Profiler';
 import RequestContext from './RequestContext';
 
 export default class History {
-	_history: { role: string; parts: { text: string }[] }[] = [];
-	_threadId: string;
-	_ready: Promise<void>;
+	private _history: {
+		role: string;
+		parts: { text: string }[]
+	}[] = [];
+	private _threadId: string;
+	private _ready: Promise<void>;
 	
-	static get instance() {
+	public static get instance() {
 		return RequestContext.get('history') as History;
 	}
 	
-	static create(threadId?: string): History {
+	public static create(threadId?: string): History {
 		const history = new this(threadId);
 		RequestContext.set('history', history);
 		return history;
 	}
 	
-	constructor (threadId?: string) {
+	public constructor (threadId?: string) {
 		this._threadId = threadId;
 		
 		// TODO _ready is not actually used, so race conditions can occur
-		this._ready = this._load();
+		this._ready = Profiler.run(() => this._load(), 'load history');
 	}
 	
-	get threadId() {
+	public get threadId() {
 		return this._threadId ??= uuid();
 	}
 	
-	async _load(): Promise<void> {
+	private async _load(): Promise<void> {
 		let history;
 		
 		if (this._threadId) {
@@ -54,42 +57,42 @@ export default class History {
 		}));
 	}
 	
-	async save(result: any): Promise<void> {
+	public async save(output: any): Promise<void> {
 		const threadUpdate = Profiler.run(() => firestore.updateDocument('threads', this._threadId, {
-			output: result,
+			output,
 			history: this.toJSON(),
 		}), 'update thread');
 		
 		if (config.get('waitForThreadUpdate')) await threadUpdate;
 	}
 	
-	toVertexAi(): any[] {
+	public toVertexAi(): any[] {
 		return this._history;
 	}
 	
-	toOpenAi(): any[] {
+	public toOpenAi(): any[] {
 		return this._history.map(item => ({
 			role: item.role,
 			content: item.parts[0].text
 		}));
 	}
 	
-	add(role: string, text: string): void {
+	public add(role: string, text: string): void {
 		this._history.push({
 			role,
 			parts: [{ text }]
 		})
 	}
 	
-	toJSON(): any[] {
+	public toJSON(): any[] {
 		return this._history;
 	}
 	
-	get length() {
+	public get length() {
 		return this._history.length;
 	}
 	
-	get last() {
+	public get last() {
 		const last = this._history[this._history.length - 1];
 		return { role: last.role, content: last.parts[0].text };
 	}

@@ -20,19 +20,19 @@ import { ValueOf } from '../../types/common';
 const GOOGLE_DRIVE_URI_PATTERN = /^https?:\/\/(?:drive|docs)\.google\.com\/(?:drive\/(folders)|(?:file|document|spreadsheets|presentation)\/d)\/([\w\-]+)/;
 
 export default class DataSource {
-	_id: string;
-	_configuration: typeof DataSource.Configuration;
-	_data;
-	_dataType: ValueOf<typeof DataSourceItem.DATA_TYPE>;
-	_dataTypeBehavior: IDataTypeDataSourceBehavior;
-	_isDynamic: boolean;
-	_items: DataSourceItem[];
-	_platform: ValueOf<typeof DataSource.PLATFORM>;
-	_platformBehavior: IDataSourcePlatformBehavior;
-	_resolvedUri: string;
-	_target: ValueOf<typeof DataSource.TARGET>;
+	private readonly _id: string;
+	private readonly _configuration: typeof DataSource.Configuration;
+	private _data;
+	private _dataType: ValueOf<typeof DataSourceItem.DATA_TYPE>;
+	private _dataTypeBehavior: IDataTypeDataSourceBehavior;
+	private _isDynamic: boolean;
+	private _items: DataSourceItem[];
+	private _platform: ValueOf<typeof DataSource.PLATFORM>;
+	private _platformBehavior: IDataSourcePlatformBehavior;
+	private _resolvedUri: string;
+	private _target: ValueOf<typeof DataSource.TARGET>;
 
-	static Configuration: {
+	static readonly Configuration: {
 		type: string;
 		source?: string;
 		folder?: boolean;
@@ -43,27 +43,27 @@ export default class DataSource {
 		namespace?: string;
 	};
 
-	static Contents: (typeof DataSourceItem.Content)[];
+	static readonly Contents: (typeof DataSourceItem.Content)[];
 
-	static DataTypeBehavior: IDataTypeDataSourceBehavior;
+	static readonly DataTypeBehavior: IDataTypeDataSourceBehavior;
 
-	static PlatformBehavior: IDataSourcePlatformBehavior;
+	static readonly PlatformBehavior: IDataSourcePlatformBehavior;
 
-	static IngestedData: typeof DigestTargetDataSourceBehavior.OutputData;
+	static readonly IngestedData: typeof DigestTargetDataSourceBehavior.OutputData;
 
-	static OutputData: typeof DigestTargetDataSourceBehavior.OutputData
+	static readonly OutputData: typeof DigestTargetDataSourceBehavior.OutputData
 		| typeof FilesTargetDataSourceBehavior.OutputData
 		| typeof ProfileTargetDataSourceBehavior.OutputData
 		| typeof RawDataDataSourceTarget.OutputData
 		| typeof RawTextTargetDataSourceBehavior.OutputData
 		| typeof VectorTargetDataSourceBehavior.OutputData;
 	
-	constructor(id: string, configuration: typeof DataSource.Configuration) {
+	public constructor(id: string, configuration: typeof DataSource.Configuration) {
 		this._id = id;
 		this._configuration = configuration;
 	}
 	
-	static PLATFORM = {
+	static readonly PLATFORM = {
 		DRIVE: 'drive',
 		GCS: 'gcs',
 	} as const;
@@ -72,27 +72,27 @@ export default class DataSource {
 		return { ...StructuredDataSourceBehavior.TARGET, ...UnstructuredDataSourceBehavior.TARGET };
 	};
 	
-	get id(): string {
+	public get id(): string {
 		return this._id;
 	}
 	
-	get uri(): string {
+	public get uri(): string {
 		return this.configuration.uri;
 	}
 	
-	get isDynamic(): boolean {
+	public get isDynamic(): boolean {
 		return this._isDynamic ??= this.uri ? /\{\w+}/.test(this.uri) : this.source.startsWith(':'); // TODO for backwards compatibility
 	}
 	
-	get configuration(): typeof DataSource.Configuration {
+	public get configuration(): typeof DataSource.Configuration {
 		return this._configuration;
 	}
 	
-	get type(): string {
+	public get type(): string {
 		return this.configuration.type;
 	}
 	
-	get dataType(): ValueOf<typeof DataSourceItem.DATA_TYPE> {
+	public get dataType(): ValueOf<typeof DataSourceItem.DATA_TYPE> {
 		if (this._dataType) return this._dataType;
 
 		const dataType = this.type.split(':')[0]; // TODO for backwards compatibility
@@ -103,7 +103,7 @@ export default class DataSource {
 		return this._dataType = dataType as ValueOf<typeof DataSourceItem.DATA_TYPE>;
 	}
 	
-	get dataTypeBehavior(): typeof DataSource.DataTypeBehavior {
+	public get dataTypeBehavior(): typeof DataSource.DataTypeBehavior {
 		if (this._dataTypeBehavior) return this._dataTypeBehavior;
 
 		// TODO support mixed/unknown
@@ -119,7 +119,7 @@ export default class DataSource {
 		return this._dataTypeBehavior = new dataTypeBehaviorClass(this);
 	}
 	
-	get platform(): ValueOf<typeof DataSource.PLATFORM> {
+	public get platform(): ValueOf<typeof DataSource.PLATFORM> {
 		if (this._platform) return this._platform;
 
 		const mapping = {
@@ -144,7 +144,7 @@ export default class DataSource {
 		return this._platform;
 	}
 	
-	get platformBehavior(): typeof DataSource.PlatformBehavior {
+	public get platformBehavior(): typeof DataSource.PlatformBehavior {
 		if (this._platformBehavior) return this._platformBehavior;
 
 		const mapping = {
@@ -161,7 +161,7 @@ export default class DataSource {
 		return this._platformBehavior;
 	}
 	
-	get target(): ValueOf<typeof DataSource.TARGET> {
+	public get target(): ValueOf<typeof DataSource.TARGET> {
 		if (this._target) return this._target;
 
 		const target = this.type.split(':')[1]; // TODO for backwards compatibility
@@ -172,27 +172,27 @@ export default class DataSource {
 		return this._target = target as ValueOf<typeof DataSource.TARGET>;
 	}
 
-	get targetBehavior(): ITargetDataSourceBehavior {
+	public get targetBehavior(): ITargetDataSourceBehavior {
 		return this.dataTypeBehavior.targetBehavior;
 	}
 	
-	get source(): string {
+	public get source(): string {
 		return this.configuration.source;
 	}
 	
-	get isFolder(): boolean {
+	public get isFolder(): boolean {
 		return this.configuration.folder;
 	}
 	
-	get allowCache(): boolean {
+	public get allowCache(): boolean {
 		return this.configuration.cache ?? true;
 	}
 
-	get searchField(): string {
+	public get searchField(): string {
 		return this.configuration.searchField;
 	}
 	
-	async getResolvedUri(): Promise<string> {
+	public async getResolvedUri(): Promise<string> {
 		if (!this.isDynamic) return this.uri;
 		
 		if (!this._resolvedUri) {
@@ -212,16 +212,16 @@ export default class DataSource {
 		return this._resolvedUri;
 	}
 	
-	async getIngestedData(): Promise<typeof DataSource.OutputData> {
+	public async getIngestedData(): Promise<typeof DataSource.OutputData> {
 		try {
 			return await this.dataTypeBehavior.getIngestedData();
 		} catch (error) {
-			console.warn(`Data source "${this.id}" is not yet ingested`);
+			console.warn(`[WARN] Data source "${this.id}" is not yet ingested`);
 			// throw new Error(`Data source "${this.id}" is not yet ingested`);
 		}
 	}
 	
-	async getItems(): Promise<DataSourceItem[]> {
+	public async getItems(): Promise<DataSourceItem[]> {
 		this._items ??= await this.platformBehavior.getItems();
 		
 		if (!this._items.length) throw new Error(`Data source "${this.id}" contains no items`);
@@ -229,7 +229,7 @@ export default class DataSource {
 		return this._items;
 	}
 	
-	async getData(): Promise<typeof DataSource.OutputData> {
+	public async getData(): Promise<typeof DataSource.OutputData> {
 		if (this._data) return this._data;
 
 		if (!this.isDynamic) this._data = await this.getIngestedData();
@@ -239,23 +239,23 @@ export default class DataSource {
 		return this._data;
 	}
 	
-	async getContents(): Promise<typeof DataSource.Contents> {
+	public async getContents(): Promise<typeof DataSource.Contents> {
 		const items = await this.getItems();
 		
 		return await Promise.all(items.map(item => item.getContent()));
 	}
 	
-	async read(): Promise<typeof DataSource.OutputData> {
+	public async read(): Promise<typeof DataSource.OutputData> {
 		return this.targetBehavior.read();
 	}
 	
-	async ingest(): Promise<void> {
+	public async ingest(): Promise<void> {
 		if (this.isDynamic) return console.warn(`Not ingesting dynamic data source "${this.id}"`);
 		
 		return this.targetBehavior.ingest();
 	}
 	
-	async query(parameters: typeof StructuredDataSourceBehavior.QueryParameters): Promise<typeof DataSource.OutputData> {
+	public async query(parameters: typeof StructuredDataSourceBehavior.QueryParameters): Promise<typeof DataSource.OutputData> {
 		return this.targetBehavior.query(parameters);
 	}
 }

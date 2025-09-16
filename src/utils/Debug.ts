@@ -16,16 +16,16 @@ type DumpLogEntry = {
 	data: JsonField;
 };
 
-type LogEntry = {
+export type DebugLogEntry = {
 	ts: number;
 } & (MessageLogEntry | DumpLogEntry);
 
 export default class Debug {
-	static get _log(): LogEntry[] {
-		return RequestContext.get('debug', []) as LogEntry[];
+	private static get _log(): DebugLogEntry[] {
+		return RequestContext.get('debug', []) as DebugLogEntry[];
 	}
 	
-	static _formatData(data: JsonField): [string | number | boolean] | [string, number] {
+	private static _formatData(data: JsonField): [string | number | boolean] | [string, number] {
 		switch (typeof data) {
 			case 'string':
 				data = data.replace(/\n/g, '\\n');
@@ -39,7 +39,7 @@ export default class Debug {
 		}
 	}
 	
-	static log(message: string, topic?: string): void {
+	public static log(message: string, topic?: string): void {
 		this._log.push({ ts: Date.now(), type: 'message', topic, message });
 		
 		if (process.env.NODE_ENV !== 'dev') return;
@@ -47,21 +47,22 @@ export default class Debug {
 		console.debug('[DEBUG]', topic && `[${topic}]`, message);
 	}
 	
-	static dump(label: string, data: any): void {
+	public static dump(label: string, data: any): void {
 		this._log.push({ ts: Date.now(), type: 'dump', label, data });
 		
 		const dumpFilePath = path.join(config.get('tempPath') as string, 'dump');
 		
-		fs.mkdir(dumpFilePath, { recursive: true }).then(() =>
-			fs.writeFile(path.join(dumpFilePath, `${label}.json`), JSON.stringify(data, null, 2))
-		);
+		fs.mkdir(dumpFilePath, { recursive: true }).then(() => {
+			const content = typeof data === 'object' ? JSON.stringify(data, null, 2) : data;
+			return fs.writeFile(path.join(dumpFilePath, `${label}.json`), content);
+		});
 		
 		if (process.env.NODE_ENV !== 'dev') return;
 		
 		console.debug('[DUMP]',`[${label}]`, ...this._formatData(data));
 	}
 	
-	static get(): any[] {
+	public static get(): DebugLogEntry[] {
 		return this._log;
 	}
 }

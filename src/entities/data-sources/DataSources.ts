@@ -5,24 +5,23 @@ import RequestContext from '../../utils/RequestContext';
 import UnknownError from '../../utils/UnknownError';
 
 export default class DataSources {
-	static Configuration: Record<string, typeof DataSource.Configuration>;
+	static readonly Configuration: Record<string, typeof DataSource.Configuration>;
 
-	static _configuration: typeof DataSources.Configuration;
-	static _dataSources: Record<string, DataSource> = {};
+	private static readonly _dataSources: Record<string, DataSource> = {};
 	
-	static get configuration(): typeof DataSources.Configuration {
+	public static get configuration(): typeof DataSources.Configuration {
 		return config.get('data-sources') as typeof DataSources.Configuration;
 	}
 	
-	static get dataSources(): Record<string, DataSource> {
+	public static get dataSources(): Record<string, DataSource> {
 		return RequestContext.get('dataSources', {}) as Record<string, DataSource>;
 	}
 	
-	static get ids(): string[] {
+	public static get ids(): string[] {
 		return Object.keys(this.configuration);
 	}
 	
-	static get(id: string): DataSource {
+	public static get(id: string): DataSource {
 		if (this.dataSources[id]) return this.dataSources[id];
 		
 		const dataSourceConfiguration = this.configuration[id];
@@ -38,7 +37,7 @@ export default class DataSources {
 		return this.dataSources[id];
 	}
 	
-	static async ingest(namespace?: string): Promise<void> {
+	public static async ingest(namespace?: string): Promise<void> {
 		await Promise.all(this.ids.map(id => {
 			if (namespace && this.configuration[id].namespace !== namespace) return;
 			

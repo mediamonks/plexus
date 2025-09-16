@@ -5,40 +5,40 @@ import config from '../../utils/config';
 import Debug from '../../utils/Debug';
 
 export default abstract class StorageFile<T> {
-	_name: string;
-	_type: string;
+	private readonly _name: string;
+	private readonly _type: string;
 
-	abstract readonly _extension: string;
+	protected abstract readonly _extension: string;
 
-	static TYPE = {
+	static readonly TYPE = {
 		AGENT_INSTRUCTIONS: 'AGENT_INSTRUCTIONS',
 		DIGEST_INSTRUCTIONS: 'DIGEST_INSTRUCTIONS',
 		STRUCTURED_DATA: 'STRUCTURED_DATA',
 		UNSTRUCTURED_DATA: 'UNSTRUCTURED_DATA',
 	} as const
 	
-	constructor(name: string, type: string) {
+	protected constructor(name: string, type: string) {
 		this._name = name;
 		this._type = type;
 	}
 	
-	get name() {
+	public get name() {
 		return this._name;
 	}
 	
-	get type() {
+	public get type() {
 		return this._type;
 	}
 	
-	get extension(): string {
+	public get extension(): string {
 		return this._extension;
 	}
 	
-	get fileName() {
+	public get fileName() {
 		return `${this.name}.${this.extension}`;
 	}
 	
-	get typeBasedPath() {
+	public get typeBasedPath() {
 		return {
 			[StorageFile.TYPE.AGENT_INSTRUCTIONS]: 'instructions/agent',
 			[StorageFile.TYPE.DIGEST_INSTRUCTIONS]: 'instructions/digest',
@@ -47,15 +47,15 @@ export default abstract class StorageFile<T> {
 		}[this.type];
 	}
 	
-	get remotePath() {
+	public get remotePath() {
 		return `${this.typeBasedPath}/${this.fileName}`;
 	}
 	
-	get localPath() {
+	public get localPath() {
 		return path.join(config.get('tempPath') as string, 'storage', ...this.typeBasedPath.split('/'), this.fileName);
 	}
 	
-	get uri() {
+	public get uri() {
 		return `gs://${config.get('storage.bucket')}/${this.remotePath}`;
 	}
 	
@@ -68,9 +68,9 @@ export default abstract class StorageFile<T> {
 		}
 	}
 	
-	abstract read(): Promise<T>;
+	public abstract read(): Promise<T>;
 
-	abstract write(data: T): Promise<void>;
+	public abstract write(data: T): Promise<void>;
 
 	protected async writeText(text: string): Promise<void> {
 		await Promise.all([

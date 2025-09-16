@@ -12,16 +12,16 @@ import UnsupportedError from '../../../utils/UnsupportedError';
 import { JsonObject, JsonPrimitive } from '../../../types/common';
 
 export default class StructuredDataSourceBehavior extends DataSourceBehavior implements IDataTypeDataSourceBehavior {
-	static InputData: typeof DataSourceItem.DataContent;
+	static readonly InputData: typeof DataSourceItem.DataContent;
 
-	static OutputData: typeof RawDataDataSourceTarget.OutputData
+	static readonly OutputData: typeof RawDataDataSourceTarget.OutputData
 		| typeof ProfileTargetDataSourceBehavior.OutputData
 		| typeof VectorTargetDataSourceBehavior.OutputData
 		| typeof FilesDataSourceTarget.OutputData;
 
-	_targetBehavior: RawDataDataSourceTarget | ProfileTargetDataSourceBehavior | VectorTargetDataSourceBehavior | FilesDataSourceTarget;
+	private _targetBehavior: RawDataDataSourceTarget | ProfileTargetDataSourceBehavior | VectorTargetDataSourceBehavior | FilesDataSourceTarget;
 
-	static QueryParameters: {
+	static readonly QueryParameters: {
 		input?: string;
 		filter?: { [key: string]: string };
 		limit?: number;
@@ -29,14 +29,14 @@ export default class StructuredDataSourceBehavior extends DataSourceBehavior imp
 		sort?: string;
 	};
 
-	static TARGET = {
+	static readonly TARGET = {
 		RAW_STRUCTURED: 'raw',
 		PROFILE: 'profile',
 		VECTOR_STRUCTURED: 'vector',
 		FILES: 'files',
 	} as const;
 	
-	get targetBehavior(): ITargetDataSourceBehavior {
+	public get targetBehavior(): ITargetDataSourceBehavior {
 		if (!this._targetBehavior) {
 			const mapping = {
 				raw: RawDataDataSourceTarget,
@@ -55,7 +55,7 @@ export default class StructuredDataSourceBehavior extends DataSourceBehavior imp
 		return this._targetBehavior;
 	}
 	
-	async getIngestedData(): Promise<AsyncGenerator<JsonObject>> {
+	public async getIngestedData(): Promise<AsyncGenerator<JsonObject>> {
 		return Storage.get(StorageFile.TYPE.STRUCTURED_DATA, this.dataSource.id).read();
 	}
 }
