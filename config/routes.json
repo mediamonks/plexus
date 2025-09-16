@@ -5,15 +5,6 @@
 				"summary": "Invokes an agent pipeline",
 				"handler": "invoke",
 				"payload": {
-					"languageId": {
-						"type": "string",
-						"description": "The ID of the language to use",
-						"enum": [
-							"en-us",
-							"fr-fr"
-						],
-						"default": "en-us"
-					},
 					"threadId": {
 						"type": "string",
 						"description": "The ID of the conversation thread to continue"
@@ -21,6 +12,10 @@
 					"config": {
 						"type": "object",
 						"description": "Runtime configuration overrides."
+					},
+					"fields": {
+						"type": "object",
+						"description": "Values for the pipeline's input fields"
 					}
 				},
 				"response": {
@@ -34,6 +29,28 @@
 							"type": "string",
 							"format": "uuid",
 							"description": "Unique identifier for the thread."
+						},
+						"output": {
+							"type": "object",
+							"description": "Generated values for the pipeline's output fields"
+						},
+						"fields": {
+							"type": "object",
+							"description": "Values of the pipeline's input fields"
+						},
+						"performance": {
+							"type": "array",
+							"description": "Performance metrics for the pipeline",
+							"items": {
+								"type": "object"
+							}
+						},
+						"debug": {
+							"type": "array",
+							"description": "Debug information for the pipeline",
+							"items": {
+								"type": "object"
+							}
 						}
 					}
 				}
@@ -94,13 +111,9 @@
 							"type": "array",
 							"description": "The conversation history."
 						},
-						"context": {
+						"output": {
 							"type": "object",
-							"description": "Context used for last generation."
-						},
-						"copy": {
-							"type": "string",
-							"description": "Output copy of last generation."
+							"description": "Output of the last interaction."
 						}
 					}
 				}

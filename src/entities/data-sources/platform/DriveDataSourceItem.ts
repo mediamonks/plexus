@@ -17,30 +17,31 @@ const LLM_SUPPORTED_MIME_TYPES = [
 ];
 
 export default class DriveDataSourceItem extends DataSourceItem {
-	static TextContent: string;
+	static readonly TextContent: string;
 
-	static DataContent: SpreadSheet;
+	static readonly DataContent: SpreadSheet;
 
-	_metadata;;
+	private readonly _metadata: FileMetaData;
+	private _localFile: Promise<string> | string;
 
-	constructor(dataSource: any, metadata: any) {
+	public constructor(dataSource: any, metadata: any) {
 		super(dataSource);
 		this._metadata = metadata;
 	}
 	
-	get metadata(): FileMetaData {
+	public get metadata(): FileMetaData {
 		return this._metadata;
 	}
 	
-	get mimeType() {
+	public get mimeType(): string {
 		return this._metadata.mimeType;
 	}
 	
-	get fileName() {
+	public get fileName(): string {
 		return this._metadata.name;
 	}
 	
-	detectDataType(): ValueOf<typeof DataSourceItem.DATA_TYPE> {
+	protected detectDataType(): ValueOf<typeof DataSourceItem.DATA_TYPE> {
 		const mapping = {
 			'application/vnd.google-apps.document': 'text',
 			'application/pdf': 'text',
@@ -56,7 +57,11 @@ export default class DriveDataSourceItem extends DataSourceItem {
 		return dataType;
 	}
 	
-	async getLocalFile(): Promise<string> {
+	public getLocalFile(): Promise<string> | string {
+		return this._localFile ??= this._getLocalFile();
+	}
+	
+	private async _getLocalFile(): Promise<string> {
 		const driveService = await drive();
 		
 		let metadata = this.metadata;
@@ -70,7 +75,7 @@ export default class DriveDataSourceItem extends DataSourceItem {
 		return driveService.exportFile(metadata, 'pdf', this.allowCache);
 	}
 	
-	async toText(): Promise<typeof DriveDataSourceItem.TextContent> {
+	public async toText(): Promise<typeof DriveDataSourceItem.TextContent> {
 		const { metadata } = this;
 		
 		if (metadata.mimeType === 'application/vnd.google-apps.document') {
@@ -90,7 +95,7 @@ export default class DriveDataSourceItem extends DataSourceItem {
 		throw new UnsupportedError('mime type for text extraction', metadata.mimeType);
 	}
 	
-	async toData(): Promise<typeof DriveDataSourceItem.DataContent> {
+	public async toData(): Promise<typeof DriveDataSourceItem.DataContent> {
 		const { metadata } = this;
 		
 		if (metadata.mimeType === 'application/vnd.google-apps.spreadsheet') {

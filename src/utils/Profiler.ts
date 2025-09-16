@@ -1,27 +1,27 @@
 import { performance } from 'node:perf_hooks';
 import RequestContext from './RequestContext';
 
-type LogEntry = Record<string, number>;
+export type ProfilerLogEntry = Record<string, number>;
 
 export default class Profiler {
-	static getReport(): LogEntry[] {
+	public static getReport(): ProfilerLogEntry[] {
 		return this._log;
 	}
 
-	static get _log(): LogEntry[] {
-		return RequestContext.get('profiler', []) as LogEntry[];
+	private static get _log(): ProfilerLogEntry[] {
+		return RequestContext.get('profiler', []) as ProfilerLogEntry[];
 	}
 	
-	static log(label: string, start: number): void {
+	private static log(label: string, start: number): void {
 		const ms = performance.now() - start;
 		this._log.push({ [label]: ms });
 		if (process.env.NODE_ENV === 'dev') console.debug('[PERF]', `[${label}]`, ms);
 	}
 
-	static run<T>(fn: () => T, label?: string): T;
-	static run<T>(fn: () => T, args: any[], label?: string): T;
+	public static run<T>(fn: () => T, label?: string): T;
+	public static run<T>(fn: () => T, args: any[], label?: string): T;
 
-	static run<T, K>(fn: () => T, argsOrLabel?: K[] | string, label?: string): T {
+	public static run<T, K>(fn: () => T, argsOrLabel?: K[] | string, label?: string): T {
 		if (typeof argsOrLabel === 'string') {
 			label = argsOrLabel;
 			argsOrLabel = [];

@@ -7,7 +7,7 @@ import vectordb from '../../../modules/vectordb';
 import { JsonObject } from '../../../types/common';
 
 export default class VectorTargetDataSourceBehavior extends DataSourceBehavior implements ITargetDataSourceBehavior {
-	static OutputData: AsyncGenerator<JsonObject>;;
+	static OutputData: AsyncGenerator<JsonObject>;
 
 	private async* textToChunks(text: string) {
 		const splitter = new RecursiveCharacterTextSplitter({

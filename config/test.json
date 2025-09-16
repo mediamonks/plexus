@@ -1,0 +1,53 @@
+{
+	"agents": {
+		"hello": {
+			"instructions": "gs://monks-plexus/system-instructions/hello.txt",
+			"context": ["names"]
+		},
+		"names": {
+			"instructions": "gs://monks-plexus/system-instructions/names.txt",
+			"context": ["documents"]
+		}
+	},
+	"catalog": {
+		"name": {
+			"type": "input",
+			"field": "name",
+			"required": true
+		},
+		"helloString": {
+			"type": "output",
+			"agent": "hello",
+			"field": "helloString",
+			"example": "the output string"
+		},
+		"documents": {
+			"type": "data",
+			"dataSource": "documents"
+		},
+		"names": {
+			"type": "output",
+			"agent": "names",
+			"field": "names",
+			"example": [
+				"John",
+				"Pete"
+			]
+		}
+	},
+	"data-sources": {
+		"documents": {
+			"uri": "https://drive.google.com/drive/folders/1o8kMT0Fra7KpZHkB9Ud7CkjbzlEaJtFG",
+			"platform": "drive",
+			"type": "text:raw",
+			"dataType": "text",
+			"target": "raw",
+			"folder": true
+		}
+	},
+	"output": [
+		"documents",
+		"names",
+		"helloString"
+	]
+}

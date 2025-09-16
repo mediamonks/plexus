@@ -5,16 +5,17 @@ import DataSources from '../entities/data-sources/DataSources';
 export type JsonPrimitive = string | number | boolean | null;
 export type JsonArray = JsonField[];
 export type JsonField = JsonPrimitive | JsonArray | JsonObject;
-export type JsonObject = { [key: string]: JsonField };
+export type JsonObject = Record<string, JsonField>;
 
 export type ValueOf<T> = T[keyof T];
 
 export type SpreadSheet = { sheets: { title: string; rows: any[] }[] };
 
-// TODO this needs a bit of thinking about
 export type RequestPayload = {
+	threadId?: string;
 	config?: JsonObject;
-} & JsonObject;
+	fields?: JsonObject;
+};
 
 export type RouteMethodConfiguration = {
 	summary: string;
@@ -51,10 +52,12 @@ export type Configuration = {
 	embeddingPlatform?: string;
 	waitForThreadUpdate?: boolean;
 	tempPath?: string;
+	output?: string[];
 	postback?: {
 		url: string;
 		headers?: Record<string, string>;
 	};
+	instructionsPath?: string;
 	agents?: Record<string, typeof Agent.Configuration>;
 	azure?: {
 		apiVersion: string;

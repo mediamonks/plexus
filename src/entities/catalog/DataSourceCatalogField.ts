@@ -7,11 +7,10 @@ import { JsonField, JsonObject } from '../../types/common';
 import DataSourceItem from '../data-sources/platform/DataSourceItem';
 
 export default class DataSourceCatalogField extends CatalogField {
-	static Configuration: {
+	static readonly Configuration: {
 		type: 'data';
 		example: JsonField;
 		dataSource: string;
-		required?: boolean;
 		input?: string;
 		limit?: number;
 		filter?: JsonObject;
@@ -19,25 +18,25 @@ export default class DataSourceCatalogField extends CatalogField {
 		sort?: string;
 	};
 
-	get configuration(): typeof DataSourceCatalogField.Configuration {
+	public get configuration(): typeof DataSourceCatalogField.Configuration {
 		return super.configuration as typeof DataSourceCatalogField.Configuration;
 	}
 
-	get dataSourceId(): string {
+	public get dataSourceId(): string {
 		if (!this.configuration.dataSource) throw new Error(`Missing 'dataSource' property for data field "${this.id}"`);
 		
 		return this.configuration.dataSource;
 	}
 	
-	get inputField(): string {
+	public get inputField(): string {
 		return this.configuration.input;
 	}
 	
-	get filter(): Record<string, string> {
+	public get filter(): Record<string, string> {
 		return this.configuration.filter as Record<string, string>;
 	}
 	
-	get queryParameters(): typeof StructuredDataSourceBehavior.QueryParameters {
+	public get queryParameters(): typeof StructuredDataSourceBehavior.QueryParameters {
 		return {
 			limit: this.configuration.limit,
 			fields: this.configuration.fields,
@@ -45,11 +44,11 @@ export default class DataSourceCatalogField extends CatalogField {
 		};
 	}
 	
-	get dataSource(): DataSource {
+	public get dataSource(): DataSource {
 		return DataSources.get(this.dataSourceId);
 	}
 	
-	async populate(): Promise<JsonField | DataSourceItem[]> {
+	protected async populate(): Promise<JsonField | DataSourceItem[]> {
 		Debug.log(`Populating data source field "${this.id}"`, 'Catalog');
 		
 		const promises = [];

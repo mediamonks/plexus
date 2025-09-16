@@ -8,31 +8,31 @@ import UnsupportedError from '../../../utils/UnsupportedError';
 import { JsonObject, ValueOf } from '../../../types/common';
 
 export default class GcsDataSourceItem extends DataSourceItem {
-	static TextContent: string;
+	static readonly TextContent: string;
 
-	static DataContent: AsyncGenerator<JsonObject>;
+	static readonly DataContent: AsyncGenerator<JsonObject>;
 
-	_uri: string;;;;
+	private readonly _uri: string;
 	
-	constructor(dataSource: any, uri: string) {
+	public constructor(dataSource: any, uri: string) {
 		super(dataSource);
 
 		this._uri = uri;
 	}
 	
-	get uri(): string {
+	public get uri(): string {
 		return this._uri;
 	}
 	
-	get extension(): string {
+	public get extension(): string {
 		return path.extname(this.uri).substring(1);
 	}
 	
-	get fileName(): string {
+	public get fileName(): string {
 		return path.basename(this.uri);
 	}
 	
-	detectDataType(): ValueOf<typeof DataSourceItem.DATA_TYPE> {
+	protected detectDataType(): ValueOf<typeof DataSourceItem.DATA_TYPE> {
 		return {
 			pdf: DataSourceItem.DATA_TYPE.UNSTRUCTURED,
 			txt: DataSourceItem.DATA_TYPE.UNSTRUCTURED,
@@ -40,11 +40,11 @@ export default class GcsDataSourceItem extends DataSourceItem {
 		}[this.extension];
 	}
 	
-	async getLocalFile(): Promise<string> {
+	public async getLocalFile(): Promise<string> {
 		return this.allowCache ? await gcs.cache(this.uri) : gcs.download(this.uri);
 	}
 	
-	async toText(): Promise<typeof GcsDataSourceItem.TextContent> {
+	public async toText(): Promise<typeof GcsDataSourceItem.TextContent> {
 		const file = await this.getLocalFile();
 		
 		const mapping = {
@@ -57,7 +57,7 @@ export default class GcsDataSourceItem extends DataSourceItem {
 		return await mapping[this.extension]();
 	}
 	
-	async toData(): Promise<typeof GcsDataSourceItem.DataContent> {
+	public async toData(): Promise<typeof GcsDataSourceItem.DataContent> {
 		const file = await this.getLocalFile();
 		return jsonl.read(file);
 	}

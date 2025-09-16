@@ -182,7 +182,7 @@ export default async () => {
 		const cacheContents = await listFolderContents(tempFolderId);
 		const existingFile = cacheContents.find(cacheFile => cacheFile.name === newName);
 		
-		if (allowCache) console.debug('[Drive] Import', file.name, 'cache', existingFile ? 'hit' : 'miss');
+		if (allowCache) Debug.log(`Import "${file.name}": cache ${existingFile ? 'hit' : 'miss'}`, 'Google Drive');
 		if (existingFile && allowCache) return existingFile;
 		if (existingFile) await trashItem(existingFile.id);
 		

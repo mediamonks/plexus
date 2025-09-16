@@ -7,31 +7,31 @@ import { JsonField } from '../../types/common';
 import DataSourceItem from '../data-sources/platform/DataSourceItem';
 
 export default class CatalogField {
-	_id: string;
-	_catalog: Catalog;
-	_configuration: typeof CatalogField.Configuration;
-	_value: Promise<JsonField | DataSourceItem[]> | JsonField | DataSourceItem[];
+	private readonly _id: string;
+	private readonly _catalog: Catalog;
+	private _configuration: typeof CatalogField.Configuration;
+	protected _value: Promise<JsonField | DataSourceItem[]> | JsonField | DataSourceItem[];
 
-	static Configuration: typeof DataSourceCatalogField.Configuration
+	static readonly Configuration: typeof DataSourceCatalogField.Configuration
 		| typeof InputCatalogField.Configuration
 		| typeof OutputCatalogField.Configuration;
 
-	static TYPE = {
+	static readonly TYPE = {
 		INPUT: 'input',
 		OUTPUT: 'output',
 		DATA: 'data'
 	} as const;
 	
-	constructor(id: string, catalog: Catalog) {
+	public constructor(id: string, catalog: Catalog) {
 		this._id = id;
 		this._catalog = catalog;
 	}
 	
-	get id(): string {
+	public get id(): string {
 		return this._id;
 	}
 	
-	get configuration(): typeof CatalogField.Configuration {
+	public get configuration(): typeof CatalogField.Configuration {
 		if (!this._configuration) {
 			const configuration = this.catalog.configuration[this.id];
 			if (!configuration) throw new UnknownError('catalog field', this.id, this.catalog.configuration);
@@ -41,23 +41,23 @@ export default class CatalogField {
 		return this._configuration;
 	}
 	
-	get catalog(): Catalog {
+	public get catalog(): Catalog {
 		return this._catalog;
 	}
 	
-	get type(): string {
+	public get type(): string {
 		return String(this.configuration.type || '');
 	}
 	
-	get example(): JsonField {
+	public get example(): JsonField {
 		return this.configuration.example;
 	}
 	
-	async populate(): Promise<JsonField | DataSourceItem[]> {
+	protected async populate(): Promise<JsonField | DataSourceItem[]> {
 		throw new Error('Cannot create instance of CatalogField');
 	}
 	
-	async getValue(): Promise<JsonField | DataSourceItem[]> {
+	public async getValue(): Promise<JsonField | DataSourceItem[]> {
 		return this._value ??= this.populate();
 	}
 }

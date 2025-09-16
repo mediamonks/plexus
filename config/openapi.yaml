@@ -2,7 +2,7 @@ swagger: "2.0"
 info:
   title: plexus
   description: Plexus Agentic Engine
-  version: 1.1.0
+  version: 1.2.0
 schemes:
   - https
 produces:
@@ -16,7 +16,7 @@ x-google-backend:
 paths:
   /api/invoke:
     post:
-      summary: Invokes an agentic pipeline
+      summary: Invokes an agent pipeline
       parameters:
         - name: body
           in: body
@@ -30,6 +30,9 @@ paths:
               config:
                 type: object
                 description: Runtime configuration overrides.
+              fields:
+                type: object
+                description: Values for the pipeline's input fields
       responses:
         "200":
           description: Successful response
@@ -43,6 +46,22 @@ paths:
                 type: string
                 format: uuid
                 description: Unique identifier for the thread.
+              output:
+                type: object
+                description: Generated values for the pipeline's output fields
+              fields:
+                type: object
+                description: Values of the pipeline's input fields
+              performance:
+                type: array
+                description: Performance metrics for the pipeline
+                items:
+                  type: object
+              debug:
+                type: array
+                description: Debug information for the pipeline
+                items:
+                  type: object
       operationId: POST /invoke
     options:
       summary: CORS preflight for /invoke
@@ -52,9 +71,9 @@ paths:
       operationId: OPTIONS /invoke
   /api/fields/{field}:
     parameters:
-      - name: field
-        description: The name of the field
+      - description: The name of the field
         type: string
+        name: field
         in: path
         required: true
     get:
@@ -86,9 +105,9 @@ paths:
       operationId: OPTIONS /fields/{field}
   /api/thread/{threadId}:
     parameters:
-      - name: threadId
-        description: The ID of the thread to retrieve
+      - description: The ID of the thread to retrieve
         type: string
+        name: threadId
         in: path
         required: true
     get:
@@ -104,12 +123,9 @@ paths:
               history:
                 type: array
                 description: The conversation history.
-              context:
+              output:
                 type: object
-                description: Context used for last generation.
-              copy:
-                type: string
-                description: Output copy of last generation.
+                description: Output of the last interaction.
       operationId: GET /thread/{threadId}
     options:
       summary: CORS preflight for /thread/{threadId}
@@ -119,9 +135,9 @@ paths:
       operationId: OPTIONS /thread/{threadId}
   /api/ingest/{namespace}:
     parameters:
-      - name: namespace
-        description: The namespace for which to ingest data
+      - description: The namespace for which to ingest data
         type: string
+        name: namespace
         in: path
         required: true
     post:

@@ -1,20 +1,36 @@
-import invoke from '../modules/invoke';
-import Profiler from '../utils/Profiler';
-import Debug from '../utils/Debug';
+import Catalog from '../entities/catalog/Catalog';
+import config from '../utils/config';
+import Debug, { DebugLogEntry } from '../utils/Debug';
 import History from '../utils/History';
+import Profiler, { ProfilerLogEntry } from '../utils/Profiler';
+import RequestContext from '../utils/RequestContext';
+import { JsonObject, RequestPayload } from '../types/common';
 
 export default async (_: any, payload: any): Promise<{
 	error: Error | undefined;
-	output: any;
+	output: JsonObject;
 	threadId: string;
-	payload: any;
-	performance: any;
-	debug: any;
+	fields: JsonObject;
+	performance: ProfilerLogEntry[];
+	debug: DebugLogEntry[];
 }> => {
-	let error: Error | undefined, output: any;
+	let error: Error | undefined;
+	const output = {};
 	
 	try {
-		output = await Profiler.run(invoke, 'total');
+		let { threadId } = RequestContext.get('payload') as RequestPayload;
+		
+		History.create(threadId as string);
+		
+		const outputFields = config.get('output') as string[];
+		
+		if (!outputFields || !outputFields.length) throw new Error('No output specified');
+		
+		await Promise.all(outputFields.map(async outputField => {
+			output[outputField] = await Profiler.run(() => Catalog.instance.get(outputField).getValue(), `get value for "${outputField}"`);
+		}));
+		
+		await History.instance.save(output);
 	} catch (err) {
 		console.error(err);
 		error = err;
@@ -24,7 +40,7 @@ export default async (_: any, payload: any): Promise<{
 		error,
 		output,
 		threadId: History.instance.threadId,
-		payload,
+		fields: payload.fields,
 		performance: Profiler.getReport(),
 		debug: Debug.get(),
 	};

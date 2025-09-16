@@ -5,37 +5,34 @@ import { JsonField } from '../../types/common';
 import DataSourceItem from '../data-sources/platform/DataSourceItem';
 
 export default class OutputCatalogField extends CatalogField {
-	static Configuration: {
+	static readonly Configuration: {
 		type: 'output';
 		example: JsonField;
 		agent: string;
 		field: string;
-		required?: boolean;
 	};
 
-	get configuration(): typeof OutputCatalogField.Configuration {
+	public get configuration(): typeof OutputCatalogField.Configuration {
 		return super.configuration as typeof OutputCatalogField.Configuration;
 	}
 
-	get outputField(): string {
-		const field = this.configuration.field;
+	public get outputField(): string {
+		const { field } = this.configuration;
+		
 		if (typeof field !== 'string') throw new Error(`Missing or invalid 'field' property for output field "${this.id}"`);
 		
 		return field;
 	}
 	
-	get agentId(): string {
-		const agent = this.configuration.agent;
+	public get agentId(): string {
+		const { agent } = this.configuration;
+		
 		if (typeof agent !== 'string') throw new Error(`Missing or invalid 'agent' property for output field "${this.id}"`);
 		
 		return agent;
 	}
 	
-	get required(): boolean {
-		return !!this.configuration.required;
-	}
-	
-	async populate(): Promise<JsonField | DataSourceItem[]> {
+	protected async populate(): Promise<JsonField | DataSourceItem[]> {
 		Debug.log(`Populating output field "${this.id}"`, 'Catalog');
 		
 		const result = await Agents.get(this.agentId, this.catalog).invoke() as Record<string, JsonField>;
@@ -47,4 +44,3 @@ export default class OutputCatalogField extends CatalogField {
 		return this._value = value;
 	}
 }
-

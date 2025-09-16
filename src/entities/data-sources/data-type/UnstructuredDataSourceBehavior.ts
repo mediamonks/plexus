@@ -10,23 +10,23 @@ import StorageFile from '../../storage/StorageFile';
 import UnsupportedError from '../../../utils/UnsupportedError';
 
 export default class UnstructuredDataSourceBehavior extends DataSourceBehavior implements IDataTypeDataSourceBehavior {
-	static InputData: typeof DataSourceItem.TextContent;
+	static readonly InputData: typeof DataSourceItem.TextContent;
 
-	static OutputData: typeof RawTextTargetDataSourceBehavior.OutputData
+	static readonly OutputData: typeof RawTextTargetDataSourceBehavior.OutputData
 		| typeof DigestTargetDataSourceBehavior.OutputData
 		| typeof VectorTargetDataSourceBehavior.OutputData
 		| typeof FilesDataSourceTarget.OutputData;
 	
-	_targetBehavior;;
+	private _targetBehavior;
 	
-	static TARGET = {
+	static readonly TARGET = {
 		RAW_UNSTRUCTURED: 'raw',
 		DIGEST: 'digest',
 		VECTOR_UNSTRUCTURED: 'vector',
 		FILES: 'files',
 	} as const;
 	
-	get targetBehavior() {
+	public get targetBehavior() {
 		if (!this._targetBehavior) {
 			const mapping = {
 				raw: RawTextTargetDataSourceBehavior,
@@ -45,7 +45,7 @@ export default class UnstructuredDataSourceBehavior extends DataSourceBehavior i
 		return this._targetBehavior;
 	}
 	
-	async getIngestedData(): Promise<string> {
+	public async getIngestedData(): Promise<string> {
 		return Storage.get(StorageFile.TYPE.UNSTRUCTURED_DATA, this.dataSource.id).read();
 	}
 }
