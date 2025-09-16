@@ -122,11 +122,18 @@ export default class Agent {
 	private async _loadBaseInstructions(): Promise<void> {
 		if (this._baseInstructions) return;
 		
+		const { instructions } = this.configuration;
+		const instructionsPath = config.get('instructionsPath');
+		
 		try {
-			if (this.configuration.instructions) {
-				this._baseInstructions = await gcs.read(this.configuration.instructions);
-			} else if (config.get('instructionsPath')) {
-				this._baseInstructions = await gcs.read(`${config.get('instructionsPath')}/${this.id}.txt`);
+			if (instructions) {
+				if (instructions.startsWith('gs://')) {
+					this._baseInstructions = await gcs.read(this.configuration.instructions);
+				} else {
+					this._baseInstructions = instructions;
+				}
+			} else if (instructionsPath) {
+				this._baseInstructions = await gcs.read(`${instructionsPath}/${this.id}.txt`);
 			} else {
 				this._baseInstructions = await Storage.get(StorageFile.TYPE.AGENT_INSTRUCTIONS, this.id).read();
 			}
