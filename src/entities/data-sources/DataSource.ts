@@ -94,11 +94,12 @@ export default class DataSource {
 	
 	public get dataType(): ValueOf<typeof DataSourceItem.DATA_TYPE> {
 		if (this._dataType) return this._dataType;
+		
+		const dataType = this.configuration.dataType ?? this.type.split(':')[0]; // TODO for backwards compatibility
 
-		const dataType = this.type.split(':')[0]; // TODO for backwards compatibility
-
-		if (!Object.values(DataSourceItem.DATA_TYPE).includes(dataType as ValueOf<typeof DataSourceItem.DATA_TYPE>))
-			 throw new UnsupportedError('data source data type', dataType, DataSourceItem.DATA_TYPE);
+		if (!Object.values(DataSourceItem.DATA_TYPE).includes(dataType as ValueOf<typeof DataSourceItem.DATA_TYPE>)) {
+			throw new UnsupportedError('data source data type', dataType, DataSourceItem.DATA_TYPE);
+		}
 
 		return this._dataType = dataType as ValueOf<typeof DataSourceItem.DATA_TYPE>;
 	}
@@ -164,10 +165,11 @@ export default class DataSource {
 	public get target(): ValueOf<typeof DataSource.TARGET> {
 		if (this._target) return this._target;
 
-		const target = this.type.split(':')[1]; // TODO for backwards compatibility
+		const target = this.configuration.target ?? this.type.split(':')[1]; // TODO for backwards compatibility
 
-		if (!Object.values(DataSource.TARGET).includes(target as ValueOf<typeof DataSource.TARGET>))
-			 throw new UnsupportedError('data source target', target, DataSource.TARGET);
+		if (!Object.values(DataSource.TARGET).includes(target as ValueOf<typeof DataSource.TARGET>)) {
+			throw new UnsupportedError('data source target', target, DataSource.TARGET);
+		}
 
 		return this._target = target as ValueOf<typeof DataSource.TARGET>;
 	}

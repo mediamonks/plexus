@@ -338,6 +338,7 @@ Defines available data sources and their properties:
 - **`target`** (string): Target for the data source: "raw" for raw text or data, "vector" for vector embeddings, "digest" for AI-generated summaries ("text" only).
 - **`namespace`** (string, optional): Logical grouping namespace, only used for batch ingestion.
 - **`platform`** (string, optional): Storage platform ("gcs", "drive", etc.), will be derived from the URI if not specified.
+- **`folder`** (boolean, optional): Whether the data source is a folder. Detected if not specified.
 - **`cache`** (boolean, optional): Whether to cache the data source, defaults to true. Set this to `false` for data sources of which the content can change between invocations.
 - **`instructions`** (string, optional): Processing instructions for a `digest`-type data source.
 - **`searchField`** (string, optional): Name of the field against which to perform vector searches for a `data`-type, `vector`-target data source.
