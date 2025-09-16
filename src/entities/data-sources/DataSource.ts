@@ -33,11 +33,13 @@ export default class DataSource {
 	private _target: ValueOf<typeof DataSource.TARGET>;
 
 	static readonly Configuration: {
-		type: string;
+		type?: string;
+		dataType?: ValueOf<typeof DataSourceItem.DATA_TYPE>;
+		target?: ValueOf<typeof DataSource.TARGET>;
 		source?: string;
 		folder?: boolean;
 		cache?: boolean;
-		platform?: string;
+		platform?: ValueOf<typeof DataSource.PLATFORM>;
 		uri?: string;
 		searchField?: string;
 		namespace?: string;
