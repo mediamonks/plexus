@@ -32,7 +32,7 @@ export default class Agent {
 	private _temperature: number  = 0;
 
 	static readonly Configuration: {
-		readonly context: readonly string[];
+		readonly context?: readonly string[];
 		readonly instructions?: string;
 		readonly required?: readonly string[];
 		readonly useHistory?: boolean;
@@ -62,9 +62,13 @@ export default class Agent {
 				.join('');
 	}
 	
+	private get context(): readonly string[] {
+		return this.configuration.context ?? [];
+	}
+	
 	public get instructions(): string {
 		const inputSchema = {};
-		for (const fieldId of this.configuration.context) {
+		for (const fieldId of this.context) {
 			inputSchema[fieldId] = this.catalog.get(fieldId).example;
 		}
 		
@@ -99,7 +103,7 @@ export default class Agent {
 	}
 	
 	private async _prepareContext(catalog: Catalog): Promise<void> {
-		const { context } = this.configuration;
+		const { context } = this;
 		
 		await Promise.all(context.map(async contextField =>
 			this._context[contextField] = catalog.get(contextField).getValue()
@@ -138,7 +142,7 @@ export default class Agent {
 				this._baseInstructions = await Storage.get(StorageFile.TYPE.AGENT_INSTRUCTIONS, this.id).read();
 			}
 		} catch (error) {
-			throw new Error(`Missing instructions for agent "${this._id}"`)
+			throw new Error(`Missing instructions for agent "${this._id}"`);
 		}
 	}
 	

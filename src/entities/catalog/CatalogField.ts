@@ -2,6 +2,7 @@ import Catalog from './Catalog';
 import DataSourceCatalogField from './DataSourceCatalogField';
 import InputCatalogField from './InputCatalogField';
 import OutputCatalogField from './OutputCatalogField';
+import ErrorLog from '../../utils/ErrorLog';
 import UnknownError from '../../utils/UnknownError';
 import { JsonField } from '../../types/common';
 import DataSourceItem from '../data-sources/platform/DataSourceItem';
@@ -34,7 +35,7 @@ export default class CatalogField {
 	public get configuration(): typeof CatalogField.Configuration {
 		if (!this._configuration) {
 			const configuration = this.catalog.configuration[this.id];
-			if (!configuration) throw new UnknownError('catalog field', this.id, this.catalog.configuration);
+			if (!configuration) ErrorLog.throw(new UnknownError('catalog field', this.id, this.catalog.configuration));
 			this._configuration = configuration as typeof CatalogField.Configuration;
 		}
 		

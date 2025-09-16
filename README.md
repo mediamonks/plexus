@@ -251,10 +251,10 @@ Defines behavior and context for each AI agent in your workflow. Each agent is i
 ```
 
 **Agent Properties:**
-- **`instructions`** (string): GCS path to the file containing the instructions for the agent
-- **`context`** (array): List of context fields the agent should receive
-- **`temperature`** (number, optional): AI model temperature setting (0.0-1.0)
-- **`useHistory`** (boolean, optional): Whether to provide the agent with the conversation history
+- **`instructions`** (string): GCS path to the file containing the instructions (system prompt) for the agent, or the literal instructions themselves.
+- **`context`** (array): List of context fields the agent should receive.
+- **`temperature`** (number, optional): AI model temperature setting (0.0-1.0).
+- **`useHistory`** (boolean, optional): Whether to provide the agent with the conversation history.
 - **`required`** (array, optional): Required (typically `input`-type) context fields for the agent. If a required field is left empty, the agent will not run and will simply return an empty response object.
 
 ### `catalog`

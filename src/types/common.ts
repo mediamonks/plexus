@@ -5,7 +5,7 @@ import DataSources from '../entities/data-sources/DataSources';
 export type JsonPrimitive = string | number | boolean | null;
 export type JsonArray = JsonField[];
 export type JsonField = JsonPrimitive | JsonArray | JsonObject;
-export type JsonObject = Record<string, JsonField>;
+export type JsonObject = { [key: string]: JsonField };
 
 export type ValueOf<T> = T[keyof T];
 
@@ -85,7 +85,7 @@ export type Configuration = {
 			threshold: string;
 		}[];
 	};
-	'input-fields'?: Record<string, { id: string; label: string; }>;
+	'input-fields'?: Record<string, { id: string; label: string; description: string; }>;
 	lancedb?: {
 		databaseUri: string;
 		rateLimitDelayMs?: number;

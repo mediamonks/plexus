@@ -1,12 +1,16 @@
 {
 	"agents": {
 		"hello": {
-			"instructions": "gs://monks-plexustest/hello.txt",
-			"context": ["names"]
+			"instructions": "gs://monks-plexus/system-instructions/hello.txt",
+			"context": [
+				"names"
+			]
 		},
 		"names": {
-			"instructions": "gs://monks-plexustest/names.txt",
-			"context": ["documents"]
+			"instructions": "gs://monks-plexus/system-instructions/names.txt",
+			"context": [
+				"documents"
+			]
 		}
 	},
 	"catalog": {
@@ -39,6 +43,7 @@
 		"documents": {
 			"uri": "https://drive.google.com/drive/folders/1o8kMT0Fra7KpZHkB9Ud7CkjbzlEaJtFG",
 			"platform": "drive",
+			"type": "text:raw",
 			"dataType": "text",
 			"target": "raw",
 			"folder": true
