@@ -188,8 +188,8 @@ The configuration object has the following top-level structure. All fields are o
   "platform": "google",
   "embeddingPlatform": "google",
   "waitForThreadUpdate": false,
-  "tempPath": "./temp/",
-	"output": ["field1", "field2"],
+  "tempPath": "./temp/", 
+  "output": ["field1", "field2"],
   "postback": {
     "url": "https://your-callback-url.com",
     "headers": {
@@ -267,19 +267,24 @@ Defines all fields that exist in the workflow and maps them to input parameters,
     "someInputField": {
       "type": "input",
       "field": "userInput",
-      "required": true
+      "required": true,
+      "example": "the user's input"
     },
     "someOutputField": {
       "type": "output",
       "agent": "agent-name",
-      "field": "result"
+      "field": "result",
+      "example": "the result of the operation"
     },
     "someDataField": {
       "type": "data",
       "dataSource": "source-id",
       "input": "queryField",
       "limit": 5,
-      "filter": { "category": "value" }
+      "filter": { "category": "value" }, 
+      "example": [
+        { "name": "John", "age": 30 }
+      ]
     }
   }
 }

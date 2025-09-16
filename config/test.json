@@ -1,11 +1,11 @@
 {
 	"agents": {
 		"hello": {
-			"instructions": "gs://monks-plexus/system-instructions/hello.txt",
+			"instructions": "gs://monks-plexustest/hello.txt",
 			"context": ["names"]
 		},
 		"names": {
-			"instructions": "gs://monks-plexus/system-instructions/names.txt",
+			"instructions": "gs://monks-plexustest/names.txt",
 			"context": ["documents"]
 		}
 	},
