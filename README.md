@@ -211,7 +211,8 @@ The configuration object has the following top-level structure. All fields are o
   "platform": "google",
   "embeddingPlatform": "google",
   "waitForThreadUpdate": false,
-  "tempPath": "./temp/", 
+  "tempPath": "./temp/",
+	"instructionsPath": "gs://my-bucket/instructions",
   "output": ["field1", "field2"],
   "postback": {
     "url": "https://your-callback-url.com",
@@ -241,6 +242,7 @@ Top-level configuration options that apply across the entire platform:
 - **`platform`** (string): Primary AI platform ("google", "azure", "openai")
 - **`embeddingPlatform`** (string): AI platform for text embeddings ("google", "azure", "openai")
 - **`waitForThreadUpdate`** (boolean): Whether to wait for the conversation thread to be updated before returning a response. Enabling this will increase response time, but will guarantee conversation consistency in scenarios where the `invoke` endpoint is called in quick succession.
+- **`instructionsPath`** (string): Root GCS path for agent and digest instruction files
 - **`output`** (array): List of output fields to return
 - **`postback`** (object): The webhook for receiving status messages during invocation. It will receive POST requests with a payload of the following format: `{ "status": "Some operation", "isRunning": true }`.
   - **`url`** (string): URL
@@ -263,9 +265,9 @@ Defines behavior and context for each AI agent in your workflow. Each agent is i
 {
   "agents": {
     "agent-id": {
-			"instructions": "gs://my-bucket/instructions.txt",
-			"context": ["field1", "field2"],
-			"temperature": 0.7,
+      "instructions": "gs://my-bucket/instructions.txt",
+      "context": ["field1", "field2"],
+      "temperature": 0.7,
       "useHistory": true,
       "required": ["requiredField"]
     }
@@ -274,7 +276,7 @@ Defines behavior and context for each AI agent in your workflow. Each agent is i
 ```
 
 **Agent Properties:**
-- **`instructions`** (string): GCS path to the file containing the instructions (system prompt) for the agent, or the literal instructions themselves.
+- **`instructions`** (string): GCS path to the file containing the instructions (system prompt) for the agent, or the literal instructions themselves. If omitted, the agent will attempt to read its instructions from a path constructed as follows: `{instructionsPath from global config}/{agent id}.txt`
 - **`context`** (array): List of context fields the agent should receive.
 - **`temperature`** (number, optional): AI model temperature setting (0.0-1.0).
 - **`useHistory`** (boolean, optional): Whether to provide the agent with the conversation history.

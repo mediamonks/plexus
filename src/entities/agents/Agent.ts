@@ -126,12 +126,12 @@ export default class Agent {
 		try {
 			if (instructions) {
 				if (instructions.startsWith('gs://')) {
-					this._baseInstructions = await gcs.read(this.configuration.instructions);
+					this._baseInstructions = await gcs.cache(this.configuration.instructions);
 				} else {
 					this._baseInstructions = instructions;
 				}
 			} else if (instructionsPath) {
-				this._baseInstructions = await gcs.read(`${instructionsPath}/${this.id}.txt`);
+				this._baseInstructions = await gcs.cache(`${instructionsPath}/${this.id}.txt`);
 			} else {
 				this._baseInstructions = await Storage.get(StorageFile.TYPE.AGENT_INSTRUCTIONS, this.id).read();
 			}
