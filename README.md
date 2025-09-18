@@ -295,13 +295,15 @@ Defines all fields that exist in the workflow and maps them to input parameters,
     },
     "someDataField": {
       "type": "data",
-      "dataSource": "source-id",
-      "input": "queryField",
-      "limit": 5,
-      "filter": { "category": "value" }, 
+      "dataSource": "data-source-id",
       "example": [
         { "name": "John", "age": 30 }
-      ]
+      ],
+      "query": {
+        "filter": { "age": "targetAge" },
+        "limit": 5,
+        "sort": "name"
+      }
     }
   }
 }
@@ -329,11 +331,12 @@ These take their value from the output object of an agent.
 **Data Fields:**
 These take their value from a data source.
 - **`dataSource`** (string): Data source identifier, points to a data source defined in the `data-sources` section
-- **`input`** (string, optional): Input field to use for queries
-- **`limit`** (number, optional): Maximum number of results
-- **`filter`** (object, optional): Filter criteria for data queries
-- **`fields`** (array, optional): Specific fields to retrieve
-- **`sort`** (string, optional): Which field to sort by
+- **`query`** (object, optional): Properties that determine if and how the data from the data source should be queried. If not specified, the source data will always be used in its entirety (after `target`-based processing applies).
+  - **`limit`** (number, optional): Maximum number of results for any type of query.
+  - **`input`** (string, optional): Performs a text search against an unstructured data source, using the value of the given catalog field as input.
+  - **`filter`** (object, optional): Filter criteria for queries against a structured data source, should consist of key-value pairs, where the key is the field name in the source data set, and the value is the name of a catalog field, which value will be used as the filter value.
+  - **`fields`** (array, optional): Specific fields to retrieve when querying a structured data source.
+  - **`sort`** (string, optional): Which field to sort by when querying a structured data source.
 
 ### `data-sources`
 
