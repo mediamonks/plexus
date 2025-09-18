@@ -9,9 +9,14 @@ Plexus employs a multi-agent architecture where different AI agents can be confi
 ## How it Works
 
 Plexus consists of 3 core entities: Agents, Data Sources, and the Catalog.
+
 The Catalog is a definition of all data fields that exist in your system. These fields can function as context for agents, or as output of the process.
+
 Catalog fields come in 3 types: input, output and data. Input fields are automatically populated by values passed in the request payload. Output fields are fields that are populated by agents. And data fields are populated by the content of data sources.
+
 Agents consists of instructions (the system prompt), and a set of context fields. An agent's input consists of these instructions, and a JSON object containing the runtime values for all context fields, as populated by the Catalog.
+
+
 When a workflow is invoked, the Catalog will first start to populate the fields defined by the workflow's `output` configuration. For output fields, this means an Agent will need to be invoked. This Agent will in turn require certain fields for its context, which causes the Catalog to start populating those fields, and so on.
 This means the workflow is essentially built backwards, at runtime.
 When a data type field value is requested, the corresponding data source will be queried. More on this in the Data Sources section. 
@@ -20,15 +25,16 @@ When a data type field value is requested, the corresponding data source will be
 
 Data sources point to a specific online resource. This can be a Google Drive file or folder, or a Google Cloud Storage Bucket object or folder.
 The following file types are currently supported:
-- PDF (unstructured)
-- TXT (unstructured)
-- Google Doc (unstructured, Google Drive only)
-- DOCX (unstructured, Google Drive only)
-- JSON (structured)
-- Google Sheet (structured, Google Drive only)
-- XLSX (structured, Google Drive only)
-- PNG (`file` target only)
-- JPEG (`file` target only)
+
+- **PDF** (unstructured)
+- **TXT** (unstructured)
+- **Google Doc** (unstructured, Google Drive only)
+- **DOCX** (unstructured, Google Drive only)
+- **JSON** (structured)
+- **Google Sheet** (structured, Google Drive only)
+- **XLSX** (structured, Google Drive only)
+- **PNG** (`file` target only)
+- **JPEG** (`file` target only)
 
 ### Ingesting
 Data sources can be ingested using the `/ingest` endpoint. This is necessary for `vector`-target data sources and recommended for all data sources that are not dynamic.
