@@ -8,7 +8,7 @@ import DriveDataSourceBehavior from './platform/DriveDataSourceBehavior';
 import GcsDataSourceBehavior from './platform/GcsDataSourceBehavior';
 import ITargetDataSourceBehavior from './target/ITargetDataSourceBehavior';
 import DigestTargetDataSourceBehavior from './target/DigestTargetDataSourceBehavior';
-import FilesTargetDataSourceBehavior from './target/FilesTargetDataSourceBehavior';
+import FileTargetDataSourceBehavior from './target/FileTargetDataSourceBehavior';
 import ProfileTargetDataSourceBehavior from './target/ProfileTargetDataSourceBehavior';
 import RawDataDataSourceTarget from './target/RawDataTargetDataSourceBehavior';
 import RawTextTargetDataSourceBehavior from './target/RawTextTargetDataSourceBehavior';
@@ -53,7 +53,7 @@ export default class DataSource {
 	static readonly PlatformBehavior: IDataSourcePlatformBehavior;
 
 	static readonly OutputData: typeof DigestTargetDataSourceBehavior.OutputData
-		| typeof FilesTargetDataSourceBehavior.OutputData
+		| typeof FileTargetDataSourceBehavior.OutputData
 		| typeof ProfileTargetDataSourceBehavior.OutputData
 		| typeof RawDataDataSourceTarget.OutputData
 		| typeof RawTextTargetDataSourceBehavior.OutputData

@@ -20,18 +20,27 @@ const global = require('../config/deploy.json')[env];
 
 const globalEnv = global.env ?? [];
 
-function gcloud(command, captureOutput = false) {
-	const cmd = `gcloud beta ${command.trim().replace(/\s+/g, ' ')} --project=${global.project} --quiet`
+function gcloud(command) {
+	const cmd = `gcloud beta ${command.trim().replace(/\s+/g, ' ')} --project=${global.project}`
 	console.log(cmd);
-	childProcess.execSync(
-		cmd,
-		{ stdio: 'inherit' }
-	);
+	
+	const result = childProcess.spawnSync('bash', ['-c', cmd], {
+		stdio: 'inherit',
+		shell: false
+	});
+	
+	if (result.error) throw result.error;
+	if (result.status !== 0) throw new Error(`Command failed with exit code ${result.status}`);
 }
 
-const projectNumber = childProcess
-	.execSync(`gcloud projects describe ${global.project} --format="value(project_number)"`, { encoding: 'utf8' })
-	.trim();
+const projectNumber = childProcess.spawnSync('bash', [
+	'-c',
+	`gcloud projects describe ${global.project} --format="value(project_number)"`
+], {
+	stdio: ['inherit', 'pipe', 'inherit'],
+	shell: false,
+	encoding: 'utf8'
+}).stdout.trim();
 
 async function deployFunction({ name, entryPoint, timeout, env, minInstances, cpus, memory }) {
 	entryPoint = entryPoint ?? name;
@@ -161,8 +170,6 @@ async function updateSecrets() {
 }
 
 (async () => {
-	if (secrets) await updateSecrets();
-	
 	if (functions) {
 		if (!names.length) names = global.functions.map(fn => fn.name);
 		
@@ -175,6 +182,8 @@ async function updateSecrets() {
 			await deployFunction(definition);
 		}
 	}
+	
+	if (secrets) await updateSecrets();
 	
 	if (gateway && global.apiGateway) await updateGateway(global.apiGateway);
 })();

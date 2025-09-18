@@ -20,7 +20,7 @@
 ### Target Behaviors
 - **Support mixed/unknown data types** - Currently only handles specific data types (`src/entities/data-sources/DataSource.ts:109`)
 - **Add incremental ingesting support** - Vector target currently drops and recreates entire dataset (`src/entities/data-sources/target/VectorTargetDataSourceBehavior.ts:69`)
-- **Implement file copying to GCS** - Files target should ingest by copying files to own GCS bucket (`src/entities/data-sources/target/FilesTargetDataSourceBehavior.ts:14`)
+- **Implement file copying to GCS** - Files target should ingest by copying files to own GCS bucket (`src/entities/data-sources/target/FileTargetDataSourceBehavior.ts:14`)
 - **Add search support for raw text targets** - Currently unclear what should happen for search queries (`src/entities/data-sources/target/RawTextTargetDataSourceBehavior.ts:21`)
 - **Add spreadsheet support for raw data targets** - Currently missing spreadsheet handling (`src/entities/data-sources/target/RawDataTargetDataSourceBehavior.ts:17`)
 - **Implement random selection for unsorted data** - Consider random selection when not sorting results (`src/entities/data-sources/target/RawDataTargetDataSourceBehavior.ts:54`)

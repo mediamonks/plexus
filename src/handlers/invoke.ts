@@ -8,7 +8,7 @@ import RequestContext from '../utils/RequestContext';
 import { JsonObject, RequestPayload } from '../types/common';
 
 export default async (_: any, payload: any): Promise<{
-	error: Error | undefined;
+	error: string | undefined;
 	output: JsonObject;
 	threadId: string;
 	fields: JsonObject;
@@ -32,11 +32,11 @@ export default async (_: any, payload: any): Promise<{
 		
 		await History.instance.save(output);
 	} catch (err) {
-		console.error(err);
+		ErrorLog.log(err);
 	}
 	
 	return {
-		error: ErrorLog.get().pop(),
+		error: ErrorLog.get().pop()?.toString(),
 		output,
 		threadId: History.instance.threadId,
 		fields: payload.fields,

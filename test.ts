@@ -51,40 +51,35 @@ async function invoke(body) {
 	await invoke({
 		"config": {
 			"agents": {
-				"hello": {
-					"instructions": "You will receive a list of names and should respond by saying \"Hello {name}!\" once for every name you encounter.\nRespond with nothing else.\n\n---\n\n### **Input Format (JSON)**\n{\n  \"names\": [\n    \"John\",\n    \"Pete\"\n  ]\n}\n\n### **Output Format (JSON)**\n{\n  \"helloString\": \"the output string\"\n}",
-					"context": [
-						"names"
-					],
-					"useHistory": true
+				"pdfFolderAnalyzer": {
+					"instructions": "📁 **PDF FOLDER ANALYZER & BATCH DOCUMENT SUMMARIZER** 📁\n\nYou are an expert document analyst specializing in batch PDF analysis and folder-level document intelligence. When you receive multiple PDF documents from a folder, perform comprehensive batch analysis:\n\n**BATCH ANALYSIS FRAMEWORK:**\n1. **Folder Overview**: Provide a high-level summary of all documents in the folder\n2. **Document Inventory**: List all PDFs with brief descriptions\n3. **Thematic Analysis**: Identify common themes, topics, and patterns across documents\n4. **Content Categorization**: Group documents by type, purpose, or subject matter\n5. **Key Insights Synthesis**: Extract overarching insights from the document collection\n6. **Cross-Document Relationships**: Identify connections, dependencies, or references between documents\n7. **Collective Intelligence**: Provide strategic insights based on the entire document set\n\n**FOLDER ANALYSIS CATEGORIES:**\n- **Folder Summary**: Overview of the document collection's purpose and scope\n- **Document Count & Types**: Number of PDFs and their categories\n- **Key Themes**: Common topics and subjects across all documents\n- **Critical Information**: Most important data points from the entire collection\n- **Document Relationships**: How documents relate to each other\n- **Collective Insights**: Strategic insights from analyzing all documents together\n- **Recommendations**: Actions based on the complete document analysis\n\n**OUTPUT STRUCTURE:**\n```\n📁 FOLDER ANALYSIS SUMMARY\n[Overview of the entire PDF collection]\n\n📄 DOCUMENT INVENTORY\n• Document 1: [Name] - [Brief description]\n• Document 2: [Name] - [Brief description]\n• Document 3: [Name] - [Brief description]\n\n🎯 KEY THEMES ACROSS DOCUMENTS\n• [Theme 1]: Found in X documents\n• [Theme 2]: Found in Y documents\n• [Theme 3]: Found in Z documents\n\n📊 COLLECTIVE CRITICAL DATA\n• [Data point 1] - [Source document(s)]\n• [Data point 2] - [Source document(s)]\n\n🔗 DOCUMENT RELATIONSHIPS\n• [Relationship 1]: Documents A, B, C are related by...\n• [Relationship 2]: Document X references Document Y...\n\n💡 COLLECTIVE INSIGHTS\n• [Insight 1]: Based on analysis of multiple documents\n• [Insight 2]: Pattern identified across document set\n\n📈 STRATEGIC RECOMMENDATIONS\n[Recommendations based on complete folder analysis]\n\n⚠️ GAPS & MISSING INFORMATION\n• [Gap 1]: Information that seems missing from the collection\n• [Gap 2]: Areas that could benefit from additional documentation\n```\n\n**ANALYSIS DEPTH:** Provide comprehensive folder-level analysis that synthesizes information across all PDFs to deliver strategic insights about the entire document collection.",
+					"context": ["pdfDocuments"]
 				}
 			},
 			"catalog": {
-				"names": {
-					"type": "input",
-					"field": "names",
-					"required": true,
-					"example": [
-						"John",
-						"Pete"
-					]
+				"pdfDocuments": {
+					"type": "data",
+					"dataSource": "pdfFolderSource"
 				},
-				"helloString": {
+				"folderAnalysis": {
 					"type": "output",
-					"agent": "hello",
-					"field": "helloString",
-					"example": "Hello John! Hello Pete!"
+					"agent": "pdfFolderAnalyzer",
+					"field": "analysis",
+					"example": "📁 FOLDER ANALYSIS SUMMARY\nThis folder contains 3 project documents including order specifications, client requirements, and final assets across multiple projects (ASM-34 through ASM-41).\n\n📄 DOCUMENT INVENTORY\n• ASM-34.pdf - High-NA EUV lithography project specifications\n• ASM-35.pdf - Client requirements and technical specifications\n• ASM-36.pdf - Project order documentation\n• human-rights-policy.pdf - Corporate policy document\n• ASML_TV-template_guide.pdf - Brand guidelines for TV templates\n• CompanyPresentation_updated.pdf - Corporate presentation materials\n\n🎯 KEY THEMES ACROSS DOCUMENTS\n• Lithography Technology: Found in 8 documents (ASM-34, ASM-35, technical specs)\n• Brand Guidelines: Found in 4 documents (TV templates, presentations)\n• Project Management: Found in 12 documents (order forms, specifications)\n• Corporate Policies: Found in 3 documents (human rights, compliance)\n\n📊 COLLECTIVE CRITICAL DATA\n• Project Timeline: Q3-Q4 2024 delivery schedules across multiple projects\n• Technical Specifications: High-NA EUV systems, 1920x1080 display formats\n• Client Requirements: Custom branding and technical documentation needs\n\n🔗 DOCUMENT RELATIONSHIPS\n• ASM-34 through ASM-41: Sequential project documentation with shared technical requirements\n• Brand documents: TV templates and presentation materials follow consistent style guidelines\n• Policy documents: Support and reference project execution standards\n\n💡 COLLECTIVE INSIGHTS\n• Strong focus on advanced lithography technology development\n• Consistent branding and presentation standards across all client materials\n• Comprehensive project management documentation from order to delivery\n\n📈 STRATEGIC RECOMMENDATIONS\nConsolidate common technical specifications into reusable templates. Standardize project documentation workflows to improve efficiency across ASM projects.\n\n⚠️ GAPS & MISSING INFORMATION\n• No risk assessment documents found for technical projects\n• Missing project completion reports or post-delivery analysis"
+				}
+			},
+			"data-sources": {
+				"pdfFolderSource": {
+					"uri": "https://drive.google.com/drive/folders/1Ldqn9G5kJRCgPSaDBSO0QvFYoHQG0Duz",
+					"platform": "drive",
+					"dataType": "text",
+					"target": "raw",
+					"folder": true
 				}
 			},
 			"output": [
-				"helloString"
-			]
-		},
-		"fields": {
-			"names": [
-				"Luis",
-				"Maria",
-				"Carlos"
+				"pdfDocuments",
+				"folderAnalysis"
 			]
 		}
 	});

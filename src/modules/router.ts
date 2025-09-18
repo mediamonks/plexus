@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import mime from 'mime-types';
 import config from '../utils/config';
+import ErrorLog from '../utils/ErrorLog';
 import RequestContext from '../utils/RequestContext';
 import { RequestPayload } from '../types/common';
 
@@ -34,6 +35,15 @@ async function sendFile(filePath: string, res: any): Promise<void> {
 
 export default async function router(req: any, res: any): Promise<void> {
 	if (cors(req, res)) return;
+	
+	process.on('uncaughtException', (error: Error) => {
+		ErrorLog.log(error);
+	});
+	
+	process.on('unhandledRejection', (reason: Error | string) => {
+		const error = reason instanceof Error ? reason : new Error(reason);
+		ErrorLog.log(error);
+	});
 	
 	let { path } = req;
 	let pattern;

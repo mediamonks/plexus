@@ -2,7 +2,7 @@ import IDataTypeDataSourceBehavior from './IDataTypeDataSourceBehavior';
 import DataSourceBehavior from '../DataSourceBehavior';
 import DataSourceItem from '../platform/DataSourceItem';
 import ITargetDataSourceBehavior from '../target/ITargetDataSourceBehavior';
-import FilesDataSourceTarget from '../target/FilesTargetDataSourceBehavior';
+import FilesDataSourceTarget from '../target/FileTargetDataSourceBehavior';
 import ProfileTargetDataSourceBehavior from '../target/ProfileTargetDataSourceBehavior';
 import RawDataDataSourceTarget from '../target/RawDataTargetDataSourceBehavior';
 import VectorTargetDataSourceBehavior from '../target/VectorTargetDataSourceBehavior';
@@ -34,7 +34,7 @@ export default class StructuredDataSourceBehavior extends DataSourceBehavior imp
 		RAW_STRUCTURED: 'raw',
 		PROFILE: 'profile',
 		VECTOR_STRUCTURED: 'vector',
-		FILES: 'files',
+		FILE: 'file',
 	} as const;
 	
 	public get targetBehavior(): ITargetDataSourceBehavior {
@@ -43,7 +43,8 @@ export default class StructuredDataSourceBehavior extends DataSourceBehavior imp
 				raw: RawDataDataSourceTarget,
 				profile: ProfileTargetDataSourceBehavior,
 				vector: VectorTargetDataSourceBehavior,
-				files: FilesDataSourceTarget,
+				files: FilesDataSourceTarget, // TODO for backwards compatibility
+				file: FilesDataSourceTarget,
 			};
 			
 			const targetBehaviorClass = mapping[this.target];

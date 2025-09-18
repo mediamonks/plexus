@@ -1,5 +1,6 @@
 import DataSource from "./DataSource";
 import DataSourceItem from "./platform/DataSourceItem";
+import { ValueOf } from '../../types/common';
 
 export default class DataSourceBehavior {
 	private readonly _dataSource: DataSource;
@@ -24,7 +25,7 @@ export default class DataSourceBehavior {
 		return this.dataSource.dataType;
 	}
 	
-	public get target(): string {
+	public get target(): ValueOf<typeof DataSource.TARGET> {
 		return this.dataSource.target;
 	}
 	
