@@ -11,11 +11,18 @@ export default class DataSourceCatalogField extends CatalogField {
 		type: 'data';
 		example: JsonField;
 		dataSource: string;
-		input?: string;
-		limit?: number;
-		filter?: JsonObject;
-		fields?: string[];
-		sort?: string;
+		query: {
+			input?: string;
+			limit?: number;
+			filter?: Record<string, string>;
+			fields?: string[];
+			sort?: string;
+		},
+		input?: string; // TODO for backwards compatibility
+		limit?: number; // TODO for backwards compatibility
+		filter?: Record<string, string>; // TODO for backwards compatibility
+		fields?: string[]; // TODO for backwards compatibility
+		sort?: string; // TODO for backwards compatibility
 	};
 
 	public get configuration(): typeof DataSourceCatalogField.Configuration {
@@ -29,18 +36,18 @@ export default class DataSourceCatalogField extends CatalogField {
 	}
 	
 	public get inputField(): string {
-		return this.configuration.input;
+		return this.configuration.query?.input ?? this.configuration.input; // TODO for backwards compatibility
 	}
 	
 	public get filter(): Record<string, string> {
-		return this.configuration.filter as Record<string, string>;
+		return this.configuration.query?.filter ?? this.configuration.filter; // TODO for backwards compatibility
 	}
 	
 	public get queryParameters(): typeof StructuredDataSourceBehavior.QueryParameters {
 		return {
-			limit: this.configuration.limit,
-			fields: this.configuration.fields,
-			sort: this.configuration.sort,
+			limit: this.configuration.query?.limit ?? this.configuration.limit, // TODO for backwards compatibility
+			fields: this.configuration.query?.fields ?? this.configuration.fields, // TODO for backwards compatibility
+			sort: this.configuration.query?.sort ?? this.configuration.sort, // TODO for backwards compatibility
 		};
 	}
 	
