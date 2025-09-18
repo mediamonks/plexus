@@ -27,11 +27,28 @@ The following file types are currently supported:
 - JSON (structured)
 - Google Sheet (structured, Google Drive only)
 - XLSX (structured, Google Drive only)
-- PNG (multimodal)
-- JPEG (multimodal)
+- PNG (`file` target only)
+- JPEG (`file` target only)
 
+### Ingesting
 Data sources can be ingested using the `/ingest` endpoint. This is necessary for `vector`-target data sources and recommended for all data sources that are not dynamic.
-Dynamic data sources are data sources that use a different data source on each invocation, based on input fields. These kind of data sources can not be ingested.
+
+### Dynamic data sources
+Dynamic data sources are data sources that can use a different location on each invocation, based on input fields. These kind of data sources can not be ingested.
+A data source becomes dynamic by using any amount of catalog field placeholders in its `uri` property, of the form `{fieldName}`. E.g. `gs://my-bucket/{folderName}/{fileName}.pdf`.
+
+### Targets
+Data sources can be precessed in several ways, determined by their `target` property:
+#### Raw text/data: `raw`
+The data source will be ingested as plain text or jsonl data, which can be fed as such directly into an agent.
+#### Vector embeddings (text/unstructured): `vector`
+Vector embeddings will be generated for distinct chunks of each document in the data source. These embeddings are then stored alongside their source text in a vector database, which can be queried as part of a catalog field's query configuration. The catalog field represents the resulting set of text chunks which can then be used by an agent. This option requires ingestion prior to invocation.
+#### Vector embeddings (data/structured): `vector`
+The data will be converted to JSONL and vector embeddings will be generated for each record based on a specific field in the data set, determined by the `searchField` property of the data source configuration. These embeddings are then stored alongside their source record in a vector database, which can be queried as part of a catalog field's query configuration. The catalog field represents the resulting set of records which can then be used by an agent. This option requires ingestion prior to invocation.
+#### Digest (text only): `digest`
+The combined text of the data sourced will be run through an LLM to generate a digest or summary. `instructions` can be provided as part of the data source configuration to instruct the LLM how to summarize. If omitted, a basic summarization prompt is used. The resulting digest can then be used by an agent.
+#### File (Google GenAI only): `file`
+The files in the data source will be converted to a mime type supported by the selected LLM if necessary, and when used by an agent, will be passed as-is to the LLM, including its original file name for context.
 
 ## API Reference
 
@@ -255,7 +272,7 @@ Defines behavior and context for each AI agent in your workflow. Each agent is i
 - **`context`** (array): List of context fields the agent should receive.
 - **`temperature`** (number, optional): AI model temperature setting (0.0-1.0).
 - **`useHistory`** (boolean, optional): Whether to provide the agent with the conversation history.
-- **`required`** (array, optional): Required (typically `input`-type) context fields for the agent. If a required field is left empty, the agent will not run and will simply return an empty response object.
+- **`required`** (array, optional): Required (typically `input`-type) context fields for the agent. If a required field is left empty, the agent will not run and will simply return an empty response object, but the workflow will continue as normal.
 
 ### `catalog`
 
@@ -302,7 +319,7 @@ Defines all fields that exist in the workflow and maps them to input parameters,
 **Input Fields:**
 These take their value directly from the request payload.
 - **`field`** (string): Name of the field in the request payload
-- **`required`** (boolean, optional): Whether the field is required
+- **`required`** (boolean, optional): Whether the field is required. If `true`, the workflow will return an error if the field is missing from the request payload.
 
 **Output Fields:**
 These take their value from the output object of an agent.
@@ -340,7 +357,7 @@ Defines available data sources and their properties:
 **Data Source Properties:**
 - **`uri`** (string): The URI pointing to the data source, can be a Google Drive URL, or a GCS path. A URI can contain catalog field values, of the form `{fielName}`, which makes the data source dynamic.
 - **`dataType`** (string): Type of data in the source: "text" for unstructured data, "data" for structured data.
-- **`target`** (string): Target for the data source: "raw" for raw text or data, "vector" for vector embeddings, "digest" for AI-generated summaries ("text" only).
+- **`target`** (string): Target for the data source: "raw" for raw text or data, "vector" for vector embeddings, "file" for unprocessed files (to feed as-is into an LLM, currently supported for Google GenAI only), "digest" for AI-generated summaries ("text" only).
 - **`namespace`** (string, optional): Logical grouping namespace, only used for batch ingestion.
 - **`platform`** (string, optional): Storage platform ("gcs", "drive", etc.), will be derived from the URI if not specified.
 - **`folder`** (boolean, optional): Whether the data source is a folder. Detected if not specified.

@@ -55,7 +55,7 @@ async function query(query: string, {
 		} else {
 			parts.push({
 				inlineData: {
-					mimeType: mimeTypes.lookup(file),
+					mimeType: mimeTypes.lookup(file) as string,
 					data: await fs.promises.readFile(file, { encoding: 'base64' }),
 				},
 			});

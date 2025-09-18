@@ -51,6 +51,7 @@
 	},
 	"devDependencies": {
 		"@google-cloud/secret-manager": "^6.0.1",
+		"@types/mime-types": "^3.0.1",
 		"express": "^4.21.2",
 		"minimist": "^1.2.8",
 		"yaml": "^2.7.0"

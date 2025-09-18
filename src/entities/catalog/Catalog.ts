@@ -14,21 +14,17 @@ export default class Catalog {
 	private readonly _fields: Record<string, CatalogField> = {};
 	private _configuration: typeof Catalog.Configuration;
 	
-	static readonly Configuration: Record<string, typeof CatalogField.Configuration>;
+	public static readonly Configuration: Record<string, typeof CatalogField.Configuration>;
 	
 	static get instance(): Catalog {
 		return (RequestContext.keys.catalog as Catalog) ??= new this();
 	}
 	
-	get configuration(): JsonObject {
+	public get configuration(): JsonObject {
 		return this._configuration ??= config.get('catalog') as typeof Catalog.Configuration;
 	}
 	
-	get fields(): CatalogField[] {
-		return Profiler.run(() => Object.keys(this.configuration).map(fieldId => this.get(fieldId)), 'create all catalog fields');
-	}
-	
-	createField(fieldId: string): CatalogField {
+	public createField(fieldId: string): CatalogField {
 		const fieldConfiguration = this.configuration[fieldId] as typeof CatalogField.Configuration;
 		
 		if (!fieldConfiguration) ErrorLog.throw(new UnknownError('fieldId', fieldId, this.configuration));
@@ -46,7 +42,21 @@ export default class Catalog {
 		return new catalogFieldClass(fieldId, this);
 	}
 	
-	get(fieldId: string): CatalogField {
+	public get(fieldId: string): CatalogField {
 		return this._fields[fieldId] ??= this.createField(fieldId);
+	}
+	
+	public getAgentOutputSchema(agentId: string): JsonObject {
+		const schema = {};
+		
+		for (const key in this.configuration) {
+			const fieldConfig = this.configuration[key] as typeof OutputCatalogField.Configuration;
+			
+			if (fieldConfig.type !== CatalogField.TYPE.OUTPUT || fieldConfig.agent !== agentId) continue;
+			
+			schema[fieldConfig.field] = fieldConfig.example;
+		}
+		
+		return schema;
 	}
 }

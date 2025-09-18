@@ -2,7 +2,7 @@ import IDataTypeDataSourceBehavior from './IDataTypeDataSourceBehavior';
 import DataSourceBehavior from '../DataSourceBehavior';
 import DataSourceItem from '../platform/DataSourceItem';
 import DigestTargetDataSourceBehavior from '../target/DigestTargetDataSourceBehavior';
-import FilesDataSourceTarget from '../target/FilesTargetDataSourceBehavior';
+import FilesDataSourceTarget from '../target/FileTargetDataSourceBehavior';
 import RawTextTargetDataSourceBehavior from '../target/RawTextTargetDataSourceBehavior';
 import VectorTargetDataSourceBehavior from '../target/VectorTargetDataSourceBehavior';
 import Storage from '../../storage/Storage';
@@ -24,7 +24,7 @@ export default class UnstructuredDataSourceBehavior extends DataSourceBehavior i
 		RAW_UNSTRUCTURED: 'raw',
 		DIGEST: 'digest',
 		VECTOR_UNSTRUCTURED: 'vector',
-		FILES: 'files',
+		FILE: 'file',
 	} as const;
 	
 	public get targetBehavior() {
@@ -33,7 +33,8 @@ export default class UnstructuredDataSourceBehavior extends DataSourceBehavior i
 				raw: RawTextTargetDataSourceBehavior,
 				digest: DigestTargetDataSourceBehavior,
 				vector: VectorTargetDataSourceBehavior,
-				files: FilesDataSourceTarget,
+				files: FilesDataSourceTarget, // TODO for backwards compatibility
+				file: FilesDataSourceTarget,
 			};
 			
 			const targetBehaviorClass = mapping[this.target];

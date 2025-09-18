@@ -8,7 +8,7 @@ const modules = ['agents', 'azure', 'catalog', 'data-sources', 'drive', 'firesto
 let _config: Configuration;
 
 function getRequestConfig(): Configuration {
-	return (RequestContext.keys.payload as RequestPayload)?.config ?? {};
+	return (RequestContext.keys?.payload as RequestPayload)?.config ?? {};
 }
 
 function createStaticConfig(): any {

@@ -13,6 +13,7 @@ import Profiler from '../../utils/Profiler';
 import status from '../../utils/status';
 import Catalog from '../catalog/Catalog';
 import { JsonField, JsonObject } from '../../types/common';
+import ErrorLog from '../../utils/ErrorLog';
 
 const INPUT_OUTPUT_TEMPLATE = fs
 	.readFileSync('./data/input-output-template.txt', 'utf8')
@@ -72,14 +73,7 @@ export default class Agent {
 			inputSchema[fieldId] = this.catalog.get(fieldId).example;
 		}
 		
-		const outputSchema = {};
-		for (const field of this.catalog.fields) {
-			if (field.type !== CatalogField.TYPE.OUTPUT) continue;
-
-			if ((field as OutputCatalogField).agentId !== this.id) continue;
-			
-			outputSchema[(field as OutputCatalogField).outputField] = field.example;
-		}
+		const outputSchema = this.catalog.getAgentOutputSchema(this.id);
 		
 		const inputOutput = INPUT_OUTPUT_TEMPLATE
 				.replace(/\{input}/, JSON.stringify(inputSchema, undefined, 2))
@@ -150,6 +144,8 @@ export default class Agent {
 		if (this._catalog === catalog) return;
 		
 		Debug.log(`Preparing ${this.id}`, 'Agent');
+		
+		this._invocation = undefined;
 		
 		this._catalog = catalog;
 		
