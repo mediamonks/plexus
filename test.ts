@@ -35,7 +35,7 @@ async function invoke(body) {
 // 		"fields": {
 // 			"briefFolderUri": "https://drive.google.com/drive/folders/1zOmWGFpsv6gCAehI7TIOduXAsCllWwdL",
 // 			"additionalInfo": [
-// 				"Localization of the EN USA assets, into Spanish-  USA, English  - Canadian, French - Canadian.\nSource files and visual references will be provided later. \nWe need to create the list of deliverables from the brief",
+// t				"Localization of the EN USA assets, into Spanish-  USA, English  - Canadian, French - Canadian.\nSource files and visual references will be provided later. \nWe need to create the list of deliverables from the brief",
 // 				":60, :30, and :15  -  are durations of the video, please put each duration separately\nplease make a separate line for each market US ES, CA FR, CA EN,\nUS EN assets are masters (source files) and will be provided next week\n",
 // 				"TV, OLV/POLV, Cinema, Social - are channels, put them separately, assume that each video in each duration will be exported for all of them\nassume 16x9 ratio for TV, OLV, Cinema, and 9x16 and 1x1 for Social",
 // 				".\n\n",
@@ -47,40 +47,557 @@ async function invoke(body) {
 // 	});
 // }());
 
+// (async function () {
+// 	await invoke({
+// 		"config": {
+// 			"instructionsPath": "gs://monks-mantra/instructions",
+// 			"agents": {
+// 				"gap-identification": {
+// 					"context": [
+// 						"briefFiles",
+// 						"additionalInfo",
+// 						"now",
+// 						"glossary-assets"
+// 					]
+// 				},
+// 				"gap-validation": {
+// 					"context": [
+// 						"criticalProductionBlockers",
+// 						"importantClarifications",
+// 						"briefInconsistencies",
+// 						"briefFiles",
+// 						"additionalInfo",
+// 						"glossary-assets"
+// 					]
+// 				},
+// 				"follow-up-generation": {
+// 					"context": [
+// 						"validatedCriticalProductionBlockers",
+// 						"validatedImportantClarifications",
+// 						"validatedBriefInconsistencies",
+// 						"glossary-assets"
+// 					]
+// 				},
+// 				"info-extraction": {
+// 					"context": [
+// 						"briefFiles",
+// 						"additionalInfo",
+// 						"now",
+// 						"glossary-assets"
+// 					]
+// 				},
+// 				"deliverables-normalization": {
+// 					"context": [
+// 						"inputDeliverables",
+// 						"ratecardFile",
+// 						"ratecardData",
+// 						"glossary-assets"
+// 					]
+// 				},
+// 				"complexity-estimation": {
+// 					"context": [
+// 						"inputDeliverables",
+// 						"inputGaps",
+// 						"glossary-assets"
+// 					]
+// 				},
+// 				"quote-generation": {
+// 					"context": [
+// 						"normalizedDeliverables",
+// 						"complexity",
+// 						"additionalInfo",
+// 						"ratecardFile",
+// 						"ratecardData",
+// 						"glossary-assets"
+// 					]
+// 				},
+// 				"timeline-generation": {
+// 					"context": [
+// 						"complexity",
+// 						"additionalInfo",
+// 						"historicalTimelines",
+// 						"glossary-assets"
+// 					]
+// 				},
+// 				"final-quote-generation": {
+// 					"context": [
+// 						"quoteData",
+// 						"timelineData",
+// 						"additionalInfo",
+// 						"startDate",
+// 						"endDate",
+// 						"glossary-assets"
+// 					]
+// 				}
+// 			},
+// 			"catalog": {
+// 				"now": {
+// 					"type": "input",
+// 					"field": "now",
+// 					"example": "The current date and time.",
+// 					"required": true
+// 				},
+// 				"brief": {
+// 					"type": "data",
+// 					"dataSource": "mantra-brief",
+// 					"example": "The text of the project brief."
+// 				},
+// 				"briefData": {
+// 					"type": "data",
+// 					"dataSource": "mantra-brief-data",
+// 					"example": "Any data related to the project brief."
+// 				},
+// 				"briefFiles": {
+// 					"type": "data",
+// 					"dataSource": "mantra-brief-files",
+// 					"example": "List of files related to the project brief. (Contents sent separately.)"
+// 				},
+// 				"briefFolderId": {
+// 					"type": "input",
+// 					"field": "briefFolderId",
+// 					"example": "The ID of the Google Drive folder containing the project brief.",
+// 					"required": true
+// 				},
+// 				"briefFolderUri": {
+// 					"type": "input",
+// 					"field": "briefFolderUri",
+// 					"example": "The URI to the Google Drive folder containing the project brief.",
+// 					"required": true
+// 				},
+// 				"additionalInfo": {
+// 					"type": "input",
+// 					"field": "additionalInfo",
+// 					"example": [
+// 						"Optional additional information about the brief and the project in general."
+// 					]
+// 				},
+// 				"criticalProductionBlockers": {
+// 					"type": "output",
+// 					"agent": "gap-identification",
+// 					"field": "critical_production_blockers",
+// 					"example": [
+// 						{
+// 							"gap": "Specific missing information",
+// 							"relevance": "Why this matters for the specific deliverables requested",
+// 							"production_impact": "Specific explanation of how this blocks production"
+// 						}
+// 					]
+// 				},
+// 				"importantClarifications": {
+// 					"type": "output",
+// 					"agent": "gap-identification",
+// 					"field": "important_clarifications",
+// 					"example": [
+// 						{
+// 							"gap": "Specific missing information",
+// 							"relevance": "Why this matters for the specific deliverables requested",
+// 							"production_impact": "How this affects quality or efficiency"
+// 						}
+// 					]
+// 				},
+// 				"briefInconsistencies": {
+// 					"type": "output",
+// 					"agent": "gap-identification",
+// 					"field": "brief_inconsistencies",
+// 					"example": [
+// 						{
+// 							"inconsistency": "Conflicting information in brief",
+// 							"conflicting_elements": "Specific sections that contradict",
+// 							"production_impact": "How this creates confusion"
+// 						}
+// 					]
+// 				},
+// 				"validatedCriticalProductionBlockers": {
+// 					"type": "output",
+// 					"agent": "gap-validation",
+// 					"field": "critical_production_blockers",
+// 					"example": [
+// 						{
+// 							"gap": "Specific missing information",
+// 							"relevance": "Why this matters for the specific deliverables requested",
+// 							"production_impact": "Specific explanation of how this blocks production"
+// 						}
+// 					]
+// 				},
+// 				"validatedImportantClarifications": {
+// 					"type": "output",
+// 					"agent": "gap-validation",
+// 					"field": "important_clarifications",
+// 					"example": [
+// 						{
+// 							"gap": "Specific missing information",
+// 							"relevance": "Why this matters for the specific deliverables requested",
+// 							"production_impact": "How this affects quality or efficiency"
+// 						}
+// 					]
+// 				},
+// 				"validatedBriefInconsistencies": {
+// 					"type": "output",
+// 					"agent": "gap-validation",
+// 					"field": "brief_inconsistencies",
+// 					"example": [
+// 						{
+// 							"inconsistency": "Conflicting information in brief",
+// 							"conflicting_elements": "Specific sections that contradict",
+// 							"production_impact": "How this creates confusion"
+// 						}
+// 					]
+// 				},
+// 				"xratecardData": {
+// 					"type": "data",
+// 					"dataSource": "mantra-ratecard",
+// 					"example": "The full rate card (asset types, tier definitions, rates)."
+// 				},
+// 				"ratecardId": {
+// 					"type": "input",
+// 					"field": "ratecardId",
+// 					"example": "The ID of the Google Drive file containing the rate card."
+// 				},
+// 				"ratecardFile": {
+// 					"type": "data",
+// 					"dataSource": "mantra-ratecard-file",
+// 					"example": "Optional: The file containing the rate card. (Contents sent separately.)"
+// 				},
+// 				"ratecardData": {
+// 					"type": "input",
+// 					"field": "ratecardData",
+// 					"example": "Optional: The full rate card (asset types, tier definitions, rates)."
+// 				},
+// 				"inputGaps": {
+// 					"type": "input",
+// 					"field": "gaps",
+// 					"example": "The list of gaps in the brief.",
+// 					"required": true
+// 				},
+// 				"followUp": {
+// 					"type": "output",
+// 					"agent": "follow-up-generation",
+// 					"field": "followUp",
+// 					"example": "The generated email."
+// 				},
+// 				"outputDeliverables": {
+// 					"type": "output",
+// 					"agent": "info-extraction",
+// 					"field": "deliverables",
+// 					"example": [
+// 						{
+// 							"deliverable_number": "A unique identifier for each deliverable in the list. Used for tracking and referencing specific items. Example: 1, 2, 3, etc.. Always required",
+// 							"asset_name": "The main identifier/title of the content being created. Usually the campaign or project name. Example: \"Joy Ride\", \"Summer Campaign\". Always required",
+// 							"asset_type": "The fundamental type of content being created. Kept simple and standardized. Example: video, image, carousel, html, audio, copy. Always required\n",
+// 							"duration": "For video: the runtime in seconds. For other assets: can indicate number of seconds for animations. Example: 15s, 30s, 60s. Required for video and animation assets only",
+// 							"language": "The language version of the deliverable. Critical for localization projects. Example: English, French, Spanish. Required when project involves multiple languages",
+// 							"market": "The specific region or country the deliverable is intended for. Important for regional variations and localization. Example: US, CA (Canada). Required for regional/localized content",
+// 							"changes_needed": "Specifies what modifications are required. Descriptions of work needed. Example: \"Export per specs\", \"Localize the UI screen and end line super\". Required when modifications to base assets are needed",
+// 							"channel": "The platform or medium where the content will be published. Standardized terms for different distribution channels. Example: TV, Cinema, OLV/POV, Social. Always required",
+// 							"placement": "Specific location within a channel where content will appear. Particularly important for social media channels. Example: For Social - Feed, Stories, Reels, Carousel. Example: For Display - Homepage Banner, Sidebar. Required when specific placements need to be tracked",
+// 							"dimensions": "The exact pixel measurements of the deliverable. Written as width x height. Example: 1920x1080, 1080x1920. Required for all visual assets",
+// 							"ratio": "The aspect ratio of the deliverable. Particularly important for social media assets. Example: 16:9, 9:16, 1:1, 4:5. Required for all visual assets if the dimensions are not provided.",
+// 							"technical_specifications": "Technical delivery requirements. Standardized by channel type. Example: Broadcast specs, DCP specs, Digital specs. Requirements vary by channel and asset type",
+// 							"asset_copy": "Indicates if and what type of copy/text work is needed. Particularly important for localization. Example: \"Script copy transcreation\". Only required when copy/text work is needed",
+// 							"frames": "Only used for carousel-type content. Indicates number of frames/slides in the carousel. Example: 3, 4, 5 frames. Required only for carousel-type content",
+// 							"target_audience": "The intended viewer demographic. Helps inform creative decisions. Example: \"18-34 year olds\", \"Young professionals\". Required when specific demographic targeting is needed",
+// 							"delivery_deadline": "Format as 'YYYY-MM-DD' if exact date is given, or leave empty if not specified"
+// 						}
+// 					]
+// 				},
+// 				"inputDeliverables": {
+// 					"type": "input",
+// 					"field": "deliverables",
+// 					"example": "The list of deliverables.",
+// 					"required": true
+// 				},
+// 				"xdeliverablesId": {
+// 					"type": "input",
+// 					"field": "deliverablesId",
+// 					"example": "The ID of the Google Drive file containing the deliverables.",
+// 					"required": true
+// 				},
+// 				"xinputDeliverables": {
+// 					"type": "data",
+// 					"dataSource": "mantra-deliverables",
+// 					"example": "The list of deliverables."
+// 				},
+// 				"normalizedDeliverables": {
+// 					"type": "output",
+// 					"agent": "deliverables-normalization",
+// 					"field": "normalizedDeliverables",
+// 					"example": [
+// 						{
+// 							"deliverable": "exactly as received",
+// 							"number": "exactly as received",
+// 							"client_name": "exactly as received",
+// 							"asset_name": "exactly as received",
+// 							"asset_type": "exactly as received",
+// 							"placement": "exactly as received",
+// 							"duration": "exactly as received",
+// 							"creative_base": "exactly as received",
+// 							"changes_needed_on_creative_base": "exactly as received",
+// 							"asset_copy": "exactly as received",
+// 							"technical_specifications": "exactly as received",
+// 							"channel": "exactly as received",
+// 							"delivery_deadline": "exactly as received",
+// 							"target_audience": "exactly as received",
+// 							"normalized_asset_type": "The asset type as it occurs in the rate card",
+// 							"normalization_reasoning": "A justification for why normalized_asset_type was chosen to match asset_type"
+// 						}
+// 					]
+// 				},
+// 				"complexity": {
+// 					"type": "output",
+// 					"agent": "complexity-estimation",
+// 					"field": "complexity",
+// 					"example": [
+// 						{
+// 							"deliverable": "exactly as received",
+// 							"number": "exactly as received",
+// 							"client_name": "exactly as received",
+// 							"asset_name": "exactly as received",
+// 							"asset_type": "exactly as received",
+// 							"placement": "exactly as received",
+// 							"duration": "exactly as received",
+// 							"creative_base": "exactly as received",
+// 							"changes_needed_on_creative_base": "exactly as received",
+// 							"asset_copy": "exactly as received",
+// 							"technical_specifications": "exactly as received",
+// 							"channel": "exactly as received",
+// 							"delivery_deadline": "exactly as received",
+// 							"target_audience": "exactly as received",
+// 							"normalized_asset_type": "exactly as received",
+// 							"complexity_tier": "Very Simple | Simple | Medium | Complex | Other",
+// 							"complexity_reasoning": "A justification for why the chosen `complexity_tier` was selected"
+// 						}
+// 					]
+// 				},
+// 				"historicalTimelines": {
+// 					"type": "data",
+// 					"dataSource": "mantra-historical-timelines",
+// 					"example": "Historical timelines for this client for reference."
+// 				},
+// 				"historicalTimelinesFolderId": {
+// 					"type": "input",
+// 					"field": "historicalTimelinesFolderId",
+// 					"example": "The ID of the Google Drive folder containing the historical timelines.",
+// 					"required": true
+// 				},
+// 				"outputQuote": {
+// 					"type": "output",
+// 					"agent": "quote-generation",
+// 					"field": "quote",
+// 					"example": [
+// 						{
+// 							"deliverable": "exactly as received",
+// 							"number": "exactly as received",
+// 							"client_name": "exactly as received",
+// 							"asset_name": "exactly as received",
+// 							"asset_type": "exactly as received",
+// 							"placement": "exactly as received",
+// 							"duration": "exactly as received",
+// 							"creative_base": "exactly as received",
+// 							"changes_needed_on_creative_base": "exactly as received",
+// 							"asset_copy": "exactly as received",
+// 							"technical_specifications": "exactly as received",
+// 							"channel": "exactly as received",
+// 							"delivery_deadline": "exactly as received",
+// 							"target_audience": "exactly as received",
+// 							"normalized_asset_type": "exactly as received",
+// 							"complexity_tier": "exactly as received",
+// 							"complexity_reasoning": "exactly as received",
+// 							"rate": "The corresponding rate for the deliverable, based on the rate card and the number of assets. Use a plain number, not a string."
+// 						}
+// 					]
+// 				},
+// 				"outputTimeline": {
+// 					"type": "output",
+// 					"agent": "timeline-generation",
+// 					"field": "timeline",
+// 					"example": [
+// 						{
+// 							"activity": "Activity name",
+// 							"owner": "Owner",
+// 							"startDay": 1,
+// 							"duration": 3
+// 						}
+// 					]
+// 				},
+// 				"quoteData": {
+// 					"type": "input",
+// 					"field": "quoteData",
+// 					"example": "The previously generated quote per asset.",
+// 					"required": true
+// 				},
+// 				"timelineData": {
+// 					"type": "input",
+// 					"field": "timelineData",
+// 					"example": "The previously generated timeline.",
+// 					"required": true
+// 				},
+// 				"startDate": {
+// 					"type": "input",
+// 					"field": "startDate",
+// 					"example": "The start date of the project.",
+// 					"required": true
+// 				},
+// 				"endDate": {
+// 					"type": "input",
+// 					"field": "endDate",
+// 					"example": "The end date of the project.",
+// 					"required": true
+// 				},
+// 				"finalQuote": {
+// 					"type": "output",
+// 					"agent": "final-quote-generation",
+// 					"field": "finalQuote",
+// 					"example": "The final quote."
+// 				},
+// 				"glossary-assets": {
+// 					"type": "data",
+// 					"dataSource": "mantra-glossary-assets",
+// 					"example": "A glossary of terms."
+// 				}
+// 			},
+// 			"data-sources": {
+// 				"mantra-brief": {
+// 					"namespace": "mantra",
+// 					"platform": "drive",
+// 					"source": ":briefFolderId",
+// 					"type": "text:raw",
+// 					"folder": true
+// 				},
+// 				"mantra-brief-data": {
+// 					"namespace": "mantra",
+// 					"platform": "drive",
+// 					"source": ":briefFolderId",
+// 					"type": "data:raw",
+// 					"folder": true
+// 				},
+// 				"mantra-brief-files": {
+// 					"namespace": "mantra",
+// 					"platform": "drive",
+// 					"uri": "{briefFolderUri}",
+// 					"type": "data:files",
+// 					"folder": true,
+// 					"cache": true
+// 				},
+// 				"mantra-ratecard": {
+// 					"namespace": "mantra",
+// 					"platform": "drive",
+// 					"uri": "{ratecardUri}",
+// 					"type": ":raw",
+// 					"cache": true
+// 				},
+// 				"mantra-deliverables": {
+// 					"namespace": "mantra",
+// 					"platform": "drive",
+// 					"uri": "{deliverablesUri}",
+// 					"type": "data:raw",
+// 					"cache": false
+// 				},
+// 				"mantra-historical-timelines": {
+// 					"namespace": "mantra",
+// 					"platform": "drive",
+// 					"uri": "{historicalTimelinesFolderUri}",
+// 					"type": "data:files",
+// 					"folder": true,
+// 					"cache": true
+// 				},
+// 				"mantra-quote": {
+// 					"namespace": "mantra",
+// 					"platform": "drive",
+// 					"uri": "{quoteUri}",
+// 					"type": "text:raw",
+// 					"cache": false
+// 				},
+// 				"mantra-timeline": {
+// 					"namespace": "mantra",
+// 					"platform": "drive",
+// 					"uri": "{timelineUri}",
+// 					"type": "text:raw",
+// 					"cache": false
+// 				},
+// 				"mantra-ratecard-file": {
+// 					"namespace": "mantra",
+// 					"platform": "drive",
+// 					"uri": "{ratecardUri}",
+// 					"type": "data:files",
+// 					"cache": true
+// 				},
+// 				"mantra-glossary-assets": {
+// 					"namespace": "mantra",
+// 					"uri": "gs://monks-mantra/glossary-assets.txt",
+// 					"type": "text:raw",
+// 					"folder": false,
+// 					"cache": true
+// 				}
+// 			},
+// 			"output": [
+// 				"followUp",
+// 				"outputDeliverables",
+// 				"validatedCriticalProductionBlockers",
+// 				"validatedImportantClarifications",
+// 				"validatedBriefInconsistencies"
+// 			]
+// 		},
+// 		"fields": {
+// 			"briefFolderUri": "https://drive.google.com/drive/folders/19_3bkjYuOVu9tUmrucRsZCiaicom5g3F",
+// 			"additionalInfo": [],
+// 			"now": "2025-09-19T08:18:49.752Z"
+// 		}
+// 	});
+// }());
+
 (async function () {
 	await invoke({
 		"config": {
 			"agents": {
-				"pdfFolderAnalyzer": {
-					"instructions": "📁 **PDF FOLDER ANALYZER & BATCH DOCUMENT SUMMARIZER** 📁\n\nYou are an expert document analyst specializing in batch PDF analysis and folder-level document intelligence. When you receive multiple PDF documents from a folder, perform comprehensive batch analysis:\n\n**BATCH ANALYSIS FRAMEWORK:**\n1. **Folder Overview**: Provide a high-level summary of all documents in the folder\n2. **Document Inventory**: List all PDFs with brief descriptions\n3. **Thematic Analysis**: Identify common themes, topics, and patterns across documents\n4. **Content Categorization**: Group documents by type, purpose, or subject matter\n5. **Key Insights Synthesis**: Extract overarching insights from the document collection\n6. **Cross-Document Relationships**: Identify connections, dependencies, or references between documents\n7. **Collective Intelligence**: Provide strategic insights based on the entire document set\n\n**FOLDER ANALYSIS CATEGORIES:**\n- **Folder Summary**: Overview of the document collection's purpose and scope\n- **Document Count & Types**: Number of PDFs and their categories\n- **Key Themes**: Common topics and subjects across all documents\n- **Critical Information**: Most important data points from the entire collection\n- **Document Relationships**: How documents relate to each other\n- **Collective Insights**: Strategic insights from analyzing all documents together\n- **Recommendations**: Actions based on the complete document analysis\n\n**OUTPUT STRUCTURE:**\n```\n📁 FOLDER ANALYSIS SUMMARY\n[Overview of the entire PDF collection]\n\n📄 DOCUMENT INVENTORY\n• Document 1: [Name] - [Brief description]\n• Document 2: [Name] - [Brief description]\n• Document 3: [Name] - [Brief description]\n\n🎯 KEY THEMES ACROSS DOCUMENTS\n• [Theme 1]: Found in X documents\n• [Theme 2]: Found in Y documents\n• [Theme 3]: Found in Z documents\n\n📊 COLLECTIVE CRITICAL DATA\n• [Data point 1] - [Source document(s)]\n• [Data point 2] - [Source document(s)]\n\n🔗 DOCUMENT RELATIONSHIPS\n• [Relationship 1]: Documents A, B, C are related by...\n• [Relationship 2]: Document X references Document Y...\n\n💡 COLLECTIVE INSIGHTS\n• [Insight 1]: Based on analysis of multiple documents\n• [Insight 2]: Pattern identified across document set\n\n📈 STRATEGIC RECOMMENDATIONS\n[Recommendations based on complete folder analysis]\n\n⚠️ GAPS & MISSING INFORMATION\n• [Gap 1]: Information that seems missing from the collection\n• [Gap 2]: Areas that could benefit from additional documentation\n```\n\n**ANALYSIS DEPTH:** Provide comprehensive folder-level analysis that synthesizes information across all PDFs to deliver strategic insights about the entire document collection.",
-					"context": ["pdfDocuments"]
+				"info": {
+					"instructions": "You will receive the contents of a folder with files. These files contain various documents.\n\nWhen writing the filenames extract the full list of names, everything needs to be included. If there is any spreadSheet it also need to be analyzed and included in the response.",
+					"context": [
+						"documents"
+					]
 				}
 			},
 			"catalog": {
-				"pdfDocuments": {
-					"type": "data",
-					"dataSource": "pdfFolderSource"
+				"request": {
+					"type": "input",
+					"field": "request",
+					"required": true
 				},
-				"folderAnalysis": {
+				"infoString": {
 					"type": "output",
-					"agent": "pdfFolderAnalyzer",
-					"field": "analysis",
-					"example": "📁 FOLDER ANALYSIS SUMMARY\nThis folder contains 3 project documents including order specifications, client requirements, and final assets across multiple projects (ASM-34 through ASM-41).\n\n📄 DOCUMENT INVENTORY\n• ASM-34.pdf - High-NA EUV lithography project specifications\n• ASM-35.pdf - Client requirements and technical specifications\n• ASM-36.pdf - Project order documentation\n• human-rights-policy.pdf - Corporate policy document\n• ASML_TV-template_guide.pdf - Brand guidelines for TV templates\n• CompanyPresentation_updated.pdf - Corporate presentation materials\n\n🎯 KEY THEMES ACROSS DOCUMENTS\n• Lithography Technology: Found in 8 documents (ASM-34, ASM-35, technical specs)\n• Brand Guidelines: Found in 4 documents (TV templates, presentations)\n• Project Management: Found in 12 documents (order forms, specifications)\n• Corporate Policies: Found in 3 documents (human rights, compliance)\n\n📊 COLLECTIVE CRITICAL DATA\n• Project Timeline: Q3-Q4 2024 delivery schedules across multiple projects\n• Technical Specifications: High-NA EUV systems, 1920x1080 display formats\n• Client Requirements: Custom branding and technical documentation needs\n\n🔗 DOCUMENT RELATIONSHIPS\n• ASM-34 through ASM-41: Sequential project documentation with shared technical requirements\n• Brand documents: TV templates and presentation materials follow consistent style guidelines\n• Policy documents: Support and reference project execution standards\n\n💡 COLLECTIVE INSIGHTS\n• Strong focus on advanced lithography technology development\n• Consistent branding and presentation standards across all client materials\n• Comprehensive project management documentation from order to delivery\n\n📈 STRATEGIC RECOMMENDATIONS\nConsolidate common technical specifications into reusable templates. Standardize project documentation workflows to improve efficiency across ASM projects.\n\n⚠️ GAPS & MISSING INFORMATION\n• No risk assessment documents found for technical projects\n• Missing project completion reports or post-delivery analysis"
+					"agent": "info",
+					"field": "infoString",
+					"example": {
+						"report": {
+							"summary": "Brief overview of all documents analyzed",
+							"key_themes": ["theme1", "theme2", "theme3"],
+							"main_topics": ["topic1", "topic2"],
+							"important_findings": "Detailed analysis of significant elements found across all documents",
+							"total_files_processed": 0
+						},
+						"document_filenames": ["filename1.txt", "filename2.txt"]
+					}
+				},
+				"documents": {
+					"type": "data",
+					"dataSource": "documents"
 				}
 			},
 			"data-sources": {
-				"pdfFolderSource": {
-					"uri": "https://drive.google.com/drive/folders/1Ldqn9G5kJRCgPSaDBSO0QvFYoHQG0Duz",
+				"documents": {
+					"uri": "https://drive.google.com/drive/u/3/folders/1Ldqn9G5kJRCgPSaDBSO0QvFYoHQG0Duz",
 					"platform": "drive",
 					"dataType": "text",
 					"target": "raw",
+					"cache": false,
 					"folder": true
 				}
 			},
 			"output": [
-				"pdfDocuments",
-				"folderAnalysis"
+				"infoString",
 			]
+		},
+		"fields": {
+			"request": "analysis"
 		}
 	});
 }());

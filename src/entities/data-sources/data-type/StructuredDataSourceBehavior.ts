@@ -34,6 +34,7 @@ export default class StructuredDataSourceBehavior extends DataSourceBehavior imp
 		RAW_STRUCTURED: 'raw',
 		PROFILE: 'profile',
 		VECTOR_STRUCTURED: 'vector',
+		FILES: 'files', // TODO for backwards compatibility
 		FILE: 'file',
 	} as const;
 	
