@@ -24,6 +24,7 @@ export default class UnstructuredDataSourceBehavior extends DataSourceBehavior i
 		RAW_UNSTRUCTURED: 'raw',
 		DIGEST: 'digest',
 		VECTOR_UNSTRUCTURED: 'vector',
+		FILES: 'files', // TODO for backwards compatibility
 		FILE: 'file',
 	} as const;
 	
