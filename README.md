@@ -44,7 +44,7 @@ Dynamic data sources are data sources that can use a different location on each 
 A data source becomes dynamic by using any amount of catalog field placeholders in its `uri` property, of the form `{fieldName}`. E.g. `gs://my-bucket/{folderName}/{fileName}.pdf`.
 
 ### Targets
-Data sources can be precessed in several ways, determined by their `target` property:
+Data sources can be processed in several ways, determined by their `target` property:
 #### Raw text/data: `raw`
 The data source will be ingested as plain text or jsonl data, which can be fed as such directly into an agent.
 #### Vector embeddings (text/unstructured): `vector`
@@ -52,7 +52,7 @@ Vector embeddings will be generated for distinct chunks of each document in the 
 #### Vector embeddings (data/structured): `vector`
 The data will be converted to JSONL and vector embeddings will be generated for each record based on a specific field in the data set, determined by the `searchField` property of the data source configuration. These embeddings are then stored alongside their source record in a vector database, which can be queried as part of a catalog field's query configuration. The catalog field represents the resulting set of records which can then be used by an agent. This option requires ingestion prior to invocation.
 #### Digest (text only): `digest`
-The combined text of the data sourced will be run through an LLM to generate a digest or summary. `instructions` can be provided as part of the data source configuration to instruct the LLM how to summarize. If omitted, a basic summarization prompt is used. The resulting digest can then be used by an agent.
+The combined text of the data source will be run through an LLM to generate a digest or summary. `instructions` can be provided as part of the data source configuration to instruct the LLM how to summarize. If omitted, a basic summarization prompt is used. The resulting digest can then be used by an agent.
 #### File (Google GenAI only): `file`
 The files in the data source will be converted to a mime type supported by the selected LLM if necessary, and when used by an agent, will be passed as-is to the LLM, including its original file name for context.
 
@@ -276,7 +276,7 @@ Defines behavior and context for each AI agent in your workflow. Each agent is i
 ```
 
 **Agent Properties:**
-- **`instructions`** (string): GCS path to the file containing the instructions (system prompt) for the agent, or the literal instructions themselves. If omitted, the agent will attempt to read its instructions from a path constructed as follows: `{instructionsPath from global config}/{agent id}.txt`
+- **`instructions`** (string): GCS path to the file containing the instructions (system prompt) for the agent, or the literal instructions themselves. If omitted, the agent will attempt to read its instructions from a path constructed as follows: `{instructionsPath from global config}/{agent id}.txt`. **Note**: input and output format instructions are automatically added by Plexus, based on the Catalog configuration.
 - **`context`** (array): List of context fields the agent should receive.
 - **`temperature`** (number, optional): AI model temperature setting (0.0-1.0).
 - **`useHistory`** (boolean, optional): Whether to provide the agent with the conversation history.
@@ -324,7 +324,7 @@ Defines all fields that exist in the workflow and maps them to input parameters,
 
 **Common Properties:**
 - **`type`** (string): Field type ("input", "output", or "data")
-- **`example`** (any, optional): Example value used to provide instructions to the LLM about how to interpret or populate a field
+- **`example`** (any, optional): Example value used to provide instructions to the LLM about how to interpret and/or populate a field
 
 **Input Fields:**
 These take their value directly from the request payload.
@@ -367,8 +367,8 @@ Defines available data sources and their properties:
 
 **Data Source Properties:**
 - **`uri`** (string): The URI pointing to the data source, can be a Google Drive URL, or a GCS path. A URI can contain catalog field values, of the form `{fielName}`, which makes the data source dynamic.
-- **`dataType`** (string): Type of data in the source: "text" for unstructured data, "data" for structured data.
 - **`target`** (string): Target for the data source: "raw" for raw text or data, "vector" for vector embeddings, "file" for unprocessed files (to feed as-is into an LLM, currently supported for Google GenAI only), "digest" for AI-generated summaries ("text" only).
+- **`dataType`** (string, optional): Type of data in the source: "text" for unstructured data, "data" for structured data. Required for `target` types: "raw" and "vector".
 - **`namespace`** (string, optional): Logical grouping namespace, only used for batch ingestion.
 - **`platform`** (string, optional): Storage platform ("gcs", "drive", etc.), will be derived from the URI if not specified.
 - **`folder`** (boolean, optional): Whether the data source is a folder. Detected if not specified.

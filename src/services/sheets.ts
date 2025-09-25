@@ -2,6 +2,7 @@ import { google } from 'googleapis';
 import authenticate from './auth';
 import drive from './drive';
 import workspace from './workspace';
+import CustomError from '../entities/error-handling/CustomError';
 import { SpreadSheet } from '../types/common';
 
 const TAB_NAME = 'Sheet1';
@@ -93,7 +94,7 @@ export default async () => {
 			
 			return { sheets: tabs.filter(Boolean) };
 		} catch (error) {
-			throw new Error(`Failed to get spreadsheet data for ID "${spreadsheetId}": ${error.message}`);
+			throw new CustomError(`Failed to get spreadsheet data for ID "${spreadsheetId}": ${error.message}`);
 		}
 	}
 	
@@ -118,7 +119,7 @@ export default async () => {
 			
 			return metadata;
 		} catch (error) {
-			throw new Error(`Failed to create spreadsheet "${name}": ${error.message}`);
+			throw new CustomError(`Failed to create spreadsheet "${name}": ${error.message}`);
 		}
 	}
 	

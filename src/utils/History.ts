@@ -1,8 +1,9 @@
 import { v4 as uuid } from 'uuid';
-import firestore from '../services/firestore';
 import config from './config';
 import Profiler from './Profiler';
 import RequestContext from './RequestContext';
+import firestore from '../services/firestore';
+import CustomError from '../entities/error-handling/CustomError';
 
 export default class History {
 	private _history: {
@@ -39,7 +40,7 @@ export default class History {
 		if (this._threadId) {
 			const thread = await Profiler.run(() => firestore.getDocument('threads', this._threadId), 'retrieve thread');
 			
-			if (!thread) throw new Error('Invalid threadId');
+			if (!thread) throw new CustomError('Invalid threadId');
 			
 			({ history } = thread);
 		}

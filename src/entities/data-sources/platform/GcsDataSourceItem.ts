@@ -1,21 +1,20 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import DataSourceItem from './DataSourceItem';
+import DataSource from '../DataSource';
 import gcs from '../../../services/gcs';
-import ErrorLog from '../../../utils/ErrorLog';
 import jsonl from '../../../utils/jsonl';
 import pdf from '../../../utils/pdf';
-import UnsupportedError from '../../../utils/UnsupportedError';
-import { JsonObject, ValueOf } from '../../../types/common';
+import UnsupportedError from '../../error-handling/UnsupportedError';
+import { JsonField, JsonObject, ValueOf } from '../../../types/common';
 
 export default class GcsDataSourceItem extends DataSourceItem {
 	static readonly TextContent: string;
-
 	static readonly DataContent: AsyncGenerator<JsonObject>;
 
 	private readonly _uri: string;
 	
-	public constructor(dataSource: any, uri: string) {
+	public constructor(dataSource: DataSource, uri: string) {
 		super(dataSource);
 
 		this._uri = uri;
@@ -53,7 +52,7 @@ export default class GcsDataSourceItem extends DataSourceItem {
 			txt: async () => (await fs.readFile(file)).toString()
 		};
 		
-		if (!mapping[this.extension]) ErrorLog.throw(new UnsupportedError('file type', this.extension, mapping));
+		if (!mapping[this.extension]) throw new UnsupportedError('file type', this.extension, Object.keys(mapping));
 		
 		return await mapping[this.extension]();
 	}
@@ -61,5 +60,9 @@ export default class GcsDataSourceItem extends DataSourceItem {
 	public async toData(): Promise<typeof GcsDataSourceItem.DataContent> {
 		const file = await this.getLocalFile();
 		return jsonl.read(file);
+	}
+	
+	public toJSON(): JsonField {
+		return this.uri;
 	}
 }

@@ -1,7 +1,7 @@
 import fs from 'node:fs';
-import CatalogField from '../catalog/CatalogField';
-import OutputCatalogField from '../catalog/OutputCatalogField';
+import Catalog from '../catalog/Catalog';
 import DataSourceItem from '../data-sources/platform/DataSourceItem';
+import CustomError from '../error-handling/CustomError';
 import Storage from '../storage/Storage';
 import StorageFile from '../storage/StorageFile';
 import llm from '../../modules/llm';
@@ -11,9 +11,7 @@ import Debug from '../../utils/Debug';
 import History from '../../utils/History';
 import Profiler from '../../utils/Profiler';
 import status from '../../utils/status';
-import Catalog from '../catalog/Catalog';
 import { JsonField, JsonObject } from '../../types/common';
-import ErrorLog from '../../utils/ErrorLog';
 
 const INPUT_OUTPUT_TEMPLATE = fs
 	.readFileSync('./data/input-output-template.txt', 'utf8')
@@ -136,7 +134,7 @@ export default class Agent {
 				this._baseInstructions = await Storage.get(StorageFile.TYPE.AGENT_INSTRUCTIONS, this.id).read();
 			}
 		} catch (error) {
-			throw new Error(`Missing instructions for agent "${this._id}"`);
+			throw new CustomError(`Missing instructions for agent "${this._id}"`);
 		}
 	}
 	
@@ -181,7 +179,7 @@ export default class Agent {
 					structuredResponse: true,
 					files: this._files,
 				}),
-				`${this.id} Agent - query`
+				`invoke agent "${this.id}"`
 			)
 		);
 		
@@ -191,7 +189,7 @@ export default class Agent {
 		try {
 			output = JSON.parse(response);
 		} catch (error) {
-			throw new Error(`Error: ${this.displayName} agent returned invalid JSON`);
+			throw new CustomError(`Error: ${this.displayName} agent returned invalid JSON`);
 		}
 		
 		Debug.log(`Completed invocation of ${this.id}`, 'Agent');

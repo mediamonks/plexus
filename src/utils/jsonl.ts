@@ -1,8 +1,10 @@
 import fs from 'node:fs';
 import readline from 'node:readline/promises';
+import CustomError from '../entities/error-handling/CustomError';
+import { JsonArray, JsonObject } from '../types/common';
 
-async function* read(filePath: string): AsyncGenerator<any> {
-	if (!filePath.toLowerCase().endsWith('.jsonl')) throw new Error(`Error while opening ${filePath}: Invalid filetype. Must be JSONL.`);
+async function* read(filePath: string): AsyncGenerator<JsonObject> {
+	if (!filePath.toLowerCase().endsWith('.jsonl')) throw new CustomError(`Error while opening ${filePath}: Invalid filetype. Must be JSONL.`);
 	
 	const rl = readline.createInterface({
 		input: fs.createReadStream(filePath),
@@ -14,19 +16,19 @@ async function* read(filePath: string): AsyncGenerator<any> {
 		try {
 			data = JSON.parse(line);
 		} catch (error) {
-			throw new Error(`Error while reading ${filePath}: Invalid file contents. Must be valid JSONL.`);
+			throw new CustomError(`Error while reading ${filePath}: Invalid file contents. Must be valid JSONL.`);
 		}
 		yield data;
 	}
 }
 
-async function* readAll(filePaths: string[]): AsyncGenerator<any> {
+async function* readAll(filePaths: string[]): AsyncGenerator<JsonObject> {
 	for await (const filePath of filePaths) {
 		for await (const data of read(filePath)) yield data;
 	}
 }
 
-async function parse(data: string): Promise<any[]> {
+async function parse(data: string): Promise<JsonArray> {
 	return data.split(/\n+/).map(line => JSON.parse(line));
 }
 

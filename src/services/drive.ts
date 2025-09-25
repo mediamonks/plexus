@@ -6,6 +6,7 @@ import mime from 'mime-types';
 import { Readable } from 'stream';
 import authenticate from './auth';
 import workspace from './workspace';
+import CustomError from '../entities/error-handling/CustomError';
 import config from '../utils/config';
 import Debug from '../utils/Debug';
 import Profiler from '../utils/Profiler';
@@ -20,7 +21,7 @@ export default async () => {
 	const auth = await authenticate();
 	const drive = google.drive({ version: 'v3', auth });
 	
-	async function createFile(name: string, folderId: string, mimeType: string, body?: Buffer | Readable | string, mediaMimeType?: string) {
+	async function createFile(name: string, folderId: string, mimeType: string, body?: Buffer | Readable | string, mediaMimeType?: string): Promise<FileMetaData> {
 		await workspace.quotaDelay(workspace.SERVICE.DRIVE, workspace.OPERATION.WRITE);
 		
 		const response = await drive.files.create({
@@ -45,7 +46,7 @@ export default async () => {
 		return response.data;
 	}
 	
-	async function uploadFile(filePath, folderId) {
+	async function uploadFile(filePath, folderId): Promise<FileMetaData> {
 		return await createFile(
 				filePath.split('/').pop(),
 				folderId,
@@ -54,7 +55,7 @@ export default async () => {
 		);
 	}
 	
-	async function createFolder(folderName, parentFolderId) {
+	async function createFolder(folderName, parentFolderId): Promise<string> {
 		const fileMetadata = {
 			name: folderName,
 			mimeType: 'application/vnd.google-apps.folder',
@@ -76,7 +77,7 @@ export default async () => {
 		}
 	}
 	
-	async function getFolderId(name, parentFolderId) {
+	async function getFolderId(name, parentFolderId): Promise<string> {
 		await workspace.quotaDelay();
 		
 		const res = await drive.files.list({
@@ -90,7 +91,7 @@ export default async () => {
 		return res.data.files[0]?.id;
 	}
 	
-	async function downloadFile(file: drive_v3.Schema$File, destPath?: string) {
+	async function downloadFile(file: FileMetaData, destPath?: string): Promise<string> {
 		Debug.log(`Downloading file "${file.name}"`, 'Google Drive');
 		
 		await workspace.quotaDelay();
@@ -119,7 +120,7 @@ export default async () => {
 		}
 	}
 	
-	async function listFolderContents(folderId: string, mimeType?: string) {
+	async function listFolderContents(folderId: string, mimeType?: string): Promise<FileMetaData[]> {
 		const files = [];
 		let pageToken;
 		
@@ -159,7 +160,7 @@ export default async () => {
 		return files;
 	}
 	
-	async function downloadFolderContents(folderId) {
+	async function downloadFolderContents(folderId): Promise<string[]> {
 		fs.mkdirSync(downloadPath, { recursive: true });
 
 		const files = await listFolderContents(folderId);
@@ -169,7 +170,7 @@ export default async () => {
 		return await Promise.all(downloadableFiles.map(file => downloadFile(file)));
 	}
 	
-	async function exportFolderContents(folderId, type) {
+	async function exportFolderContents(folderId, type): Promise<string[]> {
 		fs.mkdirSync(downloadPath, { recursive: true });
 		
 		const files = await listFolderContents(folderId);
@@ -177,96 +178,100 @@ export default async () => {
 		return await Promise.all(files.map(file => exportFile(file, type)));
 	}
 	
-	async function importFile(file, allowCache) {
-		const newName = `imported-${file.id}`;
-		const cacheContents = await listFolderContents(tempFolderId);
-		const existingFile = cacheContents.find(cacheFile => cacheFile.name === newName);
-		
-		if (allowCache) Debug.log(`Import "${file.name}": cache ${existingFile ? 'hit' : 'miss'}`, 'Google Drive');
-		if (existingFile && allowCache) return existingFile;
-		if (existingFile) await trashItem(existingFile.id);
-		
-		const conversionMap = {
-			'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'application/vnd.google-apps.spreadsheet',
-			'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'application/vnd.google-apps.document',
-			'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'application/vnd.google-apps.presentation',
-			'application/vnd.ms-excel': 'application/vnd.google-apps.spreadsheet',
-			'application/msword': 'application/vnd.google-apps.document',
-			'application/vnd.ms-powerpoint': 'application/vnd.google-apps.presentation',
-		};
-		
-		const targetMimeType = conversionMap[file.mimeType];
-		if (!targetMimeType) {
-			throw new Error(`Cannot import file type ${file.mimeType}. Supported types: ${Object.keys(conversionMap).join(', ')}`);
-		}
-		
-		Debug.log(`Importing file "${file.name}"`, 'Google Drive');
-		
-		await workspace.quotaDelay(workspace.SERVICE.DRIVE, workspace.OPERATION.WRITE);
-		
-		const fileContent = await drive.files.get({
-			fileId: file.id,
-			alt: 'media'
-		}, { responseType: 'stream' });
-		
-		const chunks = [];
-		for await (const chunk of fileContent.data) {
-			chunks.push(chunk);
-		}
-		const buffer = Buffer.concat(chunks); // TODO use fileContent.data directly?
-		
-		const importedFile = await createFile(
-			newName,
-			tempFolderId,
-			targetMimeType,
-			buffer,
-			file.mimeType,
-		);
-		
-		return {
-			...importedFile,
-			mimeType: targetMimeType
-		};
-	}
-	
-	async function exportFile(file: drive_v3.Schema$File, type: string, allowCache = false) {
-		const mimeType = mime.lookup(type);
-		
-		if (!mimeType) throw new Error(`Cannot export file type ${type}. Supported types: ${Object.keys(mime.types).join(', ')}`);
-		
-		const destPath = path.join(downloadPath, `${file.id}.${type}`);
-		
-		if (allowCache && fs.existsSync(destPath)) return destPath;
-		
-		Debug.log(`Exporting file "${file.name}"`, 'Google Drive');
-		
-		await workspace.quotaDelay();
-		
-		let fileStream;
-		try {
-			fileStream = await drive.files.export({
+	async function importFile(file, allowCache): Promise<FileMetaData> {
+		return Profiler.run(async () => {
+			const newName = `imported-${file.id}`;
+			const cacheContents = await listFolderContents(tempFolderId);
+			const existingFile = cacheContents.find(cacheFile => cacheFile.name === newName);
+			
+			if (allowCache) Debug.log(`Import "${file.name}": cache ${existingFile ? 'hit' : 'miss'}`, 'Google Drive');
+			if (existingFile && allowCache) return existingFile;
+			if (existingFile) await trashItem(existingFile.id);
+			
+			const conversionMap = {
+				'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'application/vnd.google-apps.spreadsheet',
+				'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'application/vnd.google-apps.document',
+				'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'application/vnd.google-apps.presentation',
+				'application/vnd.ms-excel': 'application/vnd.google-apps.spreadsheet',
+				'application/msword': 'application/vnd.google-apps.document',
+				'application/vnd.ms-powerpoint': 'application/vnd.google-apps.presentation',
+			};
+			
+			const targetMimeType = conversionMap[file.mimeType];
+			if (!targetMimeType) {
+				throw new CustomError(`Cannot import file type ${file.mimeType}. Supported types: ${Object.keys(conversionMap).join(', ')}`);
+			}
+			
+			Debug.log(`Importing file "${file.name}"`, 'Google Drive');
+			
+			await workspace.quotaDelay(workspace.SERVICE.DRIVE, workspace.OPERATION.WRITE);
+			
+			const fileContent = await drive.files.get({
 				fileId: file.id,
-				mimeType,
+				alt: 'media'
 			}, { responseType: 'stream' });
-		} catch (error) {
-			throw new Error(`Error exporting file "${file.name}": ${error.message}`);
-		}
-		
-		fs.mkdirSync(downloadPath, { recursive: true });
-		
-		const writeStream = fs.createWriteStream(destPath);
-		
-		await new Promise((resolve, reject) => {
-			fileStream.data
-					.on('end', resolve)
-					.on('error', reject)
-					.pipe(writeStream);
-		});
-		
-		return destPath;
+			
+			const chunks = [];
+			for await (const chunk of fileContent.data) {
+				chunks.push(chunk);
+			}
+			const buffer = Buffer.concat(chunks); // TODO use fileContent.data directly?
+			
+			const importedFile = await createFile(
+				newName,
+				tempFolderId,
+				targetMimeType,
+				buffer,
+				file.mimeType,
+			);
+			
+			return {
+				...importedFile,
+				mimeType: targetMimeType
+			};
+		}, `import drive file "${file.name}"`);
 	}
 	
-	async function createLink(targetId, folderId, name) {
+	async function exportFile(file: drive_v3.Schema$File, type: string, allowCache = false): Promise<string> {
+		return Profiler.run(async () => {
+			const mimeType = mime.lookup(type);
+			
+			if (!mimeType) throw new CustomError(`Cannot export file type ${type}. Supported types: ${Object.keys(mime.types).join(', ')}`);
+			
+			const destPath = path.join(downloadPath, `${file.id}.${type}`);
+			
+			if (allowCache && fs.existsSync(destPath)) return destPath;
+			
+			Debug.log(`Exporting file "${file.name}"`, 'Google Drive');
+			
+			await workspace.quotaDelay();
+			
+			let fileStream;
+			try {
+				fileStream = await drive.files.export({
+					fileId: file.id,
+					mimeType,
+				}, { responseType: 'stream' });
+			} catch (error) {
+				throw new CustomError(`Error exporting file "${file.name}": ${error.message}`);
+			}
+			
+			fs.mkdirSync(downloadPath, { recursive: true });
+			
+			const writeStream = fs.createWriteStream(destPath);
+			
+			await new Promise((resolve, reject) => {
+				fileStream.data
+						.on('end', resolve)
+						.on('error', reject)
+						.pipe(writeStream);
+			});
+			
+			return destPath;
+		}, `export drive file "${file.name}"`);
+	}
+	
+	async function createLink(targetId, folderId, name): Promise<string> {
 		if (!name) {
 			await workspace.quotaDelay();
 			
@@ -296,7 +301,7 @@ export default async () => {
 		return response.data.webViewLink;
 	}
 	
-	async function createCsvFile(csvString, fileName, folderId) {
+	async function createCsvFile(csvString, fileName, folderId): Promise<FileMetaData> {
 		const buffer = Buffer.from(csvString);
 		
 		return await createFile(
@@ -307,7 +312,7 @@ export default async () => {
 		);
 	}
 	
-	async function isFolder(id) {
+	async function isFolder(id): Promise<boolean> {
 		return Profiler.run(async () => {
 			await workspace.quotaDelay();
 			
@@ -323,7 +328,7 @@ export default async () => {
 		}, 'drive.isFolder');
 	}
 	
-	async function getFileMetadata(id) {
+	async function getFileMetadata(id): Promise<FileMetaData> {
 		await workspace.quotaDelay();
 		
 		const response = await drive.files.get({
@@ -336,7 +341,7 @@ export default async () => {
 	}
 	
 	// TODO abstract common file cache logic (see gcs.js)
-	async function cacheFile(metadata) {
+	async function cacheFile(metadata): Promise<string> {
 		const filePath = path.join(downloadPath, `${metadata.id}.${mime.extension(metadata.mimeType)}`);
 		fs.mkdirSync(downloadPath, { recursive: true });
 		try {
@@ -347,7 +352,7 @@ export default async () => {
 		return filePath;
 	}
 	
-	async function trashItem(id) {
+	async function trashItem(id): Promise<void> {
 		await workspace.quotaDelay(workspace.SERVICE.DRIVE, workspace.OPERATION.WRITE);
 		
 		await drive.files.update({
@@ -357,7 +362,7 @@ export default async () => {
 		});
 	}
 	
-	async function deleteFile(id) {
+	async function deleteFile(id): Promise<void> {
 		await workspace.quotaDelay(workspace.SERVICE.DRIVE, workspace.OPERATION.WRITE);
 		
 		await drive.files.delete({

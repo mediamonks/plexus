@@ -3,20 +3,18 @@ import IDataTypeDataSourceBehavior from './data-type/IDataTypeDataSourceBehavior
 import StructuredDataSourceBehavior from './data-type/StructuredDataSourceBehavior';
 import UnstructuredDataSourceBehavior from './data-type/UnstructuredDataSourceBehavior';
 import IDataSourcePlatformBehavior from './platform/IPlatformDataSourceBehavior';
+import ApiSourceDataSourceBehavior from './platform/ApiSourceDataSourceBehavior';
 import DataSourceItem from './platform/DataSourceItem';
 import DriveDataSourceBehavior from './platform/DriveDataSourceBehavior';
 import GcsDataSourceBehavior from './platform/GcsDataSourceBehavior';
 import ITargetDataSourceBehavior from './target/ITargetDataSourceBehavior';
-import DigestTargetDataSourceBehavior from './target/DigestTargetDataSourceBehavior';
 import FileTargetDataSourceBehavior from './target/FileTargetDataSourceBehavior';
-import ProfileTargetDataSourceBehavior from './target/ProfileTargetDataSourceBehavior';
-import RawDataDataSourceTarget from './target/RawDataTargetDataSourceBehavior';
-import RawTextTargetDataSourceBehavior from './target/RawTextTargetDataSourceBehavior';
-import VectorTargetDataSourceBehavior from './target/VectorTargetDataSourceBehavior';
-import ErrorLog from '../../utils/ErrorLog';
+import CustomError from '../error-handling/CustomError';
+import Profiler from '../../utils/Profiler';
 import RequestContext from '../../utils/RequestContext';
-import UnsupportedError from '../../utils/UnsupportedError';
-import { ValueOf } from '../../types/common';
+import UnsupportedError from '../error-handling/UnsupportedError';
+import { JsonArray, JsonObject, ValueOf } from '../../types/common';
+import DigestTargetDataSourceBehavior from './target/DigestTargetDataSourceBehavior';
 
 const GOOGLE_DRIVE_URI_PATTERN = /^https?:\/\/(?:drive|docs)\.google\.com\/(?:drive\/(folders)|(?:file|document|spreadsheets|presentation)\/d)\/([\w\-]+)/;
 
@@ -32,32 +30,26 @@ export default class DataSource {
 	private _platformBehavior: IDataSourcePlatformBehavior;
 	private _resolvedUri: string;
 	private _target: ValueOf<typeof DataSource.TARGET>;
-
+	private _targetBehavior: ITargetDataSourceBehavior;
+	
 	static readonly Configuration: {
-		type?: string;
+		type?: string; // TODO for backwards compatibility
 		dataType?: ValueOf<typeof DataSourceItem.DATA_TYPE>;
 		target?: ValueOf<typeof DataSource.TARGET>;
-		source?: string;
+		source?: string; // TODO for backwards compatibility
 		folder?: boolean;
 		cache?: boolean;
 		platform?: ValueOf<typeof DataSource.PLATFORM>;
 		uri?: string;
 		searchField?: string;
 		namespace?: string;
-	};
+	} & ApiSourceDataSourceBehavior.Configuration;
 
 	static readonly Contents: (typeof DataSourceItem.Content)[];
 
 	static readonly DataTypeBehavior: IDataTypeDataSourceBehavior;
 
 	static readonly PlatformBehavior: IDataSourcePlatformBehavior;
-
-	static readonly OutputData: typeof DigestTargetDataSourceBehavior.OutputData
-		| typeof FileTargetDataSourceBehavior.OutputData
-		| typeof ProfileTargetDataSourceBehavior.OutputData
-		| typeof RawDataDataSourceTarget.OutputData
-		| typeof RawTextTargetDataSourceBehavior.OutputData
-		| typeof VectorTargetDataSourceBehavior.OutputData;
 	
 	public constructor(id: string, configuration: typeof DataSource.Configuration) {
 		this._id = id;
@@ -69,8 +61,13 @@ export default class DataSource {
 		GCS: 'gcs',
 	} as const;
 	
-	static get TARGET (): typeof StructuredDataSourceBehavior.TARGET & typeof UnstructuredDataSourceBehavior.TARGET {
-		return { ...StructuredDataSourceBehavior.TARGET, ...UnstructuredDataSourceBehavior.TARGET };
+	static get TARGET (): typeof StructuredDataSourceBehavior.TARGET & typeof UnstructuredDataSourceBehavior.TARGET & { FILE: 'file', FILES: 'files' } {
+		return {
+			...StructuredDataSourceBehavior.TARGET,
+			...UnstructuredDataSourceBehavior.TARGET,
+			FILE: 'file',
+			FILES: 'files', // TODO for backwards compatibility
+		};
 	};
 	
 	public get id(): string {
@@ -96,10 +93,10 @@ export default class DataSource {
 	public get dataType(): ValueOf<typeof DataSourceItem.DATA_TYPE> {
 		if (this._dataType) return this._dataType;
 		
-		const dataType = this.configuration.dataType ?? this.type.split(':')[0]; // TODO for backwards compatibility
+		const dataType = this.configuration.dataType ?? this.type?.split(':')?.[0]; // TODO for backwards compatibility
 
 		if (!Object.values(DataSourceItem.DATA_TYPE).includes(dataType as ValueOf<typeof DataSourceItem.DATA_TYPE>)) {
-			ErrorLog.throw(new UnsupportedError('data source data type', dataType, DataSourceItem.DATA_TYPE));
+			throw new UnsupportedError('data source data type', dataType, Object.values(DataSourceItem.DATA_TYPE));
 		}
 
 		return this._dataType = dataType as ValueOf<typeof DataSourceItem.DATA_TYPE>;
@@ -116,7 +113,7 @@ export default class DataSource {
 		
 		const dataTypeBehaviorClass = mapping[this.dataType];
 	
-		if (!dataTypeBehaviorClass) ErrorLog.throw(new UnsupportedError('data source data type', this.dataType, mapping));
+		if (!dataTypeBehaviorClass) throw new UnsupportedError('data source data type', this.dataType, Object.keys(mapping));
 		
 		return this._dataTypeBehavior = new dataTypeBehaviorClass(this);
 	}
@@ -131,17 +128,17 @@ export default class DataSource {
 		
 		if (this.configuration.platform) {
 			if (!mapping[this.configuration.platform])
-				ErrorLog.throw(new UnsupportedError('data source platform', this.configuration.platform, DataSource.PLATFORM));
+				throw new UnsupportedError('data source platform', this.configuration.platform, Object.values(DataSource.PLATFORM));
 			
 			return this._platform = this.configuration.platform as ValueOf<typeof DataSource.PLATFORM>;
 		}
 		
-		if (this.isDynamic) throw new Error('Property `platform` must be explicitly set for dynamic data sources');
+		if (this.isDynamic) throw new CustomError('Property `platform` must be explicitly set for dynamic data sources');
 		
 		this._platform = Object.keys(mapping)
 			.find(platform => mapping[platform].test(this.uri)) as ValueOf<typeof DataSource.PLATFORM>;
 		
-		if (!this._platform) ErrorLog.throw(new UnsupportedError('data source URI', this.uri, mapping));
+		if (!this._platform) throw new UnsupportedError('data source URI', this.uri, Object.keys(mapping));
 		
 		return this._platform;
 	}
@@ -156,7 +153,7 @@ export default class DataSource {
 		
 		const platformBehaviorClass = mapping[this.platform];
 
-		if (!platformBehaviorClass) ErrorLog.throw(new UnsupportedError('data source platform', this.platform, mapping));
+		if (!platformBehaviorClass) throw new UnsupportedError('data source platform', this.platform, Object.keys(mapping));
 		
 		this._platformBehavior = new platformBehaviorClass(this);
 		
@@ -169,14 +166,28 @@ export default class DataSource {
 		const target = this.configuration.target ?? this.type.split(':')[1]; // TODO for backwards compatibility
 
 		if (!Object.values(DataSource.TARGET).includes(target as ValueOf<typeof DataSource.TARGET>)) {
-			ErrorLog.throw(new UnsupportedError('data source target', target, DataSource.TARGET));
+			throw new UnsupportedError('data source target', target, Object.values(DataSource.TARGET));
 		}
 
 		return this._target = target as ValueOf<typeof DataSource.TARGET>;
 	}
 
-	public get targetBehavior(): ITargetDataSourceBehavior {
-		return this.dataTypeBehavior.targetBehavior;
+	public get targetBehavior() {
+		if (!this._targetBehavior) {
+			const mapping = {
+				digest: DigestTargetDataSourceBehavior,
+				file: FileTargetDataSourceBehavior,
+				files: FileTargetDataSourceBehavior, // TODO for backwards compatibility
+			};
+			
+			const targetBehaviorClass = mapping[this.target] ?? this.dataTypeBehavior.targetBehaviorClass;
+			
+			if (!targetBehaviorClass) throw new UnsupportedError('data source target', this.target, Object.keys(mapping));
+			
+			this._targetBehavior = new targetBehaviorClass(this);
+		}
+		
+		return this._targetBehavior;
 	}
 	
 	public get source(): string {
@@ -206,7 +217,7 @@ export default class DataSource {
 				const catalog = RequestContext.get('catalog') as Catalog;
 				const value = await catalog.get(field).getValue();
 
-				if (typeof value !== 'string') throw new Error(`Unable to use non-string value "${value}" of catalog field "${field}" in dynamic uri of data source "${this.id}"`);
+				if (typeof value !== 'string') throw new CustomError(`Unable to use non-string value "${value}" of catalog field "${field}" in dynamic uri of data source "${this.id}"`);
 
 				this._resolvedUri = this._resolvedUri.replaceAll(match, value);
 			}));
@@ -215,31 +226,12 @@ export default class DataSource {
 		return this._resolvedUri;
 	}
 	
-	public async getIngestedData(): Promise<typeof DataSource.OutputData> {
-		try {
-			return await this.dataTypeBehavior.getIngestedData();
-		} catch (error) {
-			console.warn(`[WARN] Data source "${this.id}" is not yet ingested`);
-			// throw new Error(`Data source "${this.id}" is not yet ingested`);
-		}
-	}
-	
 	public async getItems(): Promise<DataSourceItem[]> {
 		this._items ??= await this.platformBehavior.getItems();
 		
-		if (!this._items.length) throw new Error(`Data source "${this.id}" contains no items`);
+		if (!this._items.length) throw new CustomError(`Data source "${this.id}" contains no items`);
 		
 		return this._items;
-	}
-	
-	public async getData(): Promise<typeof DataSource.OutputData> {
-		if (this._data) return this._data;
-
-		if (!this.isDynamic) this._data = await this.getIngestedData();
-
-		if (!this._data) this._data = await this.read();
-
-		return this._data;
 	}
 	
 	public async getContents(): Promise<typeof DataSource.Contents> {
@@ -248,8 +240,8 @@ export default class DataSource {
 		return await Promise.all(items.map(item => item.getContent()));
 	}
 	
-	public async read(): Promise<typeof DataSource.OutputData> {
-		return this.targetBehavior.read();
+	public async read(): Promise<string | AsyncGenerator<JsonObject> | DataSourceItem[]> {
+		return Profiler.run(async () => await this.targetBehavior.read(), `read data source "${this.id}"`);
 	}
 	
 	public async ingest(): Promise<void> {
@@ -258,7 +250,15 @@ export default class DataSource {
 		return this.targetBehavior.ingest();
 	}
 	
-	public async query(parameters: typeof StructuredDataSourceBehavior.QueryParameters): Promise<typeof DataSource.OutputData> {
-		return this.targetBehavior.query(parameters);
+	public async getIngestedData(): Promise<string | AsyncGenerator<JsonObject> | void> {
+		return await this.targetBehavior.getIngestedData();
+	}
+	
+	public async getData(): Promise<string | AsyncGenerator<JsonObject> | DataSourceItem[]> {
+		return this._data ??= this.targetBehavior.getData();
+	}
+	
+	public async query(parameters: typeof StructuredDataSourceBehavior.QueryParameters): Promise<string | JsonArray | DataSourceItem[]> {
+		return Profiler.run(async () => await this.targetBehavior.query(parameters), `query data source "${this.id}"`);
 	}
 }

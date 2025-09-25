@@ -1,9 +1,8 @@
 import Agent from './Agent';
 import Catalog from '../catalog/Catalog';
 import config from '../../utils/config';
-import ErrorLog from '../../utils/ErrorLog';
 import hash from '../../utils/hash';
-import UnknownError from '../../utils/UnknownError';
+import UnknownError from '../error-handling/UnknownError';
 
 export default class Agents {
 	private static readonly _agents: Record<string, Agent> = {};
@@ -11,7 +10,7 @@ export default class Agents {
 	public static get(id: string, catalog: Catalog): Agent {
 		const configuration = config.get(`agents`) as Record<string, typeof Agent.Configuration>;
 		
-		if (!configuration[id]) ErrorLog.throw(new UnknownError('agent', id, configuration));
+		if (!configuration[id]) throw new UnknownError('agent', id, configuration);
 		
 		const agentConfiguration = configuration[id];
 		

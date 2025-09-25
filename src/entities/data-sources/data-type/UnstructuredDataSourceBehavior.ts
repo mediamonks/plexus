@@ -1,51 +1,37 @@
 import IDataTypeDataSourceBehavior from './IDataTypeDataSourceBehavior';
 import DataSourceBehavior from '../DataSourceBehavior';
-import DataSourceItem from '../platform/DataSourceItem';
+import ITargetDataSourceBehavior from '../target/ITargetDataSourceBehavior';
 import DigestTargetDataSourceBehavior from '../target/DigestTargetDataSourceBehavior';
-import FilesDataSourceTarget from '../target/FileTargetDataSourceBehavior';
 import RawTextTargetDataSourceBehavior from '../target/RawTextTargetDataSourceBehavior';
 import VectorTargetDataSourceBehavior from '../target/VectorTargetDataSourceBehavior';
 import Storage from '../../storage/Storage';
 import StorageFile from '../../storage/StorageFile';
-import ErrorLog from '../../../utils/ErrorLog';
-import UnsupportedError from '../../../utils/UnsupportedError';
+import UnsupportedError from '../../error-handling/UnsupportedError';
 
 export default class UnstructuredDataSourceBehavior extends DataSourceBehavior implements IDataTypeDataSourceBehavior {
-	static readonly InputData: typeof DataSourceItem.TextContent;
-
-	static readonly OutputData: typeof RawTextTargetDataSourceBehavior.OutputData
-		| typeof DigestTargetDataSourceBehavior.OutputData
-		| typeof VectorTargetDataSourceBehavior.OutputData
-		| typeof FilesDataSourceTarget.OutputData;
-	
-	private _targetBehavior;
-	
 	static readonly TARGET = {
 		RAW_UNSTRUCTURED: 'raw',
 		DIGEST: 'digest',
 		VECTOR_UNSTRUCTURED: 'vector',
-		FILES: 'files', // TODO for backwards compatibility
-		FILE: 'file',
 	} as const;
 	
-	public get targetBehavior() {
-		if (!this._targetBehavior) {
-			const mapping = {
-				raw: RawTextTargetDataSourceBehavior,
-				digest: DigestTargetDataSourceBehavior,
-				vector: VectorTargetDataSourceBehavior,
-				files: FilesDataSourceTarget, // TODO for backwards compatibility
-				file: FilesDataSourceTarget,
-			};
-			
-			const targetBehaviorClass = mapping[this.target];
-			
-			if (!targetBehaviorClass) ErrorLog.throw(new UnsupportedError('unstructured data source target', this.target, mapping));
-			
-			this._targetBehavior = new targetBehaviorClass(this);
-		}
+	public get targetBehaviorClass(): new () => ITargetDataSourceBehavior {
+		const mapping = {
+			raw: RawTextTargetDataSourceBehavior,
+			vector: VectorTargetDataSourceBehavior,
+			digest: DigestTargetDataSourceBehavior,
+		};
 		
-		return this._targetBehavior;
+		const targetBehaviorClass = mapping[this.dataSource.target];
+		
+		if (!targetBehaviorClass) throw new UnsupportedError('unstructured data source target', this.dataSource.target, Object.keys(mapping));
+		
+		return targetBehaviorClass;
+	}
+	
+	public async ingest(): Promise<void> {
+		const data = await this.dataSource.read() as string;
+		return Storage.get(StorageFile.TYPE.UNSTRUCTURED_DATA, this.dataSource.id).write(data);
 	}
 	
 	public async getIngestedData(): Promise<string> {

@@ -1,7 +1,8 @@
+import CustomError from '../entities/error-handling/CustomError';
 import azure from '../services/azure';
-import openai from '../services/openai';
 import genai from '../services/genai';
 import lancedb from '../services/lancedb';
+import openai from '../services/openai';
 import config from '../utils/config';
 import Profiler from '../utils/Profiler';
 import { JsonObject } from '../types/common';
@@ -16,7 +17,7 @@ const EMBEDDING_PLATFORMS = {
 const _embeddings = {};
 
 async function generateEmbeddings(text: string, { forDocument = false }: { forDocument?: boolean } = {}): Promise<number[]> {
-	if (!text) throw new Error('Error: No text provided when generating embeddings');
+	if (!text) throw new CustomError('Error: No text provided when generating embeddings');
 	
 	const platform = getEmbeddingPlatform();
 	
@@ -102,7 +103,7 @@ async function search(tableName: string, embeddings: number[], { limit, filter, 
 function getEmbeddingPlatform(): string {
 	const embeddingPlatform = config.get('embeddingPlatform') as string;
 	
-	if (!EMBEDDING_PLATFORMS[embeddingPlatform]) throw new Error(`Invalid embedding platform selection: "${embeddingPlatform}". Must be one of: ${Object.keys(EMBEDDING_PLATFORMS).join(', ')}`);
+	if (!EMBEDDING_PLATFORMS[embeddingPlatform]) throw new CustomError(`Invalid embedding platform selection: "${embeddingPlatform}". Must be one of: ${Object.keys(EMBEDDING_PLATFORMS).join(', ')}`);
 	
 	return embeddingPlatform;
 }
@@ -113,7 +114,7 @@ function getTableName(tableName: string, dimensions?: number): string {
 
 function getDimensions(): number {
 	const embeddingPlatform = getEmbeddingPlatform();
-	if (!embeddingModels[EMBEDDING_PLATFORMS[embeddingPlatform].config.embeddingModel]) throw new Error('Error: Unsupported embedding model');
+	if (!embeddingModels[EMBEDDING_PLATFORMS[embeddingPlatform].config.embeddingModel]) throw new CustomError('Error: Unsupported embedding model');
 	return embeddingModels[EMBEDDING_PLATFORMS[embeddingPlatform].config.embeddingModel].dimensions;
 }
 

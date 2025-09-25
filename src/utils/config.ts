@@ -1,4 +1,5 @@
 import RequestContext from './RequestContext';
+import CustomError from '../entities/error-handling/CustomError';
 import global from '../../config/global.json';
 import { Configuration, JsonField, RequestPayload } from '../types/common';
 
@@ -17,7 +18,7 @@ function createStaticConfig(): any {
 		config[module] = require(`../../config/${module}.json`);
 		if (module in global) {
 			if (typeof global[module] === 'object' && typeof config[module] === 'object') config[module] = { ...config[module], ...global[module] };
-			else throw new Error(`Configuration conflict: module "${module}" and global key "${module}"`);
+			else throw new CustomError(`Configuration conflict: module "${module}" and global key "${module}"`);
 		}
 	}
 	return config;
@@ -31,7 +32,7 @@ function merge(key: string, value1: any, value2: any): any {
 	if (value2 === undefined) return value1;
 	if (value1 === undefined) return value2;
 	
-	if (typeof value1 !== typeof value2) throw new Error(`Configuration conflict for "${key}"`);
+	if (typeof value1 !== typeof value2) throw new CustomError(`Configuration conflict for "${key}"`);
 	
 	if (typeof value2 !== 'object') return value2;
 	
@@ -67,7 +68,7 @@ function get(name?: string, includeGlobal: boolean = false): JsonField {
 	if (requestConfig[key] === staticConfig[module][key])
 		return requestConfig[key];
 		
-	throw new Error(`Configuration conflict for "${module}/${key}"`);
+	throw new CustomError(`Configuration conflict for "${module}/${key}"`);
 }
 
 export default { get };

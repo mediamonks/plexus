@@ -1,6 +1,7 @@
 import { google } from 'googleapis';
 import TurndownService from 'turndown';
 import authenticate from './auth';
+import CustomError from '../entities/error-handling/CustomError';
 
 export default async (): Promise<{
 	create: (name: string, content: string, folderId?: string) => Promise<string>;
@@ -43,7 +44,7 @@ export default async (): Promise<{
 
 			return documentId;
 		} catch (error) {
-			throw new Error(`Failed to create document "${name}": ${error.message}`);
+			throw new CustomError(`Failed to create document "${name}": ${error.message}`);
 		}
 	}
 	

@@ -1,8 +1,7 @@
 import StorageFile from './StorageFile';
 import StorageDataFile from './StorageDataFile';
 import StorageTextFile from './StorageTextFile';
-import ErrorLog from '../../utils/ErrorLog';
-import UnsupportedError from '../../utils/UnsupportedError';
+import UnsupportedError from '../error-handling/UnsupportedError';
 
 export default class Storage {
 	private static readonly _storageFiles = {};
@@ -10,9 +9,9 @@ export default class Storage {
 	public static get(type: typeof StorageFile.TYPE.STRUCTURED_DATA, name: string): StorageDataFile;
 	public static get(type: typeof StorageFile.TYPE.DIGEST_INSTRUCTIONS | typeof StorageFile.TYPE.AGENT_INSTRUCTIONS | typeof StorageFile.TYPE.UNSTRUCTURED_DATA, name: string): StorageTextFile;
 	public static get(type: string, name: string): StorageDataFile | StorageTextFile {
-		let instance = Storage._storageFiles[type]?.[name];
+		let storageFile = Storage._storageFiles[type]?.[name];
 		
-		if (!instance) {
+		if (!storageFile) {
 			const mapping = {
 				[StorageFile.TYPE.DIGEST_INSTRUCTIONS]: StorageTextFile,
 				[StorageFile.TYPE.AGENT_INSTRUCTIONS]: StorageTextFile,
@@ -22,14 +21,14 @@ export default class Storage {
 			
 			const storageFileClass = mapping[type];
 			
-			if (!storageFileClass) ErrorLog.throw(new UnsupportedError('storage file type', type, mapping));
+			if (!storageFileClass) throw new UnsupportedError('storage file type', type, Object.keys(mapping));
 		
-			instance = new storageFileClass(name, type);
+			storageFile = new storageFileClass(name, type);
 			
 			Storage._storageFiles[type] ??= {};
-			Storage._storageFiles[type][name] = instance;
+			Storage._storageFiles[type][name] = storageFile;
 		}
 		
-		return instance;
+		return storageFile;
 	}
 }

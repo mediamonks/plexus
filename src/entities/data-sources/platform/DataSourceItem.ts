@@ -1,5 +1,5 @@
 import DataSource from '../DataSource';
-import { JsonObject, SpreadSheet, ValueOf } from '../../../types/common';
+import { JsonField, JsonObject, SpreadSheet, ValueOf } from '../../../types/common';
 import DriveDataSourceItem from './DriveDataSourceItem';
 import GcsDataSourceItem from './GcsDataSourceItem';
 
@@ -18,7 +18,7 @@ export default abstract class DataSourceItem {
 		STRUCTURED: 'data',
 	} as const;
 	
-	protected constructor(dataSource: any) {
+	protected constructor(dataSource: DataSource) {
 		this._dataSource = dataSource;
 	}
 	
@@ -48,4 +48,6 @@ export default abstract class DataSourceItem {
 			[DataSourceItem.DATA_TYPE.STRUCTURED]: () => this.toData(),
 		}[this.dataType]();
 	}
+	
+	public abstract toJSON(): JsonField;
 }

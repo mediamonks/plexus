@@ -2,10 +2,10 @@ import Catalog from './Catalog';
 import DataSourceCatalogField from './DataSourceCatalogField';
 import InputCatalogField from './InputCatalogField';
 import OutputCatalogField from './OutputCatalogField';
-import ErrorLog from '../../utils/ErrorLog';
-import UnknownError from '../../utils/UnknownError';
-import { JsonField } from '../../types/common';
 import DataSourceItem from '../data-sources/platform/DataSourceItem';
+import CustomError from '../error-handling/CustomError';
+import UnknownError from '../error-handling/UnknownError';
+import { JsonField } from '../../types/common';
 
 export default class CatalogField {
 	private readonly _id: string;
@@ -35,7 +35,7 @@ export default class CatalogField {
 	public get configuration(): typeof CatalogField.Configuration {
 		if (!this._configuration) {
 			const configuration = this.catalog.configuration[this.id];
-			if (!configuration) ErrorLog.throw(new UnknownError('catalog field', this.id, this.catalog.configuration));
+			if (!configuration) throw new UnknownError('catalog field', this.id, this.catalog.configuration);
 			this._configuration = configuration as typeof CatalogField.Configuration;
 		}
 		
@@ -55,10 +55,16 @@ export default class CatalogField {
 	}
 	
 	protected async populate(): Promise<JsonField | DataSourceItem[]> {
-		throw new Error('Cannot create instance of CatalogField');
+		throw new CustomError('Cannot create instance of CatalogField');
 	}
 	
 	public async getValue(): Promise<JsonField | DataSourceItem[]> {
 		return this._value ??= this.populate();
+	}
+	
+	public async toJSON(): Promise<JsonField> {
+		const value = await this.getValue();
+		if (value instanceof Array) return value.map(item => item.toJSON());
+		return value;
 	}
 }

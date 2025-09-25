@@ -1,5 +1,6 @@
 import OpenAI from 'openai';
 import { ConfidentialClientApplication } from '@azure/msal-node';
+import CustomError from '../entities/error-handling/CustomError';
 import config from '../utils/config';
 import History from '../utils/History';
 
@@ -27,7 +28,7 @@ async function getAccessToken(): Promise<string> {
 		expiresOnTimestamp = expiresOn.getTime();
 		return accessToken;
 	} catch (error) {
-		throw new Error(`Error acquiring access token: ${error}`);
+		throw new CustomError(`Error acquiring access token: ${error}`);
 	}
 }
 
@@ -81,7 +82,7 @@ async function query(prompt: string, {
 	model?: string;
 	files?: any[];
 } = {}): Promise<string> {
-	if (files && files.length) throw new Error('Azure implementation does not yet support file uploads');
+	if (files && files.length) throw new CustomError('Azure implementation does not yet support file uploads');
 	
 	const messages = [
 		...history.toOpenAi(),
