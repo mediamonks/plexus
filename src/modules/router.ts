@@ -1,9 +1,10 @@
 import fs from 'node:fs';
 import mime from 'mime-types';
+import ErrorHandler from '../entities/error-handling/ErrorHandler';
 import config from '../utils/config';
-import ErrorLog from '../utils/ErrorLog';
 import RequestContext from '../utils/RequestContext';
 import { RequestPayload } from '../types/common';
+import CustomError from '../entities/error-handling/CustomError';
 
 const routes = config.get('routes');
 
@@ -34,58 +35,60 @@ async function sendFile(filePath: string, res: any): Promise<void> {
 }
 
 export default async function router(req: any, res: any): Promise<void> {
-	if (cors(req, res)) return;
-	
-	process.on('uncaughtException', (error: Error) => {
-		ErrorLog.log(error);
-	});
-	
-	process.on('unhandledRejection', (reason: Error | string) => {
-		const error = reason instanceof Error ? reason : new Error(reason);
-		ErrorLog.log(error);
-	});
-	
-	let { path } = req;
-	let pattern;
-	path = path.replace(/^\/(dev-)?api/, '');
-	path = path.replace(/\/$/, '');
-	
-	if (!path) return await sendFile('openapi.yaml', res);
-	
-	const matchPath = Object.keys(routes).find(matchPath => {
-		pattern = '^' + matchPath.replace(/\{[^}]+}/g, '([^/]+)') + '$';
-		return (new RegExp(pattern)).test(path);
-	});
-	
-	if (!matchPath) {
-		res.status(404);
-		res.send('NOT FOUND');
-		return;
-	}
-	
-	const varNames = Array.from(matchPath.matchAll(/\{([^}]+)}/g) ?? []).map(match => match[1]);
-	let variables = {};
-	if (varNames) {
-		const [, ...varValues] = path.match(new RegExp(pattern));
-		variables = varNames.reduce(
-			(result, name, index) => ({ ...result, [name]: varValues[index] }),
-			{}
-		);
-	}
-	
-	if (routes[matchPath].file) return await sendFile(routes[matchPath].file, res);
-	
-	const handler = routes[matchPath]?.methods?.[req.method.toLowerCase()]?.handler;
-	const handlerModule = await import(`../handlers/${handler}`);
-	const fn = handlerModule.default;
-	
 	try {
+		if (cors(req, res)) return;
+		
+		let { path } = req;
+		let pattern;
+		path = path.replace(/^\/(dev-)?api/, '');
+		path = path.replace(/\/$/, '');
+		
+		if (!path) return await sendFile('openapi.yaml', res);
+		
+		const matchPath = Object.keys(routes).find(matchPath => {
+			pattern = '^' + matchPath.replace(/\{[^}]+}/g, '([^/]+)') + '$';
+			return (new RegExp(pattern)).test(path);
+		});
+		
+		if (!matchPath) {
+			res.status(404);
+			res.send('NOT FOUND');
+			return;
+		}
+		
+		const varNames = Array.from(matchPath.matchAll(/\{([^}]+)}/g) ?? []).map(match => match[1]);
+		let variables = {};
+		if (varNames) {
+			const [, ...varValues] = path.match(new RegExp(pattern));
+			variables = varNames.reduce(
+				(result, name, index) => ({ ...result, [name]: varValues[index] }),
+				{}
+			);
+		}
+		
+		if (routes[matchPath].file) return await sendFile(routes[matchPath].file, res);
+		
+		const handler = routes[matchPath]?.methods?.[req.method.toLowerCase()]?.handler;
+		const handlerModule = await import(`../handlers/${handler}`);
+		const fn = handlerModule.default;
+		
 		const payload: RequestPayload = req.method === 'POST' ? req.body : req.query;
-		const response = await RequestContext.run({ payload }, () => fn(variables, payload)) ?? 'OK';
-		res.send(response);
+		await RequestContext.run({ payload }, async () => {
+			ErrorHandler.initialize();
+			
+			let response = await fn(variables, payload) ?? 'OK';
+			
+			const error = ErrorHandler.get();
+			if (error) {
+				res.status(error instanceof CustomError ? error.status : 500);
+				response = { ...response, error: error.toString() };
+			}
+			
+			res.send(response);
+		});
 	} catch (error) {
 		res.status(500);
-		res.send(error.toString());
+		res.send({ error: error.toString() });
 		throw error;
 	}
 }

@@ -1,9 +1,9 @@
 import DataSource from './DataSource';
 import config from '../../utils/config';
-import ErrorLog from '../../utils/ErrorLog';
 import hash from '../../utils/hash';
 import RequestContext from '../../utils/RequestContext';
-import UnknownError from '../../utils/UnknownError';
+import UnknownError from '../error-handling/UnknownError';
+import Profiler from '../../utils/Profiler';
 
 export default class DataSources {
 	static readonly Configuration: Record<string, typeof DataSource.Configuration>;
@@ -27,7 +27,7 @@ export default class DataSources {
 		
 		const dataSourceConfiguration = this.configuration[id];
 		
-		if (!dataSourceConfiguration) ErrorLog.throw(new UnknownError('data source', id, this.configuration));
+		if (!dataSourceConfiguration) throw new UnknownError('data source', id, this.configuration);
 		
 		const key = hash(id, JSON.stringify(dataSourceConfiguration));
 		
@@ -42,7 +42,7 @@ export default class DataSources {
 		await Promise.all(this.ids.map(id => {
 			if (namespace && this.configuration[id].namespace !== namespace) return;
 			
-			return this.get(id).ingest();
+			return Profiler.run(() => this.get(id).ingest(), `ingest data source "${id}"`);
 		}));
 	}
 }

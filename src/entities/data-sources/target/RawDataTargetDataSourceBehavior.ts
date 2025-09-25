@@ -1,37 +1,26 @@
-import ITargetDataSourceBehavior from './ITargetDataSourceBehavior';
-import DataSourceBehavior from '../DataSourceBehavior';
-import DataSourceItem from '../platform/DataSourceItem';
+import TargetDataSourceBehavior from './TargetDataSourceBehavior';
 import StructuredDataSourceBehavior from '../data-type/StructuredDataSourceBehavior';
 import Catalog from '../../catalog/Catalog';
-import Storage from '../../storage/Storage';
-import StorageFile from '../../storage/StorageFile';
-import { JsonObject } from '../../../types/common';
+import CustomError from '../../error-handling/CustomError';
+import { JsonArray, JsonObject } from '../../../types/common';
 
-export default class RawDataTargetDataSourceBehavior extends DataSourceBehavior implements ITargetDataSourceBehavior {
-	static readonly InputData: (typeof DataSourceItem.DataContent)[];
-	static readonly OutputData: (typeof DataSourceItem.DataContent)[];
-
-	public async read(): Promise<typeof RawDataTargetDataSourceBehavior.OutputData> {
-		const contents = await this.getContents() as typeof RawDataTargetDataSourceBehavior.OutputData;
-
-		// TODO add support for spreadsheets
-		if (!contents[0][0]) throw new Error('Unsupported input data for raw data target data source: must be JSONL');
-
-		return contents.flat();
-	}
-	
-	public async ingest(): Promise<void> {
-		const data = await this.read() as AsyncGenerator<JsonObject>[];
-
-		await Storage.get(StorageFile.TYPE.STRUCTURED_DATA, this.id).write(async function* () {
-			for await (const generator of data) yield* generator;
-		}());
-	}
-	
-	public async query({ filter, limit, fields, sort }: typeof StructuredDataSourceBehavior.QueryParameters = {}): Promise<typeof RawDataTargetDataSourceBehavior.OutputData> {
-		const data = await this.getData();
+export default class RawDataTargetDataSourceBehavior extends TargetDataSourceBehavior {
+	public async read(): Promise<AsyncGenerator<JsonObject>> {
+		const contents = await this.dataSource.getContents() as AsyncGenerator<JsonObject>[];
 		
-		if (!filter && !limit && !fields && !sort) return data;
+		// if (!contents[0][0]) throw new CustomError('Unsupported input data for raw data target data source: must be JSONL');
+		
+		return (async function* () {
+			for (const generator of contents) {
+				yield* generator;
+			}
+		})();
+	}
+	
+	public async query({ filter, limit, fields, sort }: typeof StructuredDataSourceBehavior.QueryParameters = {}): Promise<JsonArray> {
+		const data = await this.getData() as AsyncGenerator<JsonObject>;
+		
+		if (!filter && !limit && !fields && !sort) return await Array.fromAsync(data);
 		
 		const result = [];
 		for await (let item of data) {

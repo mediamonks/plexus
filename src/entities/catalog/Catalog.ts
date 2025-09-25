@@ -3,11 +3,9 @@ import DataSourceCatalogField from './DataSourceCatalogField';
 import InputCatalogField from './InputCatalogField';
 import OutputCatalogField from './OutputCatalogField';
 import config from '../../utils/config';
-import ErrorLog from '../../utils/ErrorLog';
 import RequestContext from '../../utils/RequestContext';
-import UnknownError from '../../utils/UnknownError';
-import UnsupportedError from '../../utils/UnsupportedError';
-import Profiler from '../../utils/Profiler';
+import UnknownError from '../error-handling/UnknownError';
+import UnsupportedError from '../error-handling/UnsupportedError';
 import { JsonObject } from '../../types/common';
 
 export default class Catalog {
@@ -27,7 +25,7 @@ export default class Catalog {
 	public createField(fieldId: string): CatalogField {
 		const fieldConfiguration = this.configuration[fieldId] as typeof CatalogField.Configuration;
 		
-		if (!fieldConfiguration) ErrorLog.throw(new UnknownError('fieldId', fieldId, this.configuration));
+		if (!fieldConfiguration) throw new UnknownError('fieldId', fieldId, this.configuration);
 		
 		const mapping = {
 			[CatalogField.TYPE.INPUT]: InputCatalogField,
@@ -37,7 +35,7 @@ export default class Catalog {
 		
 		const catalogFieldClass = mapping[fieldConfiguration.type];
 		
-		if (!catalogFieldClass) ErrorLog.throw(new UnsupportedError('catalog field type', fieldConfiguration.type, mapping));
+		if (!catalogFieldClass) throw new UnsupportedError('catalog field type', fieldConfiguration.type, Object.keys(mapping));
 		
 		return new catalogFieldClass(fieldId, this);
 	}

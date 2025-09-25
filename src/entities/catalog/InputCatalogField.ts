@@ -1,10 +1,10 @@
 import CatalogField from './CatalogField';
 import DataSourceItem from '../data-sources/platform/DataSourceItem';
+import CustomError from '../error-handling/CustomError';
+import UnknownError from '../error-handling/UnknownError';
 import config from '../../utils/config';
 import Debug from '../../utils/Debug';
-import ErrorLog from '../../utils/ErrorLog';
 import RequestContext from '../../utils/RequestContext';
-import UnknownError from '../../utils/UnknownError';
 import { JsonField, RequestPayload, Configuration } from '../../types/common';
 
 export default class InputCatalogField extends CatalogField {
@@ -20,7 +20,7 @@ export default class InputCatalogField extends CatalogField {
 	}
 
 	public get payloadField(): string {
-		if (!this.configuration.field) throw new Error(`Missing 'field' property for input field "${this.id}"`);
+		if (!this.configuration.field) throw new CustomError(`Missing 'field' property for input field "${this.id}"`);
 		
 		return this.configuration.field;
 	}
@@ -37,7 +37,7 @@ export default class InputCatalogField extends CatalogField {
 		let value = payload.fields?.[this.payloadField] as string;
 		
 		if (value === undefined) {
-			if (this.required) throw new Error(`Field "${this.payloadField}" must be provided in payload`);
+			if (this.required) throw new CustomError(`Field "${this.payloadField}" must be provided in payload`);
 			
 			return;
 		}
@@ -46,7 +46,7 @@ export default class InputCatalogField extends CatalogField {
 		const fieldValues = inputFields[this.payloadField];
 		
 		if (fieldValues) {
-			if (!(value in fieldValues)) ErrorLog.throw(new UnknownError(`value for ${this.payloadField}`, value as string, fieldValues));
+			if (!(value in fieldValues)) throw new UnknownError(`value for ${this.payloadField}`, value as string, fieldValues);
 			value = fieldValues[value].description ?? fieldValues[value].label;
 		}
 		

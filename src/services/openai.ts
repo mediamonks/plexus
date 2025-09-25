@@ -1,4 +1,5 @@
 import OpenAI from 'openai';
+import CustomError from '../entities/error-handling/CustomError';
 import config from '../utils/config';
 import History from '../utils/History';
 
@@ -29,7 +30,7 @@ async function query(prompt: string, {
 	model?: string;
 	files?: any[];
 } = {}): Promise<string> {
-	if (files && files.length) throw new Error('OpenAI implementation does not yet support file uploads');
+	if (files && files.length) throw new CustomError('OpenAI implementation does not yet support file uploads');
 	
 	const messages = [
 		...history.toOpenAi(),

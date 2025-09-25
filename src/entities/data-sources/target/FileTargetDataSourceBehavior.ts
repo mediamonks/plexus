@@ -1,21 +1,21 @@
-import ITargetDataSourceBehavior from './ITargetDataSourceBehavior';
-import DataSourceBehavior from '../DataSourceBehavior';
+import TargetDataSourceBehavior from './TargetDataSourceBehavior';
 import DataSourceItem from '../platform/DataSourceItem';
 
-export default class FileTargetDataSourceBehavior extends DataSourceBehavior implements ITargetDataSourceBehavior {
-	static InputData: DataSourceItem[];
-	static OutputData: DataSourceItem[];
-
-	async read(): Promise<typeof FileTargetDataSourceBehavior.OutputData> {
-		return this.getItems();
+export default class FileTargetDataSourceBehavior extends TargetDataSourceBehavior {
+	public async read(): Promise<DataSourceItem[]> {
+		return this.dataSource.getItems();
 	};
 	
-	async ingest(): Promise<void> {
+	public async ingest(): Promise<void> {
 		// TODO ingest by copying files to own gcs
-		return console.warn(`Not ingesting files target data source "${this.id}"`);
+		return console.warn(`Not ingesting files target data source "${this.dataSource.id}"`);
 	}
 	
-	async query(): Promise<typeof FileTargetDataSourceBehavior.OutputData> {
-		return this.getData();
+	public async getIngestedData(): Promise<void> {
+		throw new Error('Not implemented');
+	}
+	
+	public async getData(): Promise<DataSourceItem[]> {
+		return await this.dataSource.read() as DataSourceItem[];
 	}
 }

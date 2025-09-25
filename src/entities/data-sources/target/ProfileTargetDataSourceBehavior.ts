@@ -1,20 +1,20 @@
-import ITargetDataSourceBehavior from './ITargetDataSourceBehavior';
-import DataSourceBehavior from '../DataSourceBehavior';
-import { JsonObject } from '../../../types/common';
+import TargetDataSourceBehavior from './TargetDataSourceBehavior';
+import CustomError from '../../error-handling/CustomError';
 
-export default class ProfileTargetDataSourceBehavior extends DataSourceBehavior implements ITargetDataSourceBehavior {
-	static InputData: void;
-	static OutputData: JsonObject;
-	
-	async read(): Promise<typeof ProfileTargetDataSourceBehavior.OutputData> {
-		throw new Error('Not implemented');
+export default class ProfileTargetDataSourceBehavior extends TargetDataSourceBehavior {
+	async read(): Promise<never> {
+		throw new CustomError('Not implemented');
 	}
 	
-	async ingest(): Promise<void> {
-		throw new Error('Not implemented');
+	async ingest(): Promise<never> {
+		throw new CustomError('Not implemented');
 	}
 	
-	async query(): Promise<typeof ProfileTargetDataSourceBehavior.OutputData> {
-		throw new Error('Not implemented');
+	async query(): Promise<never> {
+		throw new CustomError('Not implemented');
+	}
+	
+	public async getData(): Promise<never> {
+		throw new CustomError('Not implemented');
 	}
 }

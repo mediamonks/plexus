@@ -1,8 +1,10 @@
 import ITargetDataSourceBehavior from '../target/ITargetDataSourceBehavior';
-import DataSource from '../DataSource';
+import { JsonObject } from '../../../types/common';
 
 export default interface IDataTypeDataSourceBehavior {
-  targetBehavior: ITargetDataSourceBehavior;
+  targetBehaviorClass: new () => ITargetDataSourceBehavior;
 
-  getIngestedData(): Promise<typeof DataSource.OutputData>;
+	ingest(): Promise<void>;
+	
+  getIngestedData(): Promise<string | AsyncGenerator<JsonObject> | void>;
 }

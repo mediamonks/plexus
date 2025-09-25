@@ -32,7 +32,10 @@ export default class Profiler {
 		const start = performance.now();
 		const retval = fn.apply(null, argsOrLabel);
 
-		if (retval instanceof Promise) retval.then(() => this.log(label, start));
+		if (retval instanceof Promise) retval.then(() => this.log(label, start)).catch(error => {
+			this.log(label, start);
+			throw error;
+		});
 		else this.log(label, start);
 
 		return retval;

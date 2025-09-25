@@ -1,14 +1,15 @@
-import fs from 'node:fs';
 import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
+import pdf from 'pdf-parse-debugging-disabled';
+import CustomError from '../entities/error-handling/CustomError';
 
 async function getPdfText(filePath: string): Promise<string> {
-	const pdf = (await import('pdf-parse')).default;
-	const data = await pdf(await fs.promises.readFile(filePath));
+	const data = await pdf(filePath);
 	return data.text;
 }
 
 async function* read(filePath: string): AsyncGenerator<{ text: string }> {
-	if (!filePath.endsWith('.pdf')) throw new Error(`Error while generating embeddings for ${filePath}: Invalid filetype. Must be PDF.`);
+	// TODO this should not be part of the PDF util, move to vectordb?
+	if (!filePath.endsWith('.pdf')) throw new CustomError(`Error while generating embeddings for ${filePath}: Invalid filetype. Must be PDF.`);
 	
 	// TODO Add OCR capability for PDF's with mostly text in images
 	
@@ -16,9 +17,10 @@ async function* read(filePath: string): AsyncGenerator<{ text: string }> {
 	try {
 		text = await getPdfText(filePath);
 	} catch (error) {
-		throw new Error(`Error while generating embeddings for ${filePath}: Invalid file contents. Must be valid PDF.`);
+		throw new CustomError(`Error while generating embeddings for ${filePath}: Invalid file contents. Must be valid PDF.`);
 	}
 	
+	// TODO make configurable
 	const splitter = new RecursiveCharacterTextSplitter({
 		chunkSize: 500,
 		chunkOverlap: 200,

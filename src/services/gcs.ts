@@ -2,10 +2,11 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { Storage } from '@google-cloud/storage';
 import config from '../utils/config';
+import Profiler from '../utils/Profiler';
 
 const storage = new Storage();
 
-const GS_URI_PATTERN = /gs:\/\/([^/]+)\/(.+)/;
+const GS_URI_PATTERN = /gs:\/\/([^/]+)\/(.*)/;
 
 function getUriParts(uri: string): { bucket: string; path: string } {
 	const [, bucket, path] = GS_URI_PATTERN.exec(uri);
@@ -58,13 +59,15 @@ async function list(uri: string): Promise<string[]> {
 }
 
 async function download(uri: string, destination?: string): Promise<string> {
-	destination ??= path.join(config.get('tempPath') as string, 'download', 'gcs', getPath(uri));
-	
-	await fs.mkdir(path.dirname(destination), { recursive: true });
-	
-	await getFile(uri).download({ destination });
-	
-	return destination;
+	return Profiler.run(async () => {
+		destination ??= path.join(config.get('tempPath') as string, 'download', 'gcs', getPath(uri));
+		
+		await fs.mkdir(path.dirname(destination), { recursive: true });
+		
+		await getFile(uri).download({ destination });
+		
+		return destination;
+	}, `download gcs file "${uri}"`);
 }
 
 async function downloadAll(uri: string, destination?: string): Promise<void> {

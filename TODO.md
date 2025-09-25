@@ -50,7 +50,6 @@
 - **Review value assignment in DataSourceCatalogField** - Unclear if assignment to this._value is needed (`src/entities/catalog/DataSourceCatalogField.ts:87`)
 
 ## Bugs
-- Profiling for file ingestion
-- [DEBUG] undefined Caching storage file "data/unstructured/documents.txt"
-- DataSourceItem catalog field output. DataSourceItem should have a toJSON method.
-- dataType is unnecessary when target is `file`
+- read() should be on the Platform (which should be called Source)
+- the read() method on the Target class should be called process()
+- Add "API" type DataSource

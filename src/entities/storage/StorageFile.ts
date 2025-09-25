@@ -63,7 +63,7 @@ export default abstract class StorageFile<T> {
 		try {
 			await fs.access(this.localPath);
 		} catch (error) {
-			Debug.log(`Caching storage file "${this.remotePath}"`);
+			Debug.log(`Caching storage file "${this.remotePath}"`, 'FS');
 			await gcs.download(this.uri, this.localPath);
 		}
 	}
@@ -75,7 +75,7 @@ export default abstract class StorageFile<T> {
 	protected async writeText(text: string): Promise<void> {
 		await Promise.all([
 			gcs.write(this.uri, text),
-			fs.unlink(this.localPath).catch(),
+			fs.unlink(this.localPath).catch(() => {}),
 		]);
 	}
 }

@@ -1,10 +1,11 @@
 import CatalogField from './CatalogField';
-import DataSources from '../data-sources/DataSources';
-import Debug from '../../utils/Debug';
 import DataSource from '../data-sources/DataSource';
+import DataSources from '../data-sources/DataSources';
 import StructuredDataSourceBehavior from '../data-sources/data-type/StructuredDataSourceBehavior';
-import { JsonField, JsonObject } from '../../types/common';
 import DataSourceItem from '../data-sources/platform/DataSourceItem';
+import CustomError from '../error-handling/CustomError';
+import Debug from '../../utils/Debug';
+import { JsonField } from '../../types/common';
 
 export default class DataSourceCatalogField extends CatalogField {
 	static readonly Configuration: {
@@ -30,7 +31,7 @@ export default class DataSourceCatalogField extends CatalogField {
 	}
 
 	public get dataSourceId(): string {
-		if (!this.configuration.dataSource) throw new Error(`Missing 'dataSource' property for data field "${this.id}"`);
+		if (!this.configuration.dataSource) throw new CustomError(`Missing 'dataSource' property for data field "${this.id}"`);
 		
 		return this.configuration.dataSource;
 	}
@@ -82,15 +83,7 @@ export default class DataSourceCatalogField extends CatalogField {
 		
 		const value = await this.dataSource.query({ input, filter, ...this.queryParameters });
 
-		let result;
-		if (value instanceof Object && Symbol.asyncIterator in value) {
-			result = [];
-			for await (const item of value) result.push(item);
-		} else {
-			result = value;
-		}
-		
 		// TODO do we need to assign to this._value here?
-		return this._value = result;
+		return this._value = value;
 	}
 }

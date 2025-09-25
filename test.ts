@@ -1,8 +1,27 @@
 require('dotenv/config');
 const router = require('./src/modules/router.ts').default;
-const mantraConfig = require('./config/mantra.json');
+// const config = require('./config/mantra.json');
+const config = require('./config/test.json');
 
 process.env.NODE_ENV = 'dev';
+
+async function authentication() {
+	console.log('Warming up GCS authentication...');
+	const startTime = performance.now();
+	
+	try {
+		const gcs = require('./src/services/gcs.ts').default;
+		
+		try {
+			await gcs.list('gs://monks-mantra/');
+		} catch (error) {
+		}
+		
+		console.log(`GCS authentication warmup completed in ${Math.floor(performance.now() - startTime)}ms`);
+	} catch (error) {
+		console.warn('GCS authentication failed:', error.message);
+	}
+}
 
 async function invoke(body) {
 	let response;
@@ -23,7 +42,31 @@ async function invoke(body) {
 	return response;
 }
 
-// (async function () {
+async function ingest(namespace, body) {
+	let response;
+	await router({
+		method: 'POST',
+		path: `/ingest/${namespace}`,
+		body,
+		get: () => '',
+	}, {
+		// send: v => console.dir(v, { depth: 10 }),
+		send: v => {
+			response = v;
+			console.dir(v, { depth: 10 });
+		},
+		status: console.log,
+		set: () => undefined
+	});
+	return response;
+}
+
+(async function () {
+	
+	await authentication();
+	
+	await invoke({ config });
+
 // 	await invoke({
 // 		"config": { ...mantraConfig, output: [
 // 				"followUp",
@@ -47,7 +90,6 @@ async function invoke(body) {
 // 	});
 // }());
 
-// (async function () {
 // 	await invoke({
 // 		"config": {
 // 			"instructionsPath": "gs://monks-mantra/instructions",
@@ -543,61 +585,61 @@ async function invoke(body) {
 // 			"now": "2025-09-19T08:18:49.752Z"
 // 		}
 // 	});
-// }());
 
-(async function () {
-	await invoke({
-		"config": {
-			"agents": {
-				"info": {
-					"instructions": "You will receive the contents of a folder with files. These files contain various documents.\n\nWhen writing the filenames extract the full list of names, everything needs to be included. If there is any spreadSheet it also need to be analyzed and included in the response.",
-					"context": [
-						"documents"
-					]
-				}
-			},
-			"catalog": {
-				"request": {
-					"type": "input",
-					"field": "request",
-					"required": true
-				},
-				"infoString": {
-					"type": "output",
-					"agent": "info",
-					"field": "infoString",
-					"example": {
-						"report": {
-							"summary": "Brief overview of all documents analyzed",
-							"key_themes": ["theme1", "theme2", "theme3"],
-							"main_topics": ["topic1", "topic2"],
-							"important_findings": "Detailed analysis of significant elements found across all documents",
-							"total_files_processed": 0
-						},
-						"document_filenames": ["filename1.txt", "filename2.txt"]
-					}
-				},
-				"documents": {
-					"type": "data",
-					"dataSource": "documents"
-				}
-			},
-			"data-sources": {
-				"documents": {
-					"uri": "https://drive.google.com/drive/u/3/folders/1Ldqn9G5kJRCgPSaDBSO0QvFYoHQG0Duz",
-					"platform": "drive",
-					"dataType": "text",
-					"target": "raw",
-					"cache": false,
-					"folder": true
-				}
-			},
-			"output": [
-				"infoString",
-			]
-		},
-		"fields": {
-			"request": "analysis"
-		}
-	});
+	// await invoke({
+	// 	"config": {
+	// 		"agents": {
+	// 			"info": {
+	// 				"instructions": "You will receive the contents of a folder with files. These files contain various documents.\n\nWhen writing the filenames extract the full list of names, everything needs to be included. If there is any spreadSheet it also need to be analyzed and included in the response.",
+	// 				"context": [
+	// 					"documents"
+	// 				]
+	// 			}
+	// 		},
+	// 		"catalog": {
+	// 			"request": {
+	// 				"type": "input",
+	// 				"field": "request",
+	// 				"required": true
+	// 			},
+	// 			"infoString": {
+	// 				"type": "output",
+	// 				"agent": "info",
+	// 				"field": "infoString",
+	// 				"example": {
+	// 					"report": {
+	// 						"summary": "Brief overview of all documents analyzed",
+	// 						"key_themes": ["theme1", "theme2", "theme3"],
+	// 						"main_topics": ["topic1", "topic2"],
+	// 						"important_findings": "Detailed analysis of significant elements found across all documents",
+	// 						"total_files_processed": 0
+	// 					},
+	// 					"document_filenames": ["filename1.txt", "filename2.txt"]
+	// 				}
+	// 			},
+	// 			"documents": {
+	// 				"type": "data",
+	// 				"dataSource": "documents"
+	// 			}
+	// 		},
+	// 		"data-sources": {
+	// 			"documents": {
+	// 				"uri": "https://drive.google.com/drive/u/3/folders/1Ldqn9G5kJRCgPSaDBSO0QvFYoHQG0Duz",
+	// 				"platform": "drive",
+	// 				"dataType": "text",
+	// 				"target": "raw",
+	// 				"cache": false,
+	// 				"folder": true,
+	// 				"namespace": "luis"
+	// 			}
+	// 		},
+	// 		"output": [
+	// 			"infoString",
+	// 		]
+	// 	},
+	// 	"fields": {
+	// 		"request": "analysis"
+	// 	}
+	// });
+	
 }());

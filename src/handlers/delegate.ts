@@ -1,6 +1,8 @@
+import CustomError from '../entities/error-handling/CustomError';
+
 export default async ({}, { fn, args = [] }: { fn: string; args?: any[] }): Promise<void> => {
 	if (!fn.match(/^[\w/]+(\.\w+)?$/)) {
-		throw new Error(`Invalid delegate function format: "${fn}". Must be either [module name] or [module name].[function name]. Module name may contain forward slashes for pathing.`);
+		throw new CustomError(`Invalid delegate function format: "${fn}". Must be either [module name] or [module name].[function name]. Module name may contain forward slashes for pathing.`);
 	}
 	
 	const [moduleName, functionName] = fn.split('.');
@@ -8,11 +10,11 @@ export default async ({}, { fn, args = [] }: { fn: string; args?: any[] }): Prom
 	try {
 		module = await import(`../modules/${moduleName}`);
 	} catch (error) {
-		throw new Error(`Invalid delegate function. Module "${moduleName}" could not be loaded.`);
+		throw new CustomError(`Invalid delegate function. Module "${moduleName}" could not be loaded.`);
 	}
 	
 	if (functionName && (!module[functionName] || typeof module[functionName] !== 'function')) {
-		throw new Error(`Invalid delegate function. Function "${functionName} does not exist on module "${moduleName}".`);
+		throw new CustomError(`Invalid delegate function. Function "${functionName} does not exist on module "${moduleName}".`);
 	}
 	
 	await (functionName ? module[functionName] : module.default)(...args);

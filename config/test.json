@@ -41,17 +41,14 @@
 	},
 	"data-sources": {
 		"documents": {
+			"namespace": "test",
 			"uri": "https://drive.google.com/drive/folders/1o8kMT0Fra7KpZHkB9Ud7CkjbzlEaJtFG",
 			"platform": "drive",
-			"type": "text:raw",
-			"dataType": "text",
 			"target": "raw",
 			"folder": true
 		}
 	},
 	"output": [
-		"documents",
-		"names",
-		"helloString"
+		"documents"
 	]
 }

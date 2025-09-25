@@ -1,13 +1,13 @@
 import fs from 'node:fs/promises';
 import DataSourceItem from './DataSourceItem';
+import DataSource from '../DataSource';
 import docs from '../../../services/docs';
 import drive, { FileMetaData } from '../../../services/drive';
 import sheets from '../../../services/sheets';
-import ErrorLog from '../../../utils/ErrorLog';
 import pdf from '../../../utils/pdf';
-import UnsupportedError from '../../../utils/UnsupportedError';
+import UnsupportedError from '../../error-handling/UnsupportedError';
 import xlsx from '../../../utils/xlsx';
-import { SpreadSheet, ValueOf } from '../../../types/common';
+import { JsonField, JsonObject, SpreadSheet, ValueOf } from '../../../types/common';
 
 const LLM_SUPPORTED_MIME_TYPES = [
 	'application/pdf',
@@ -19,13 +19,12 @@ const LLM_SUPPORTED_MIME_TYPES = [
 
 export default class DriveDataSourceItem extends DataSourceItem {
 	static readonly TextContent: string;
-
 	static readonly DataContent: SpreadSheet;
-
+	
 	private readonly _metadata: FileMetaData;
 	private _localFile: Promise<string> | string;
 
-	public constructor(dataSource: any, metadata: any) {
+	public constructor(dataSource: DataSource, metadata: FileMetaData) {
 		super(dataSource);
 		this._metadata = metadata;
 	}
@@ -53,7 +52,7 @@ export default class DriveDataSourceItem extends DataSourceItem {
 		
 		const dataType = mapping[this.mimeType];
 		
-		if (!dataType) ErrorLog.throw(new UnsupportedError('Google Drive data source mime type', this.mimeType, mapping));
+		if (!dataType) throw new UnsupportedError('Google Drive data source mime type', this.mimeType, Object.keys(mapping));
 		
 		return dataType;
 	}
@@ -93,7 +92,7 @@ export default class DriveDataSourceItem extends DataSourceItem {
 			return buffer.toString();
 		}
 		
-		ErrorLog.throw(new UnsupportedError('mime type for text extraction', metadata.mimeType));
+		throw new UnsupportedError('mime type for text extraction', metadata.mimeType);
 	}
 	
 	public async toData(): Promise<typeof DriveDataSourceItem.DataContent> {
@@ -108,6 +107,10 @@ export default class DriveDataSourceItem extends DataSourceItem {
 		
 		if (metadata.mimeType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') return await xlsx.getData(file);
 		
-		ErrorLog.throw(new UnsupportedError('mime type for data extraction', metadata.mimeType));
+		throw new UnsupportedError('mime type for data extraction', metadata.mimeType);
+	}
+	
+	public toJSON(): JsonField {
+		return this.metadata as JsonField;
 	}
 }
