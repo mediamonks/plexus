@@ -6,11 +6,9 @@ export default class StorageTextFile extends StorageFile<string> {
 	protected readonly _extension = 'txt';
 	
 	public async read(): Promise<string> {
-		return Profiler.run(async () => {
-			await this.cache();
-			const buffer = await fs.readFile(this.localPath);
-			return buffer.toString();
-		}, `read file "${this.remotePath}"`);
+		await this.cache();
+		const buffer = await fs.readFile(this.localPath);
+		return buffer.toString();
 	}
 
 	public async write(contents: string): Promise<void> {

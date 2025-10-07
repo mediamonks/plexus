@@ -21,7 +21,7 @@ export default class Profiler {
 	public static run<T>(fn: () => T, label?: string): T;
 	public static run<T>(fn: () => T, args: any[], label?: string): T;
 
-	public static run<T, K>(fn: () => T, argsOrLabel?: K[] | string, label?: string): T {
+	public static async run<T, K>(fn: () => T, argsOrLabel?: K[] | string, label?: string): Promise<T> {
 		if (typeof argsOrLabel === 'string') {
 			label = argsOrLabel;
 			argsOrLabel = [];
@@ -30,13 +30,9 @@ export default class Profiler {
 		label = label ?? fn.name;
 		
 		const start = performance.now();
-		const retval = fn.apply(null, argsOrLabel);
+		const retval = await fn.apply(null, argsOrLabel);
 
-		if (retval instanceof Promise) retval.then(() => this.log(label, start)).catch(error => {
-			this.log(label, start);
-			throw error;
-		});
-		else this.log(label, start);
+		this.log(label, start);
 
 		return retval;
 	}

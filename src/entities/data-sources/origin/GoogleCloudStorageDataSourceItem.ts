@@ -2,16 +2,13 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import DataSourceItem from './DataSourceItem';
 import DataSource from '../DataSource';
+import UnsupportedError from '../../error-handling/UnsupportedError';
 import gcs from '../../../services/gcs';
 import jsonl from '../../../utils/jsonl';
 import pdf from '../../../utils/pdf';
-import UnsupportedError from '../../error-handling/UnsupportedError';
 import { JsonField, JsonObject, ValueOf } from '../../../types/common';
 
-export default class GcsDataSourceItem extends DataSourceItem {
-	static readonly TextContent: string;
-	static readonly DataContent: AsyncGenerator<JsonObject>;
-
+export default class GoogleCloudStorageDataSourceItem extends DataSourceItem<string, AsyncGenerator<JsonObject>> {
 	private readonly _uri: string;
 	
 	public constructor(dataSource: DataSource, uri: string) {
@@ -32,11 +29,11 @@ export default class GcsDataSourceItem extends DataSourceItem {
 		return path.basename(this.uri);
 	}
 	
-	protected detectDataType(): ValueOf<typeof DataSourceItem.DATA_TYPE> {
+	protected detectDataType(): ValueOf<typeof DataSource.DATA_TYPE> {
 		return {
-			pdf: DataSourceItem.DATA_TYPE.UNSTRUCTURED,
-			txt: DataSourceItem.DATA_TYPE.UNSTRUCTURED,
-			jsonl: DataSourceItem.DATA_TYPE.STRUCTURED,
+			pdf: DataSource.DATA_TYPE.UNSTRUCTURED,
+			txt: DataSource.DATA_TYPE.UNSTRUCTURED,
+			jsonl: DataSource.DATA_TYPE.STRUCTURED,
 		}[this.extension];
 	}
 	
@@ -44,7 +41,7 @@ export default class GcsDataSourceItem extends DataSourceItem {
 		return this.allowCache ? await gcs.cache(this.uri) : gcs.download(this.uri);
 	}
 	
-	public async toText(): Promise<typeof GcsDataSourceItem.TextContent> {
+	public async toText(): Promise<string> {
 		const file = await this.getLocalFile();
 		
 		const mapping = {
@@ -57,7 +54,7 @@ export default class GcsDataSourceItem extends DataSourceItem {
 		return await mapping[this.extension]();
 	}
 	
-	public async toData(): Promise<typeof GcsDataSourceItem.DataContent> {
+	public async toData(): Promise<AsyncGenerator<JsonObject>> {
 		const file = await this.getLocalFile();
 		return jsonl.read(file);
 	}

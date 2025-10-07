@@ -242,7 +242,7 @@ Top-level configuration options that apply across the entire platform:
 - **`platform`** (string): Primary AI platform ("google", "azure", "openai")
 - **`embeddingPlatform`** (string): AI platform for text embeddings ("google", "azure", "openai")
 - **`waitForThreadUpdate`** (boolean): Whether to wait for the conversation thread to be updated before returning a response. Enabling this will increase response time, but will guarantee conversation consistency in scenarios where the `invoke` endpoint is called in quick succession.
-- **`instructionsPath`** (string): Root GCS path for agent and digest instruction files
+- **`instructionsPath`** (string): Root GOOGLE_CLOUD_STORAGE path for agent and digest instruction files
 - **`output`** (array): List of output fields to return
 - **`postback`** (object): The webhook for receiving status messages during invocation. It will receive POST requests with a payload of the following format: `{ "status": "Some operation", "isRunning": true }`.
   - **`url`** (string): URL
@@ -276,7 +276,7 @@ Defines behavior and context for each AI agent in your workflow. Each agent is i
 ```
 
 **Agent Properties:**
-- **`instructions`** (string): GCS path to the file containing the instructions (system prompt) for the agent, or the literal instructions themselves. If omitted, the agent will attempt to read its instructions from a path constructed as follows: `{instructionsPath from global config}/{agent id}.txt`. **Note**: input and output format instructions are automatically added by Plexus, based on the Catalog configuration.
+- **`instructions`** (string): GOOGLE_CLOUD_STORAGE path to the file containing the instructions (system prompt) for the agent, or the literal instructions themselves. If omitted, the agent will attempt to read its instructions from a path constructed as follows: `{instructionsPath from global config}/{agent id}.txt`. **Note**: input and output format instructions are automatically added by Plexus, based on the Catalog configuration.
 - **`context`** (array): List of context fields the agent should receive.
 - **`temperature`** (number, optional): AI model temperature setting (0.0-1.0).
 - **`useHistory`** (boolean, optional): Whether to provide the agent with the conversation history.
@@ -366,9 +366,9 @@ Defines available data sources and their properties:
 ```
 
 **Data Source Properties:**
-- **`uri`** (string): The URI pointing to the data source, can be a Google Drive URL, or a GCS path. A URI can contain catalog field values, of the form `{fielName}`, which makes the data source dynamic.
+- **`uri`** (string): The URI pointing to the data source, can be a Google Drive URL, or a GOOGLE_CLOUD_STORAGE path. A URI can contain catalog field values, of the form `{fielName}`, which makes the data source dynamic.
 - **`target`** (string): Target for the data source: "raw" for raw text or data, "vector" for vector embeddings, "file" for unprocessed files (to feed as-is into an LLM, currently supported for Google GenAI only), "digest" for AI-generated summaries ("text" only).
-- **`dataType`** (string, optional): Type of data in the source: "text" for unstructured data, "data" for structured data. Required for `target` types: "raw" and "vector".
+- **`dataType`** (string, optional): Type of data in the source: "text" for unstructured data, "data" for structured data. Required for `target` types: "raw" and "vector". Ignored for `digest` and `file`.
 - **`namespace`** (string, optional): Logical grouping namespace, only used for batch ingestion.
 - **`platform`** (string, optional): Storage platform ("gcs", "drive", etc.), will be derived from the URI if not specified.
 - **`folder`** (boolean, optional): Whether the data source is a folder. Detected if not specified.
@@ -454,7 +454,7 @@ Google Generative AI (Gemini) configuration:
 - **`embeddingModel`** (string): Embedding model name
 - **`embeddingLocation`** (string, optional): Region for embedding API
 - **`quotaDelayMs`** (number, optional): Delay between API calls for quota management
-- **`safetySettings`** (array): Content safety configuration
+- **`safetySettings`** (array): Contents safety configuration
 	- **`category`** (string): Safety category
 	- **`threshold`** (string): Blocking threshold
 

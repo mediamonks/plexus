@@ -1,14 +1,17 @@
-import StorageFile from './StorageFile';
+import StorageFile, { StorageFileType } from './StorageFile';
 import StorageDataFile from './StorageDataFile';
 import StorageTextFile from './StorageTextFile';
 import UnsupportedError from '../error-handling/UnsupportedError';
 
+type TextFileTypes = typeof StorageFile.TYPE.DIGEST_INSTRUCTIONS | typeof StorageFile.TYPE.AGENT_INSTRUCTIONS | typeof StorageFile.TYPE.UNSTRUCTURED_DATA;
+
 export default class Storage {
 	private static readonly _storageFiles = {};
 	
+	public static get(type: TextFileTypes, name: string): StorageTextFile;
 	public static get(type: typeof StorageFile.TYPE.STRUCTURED_DATA, name: string): StorageDataFile;
-	public static get(type: typeof StorageFile.TYPE.DIGEST_INSTRUCTIONS | typeof StorageFile.TYPE.AGENT_INSTRUCTIONS | typeof StorageFile.TYPE.UNSTRUCTURED_DATA, name: string): StorageTextFile;
-	public static get(type: string, name: string): StorageDataFile | StorageTextFile {
+	public static get(type: StorageFileType, name: string): StorageDataFile | StorageTextFile;
+	public static get(type: StorageFileType, name: string): StorageDataFile | StorageTextFile {
 		let storageFile = Storage._storageFiles[type]?.[name];
 		
 		if (!storageFile) {

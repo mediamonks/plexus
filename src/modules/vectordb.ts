@@ -25,7 +25,7 @@ async function generateEmbeddings(text: string, { forDocument = false }: { forDo
 	
 	if (cachedEmbeddings) return cachedEmbeddings;
 	
-	const embeddings = Profiler.run(forDocument
+	const embeddings = await Profiler.run(forDocument
 			? EMBEDDING_PLATFORMS[platform].generateDocumentEmbeddings
 			: EMBEDDING_PLATFORMS[platform].generateQueryEmbeddings,
 		[text]) as number[];

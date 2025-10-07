@@ -1,6 +1,6 @@
 import CatalogField from './CatalogField';
 import Agents from '../agents/Agents';
-import DataSourceItem from '../data-sources/platform/DataSourceItem';
+import DataSourceItem from '../data-sources/origin/DataSourceItem';
 import CustomError from '../error-handling/CustomError';
 import Debug from '../../utils/Debug';
 import { JsonField } from '../../types/common';
@@ -33,7 +33,7 @@ export default class OutputCatalogField extends CatalogField {
 		return agent;
 	}
 	
-	protected async populate(): Promise<JsonField | DataSourceItem[]> {
+	protected async populate(): Promise<JsonField | DataSourceItem<unknown, unknown>[]> {
 		Debug.log(`Populating output field "${this.id}"`, 'Catalog');
 		
 		const result = await Agents.get(this.agentId, this.catalog).invoke() as Record<string, JsonField>;

@@ -1,10 +1,11 @@
 import fs from 'node:fs';
+import IEntity from '../Entity';
 import Catalog from '../catalog/Catalog';
-import DataSourceItem from '../data-sources/platform/DataSourceItem';
+import DataSourceItem from '../data-sources/origin/DataSourceItem';
 import CustomError from '../error-handling/CustomError';
+import LLM from '../LLM';
 import Storage from '../storage/Storage';
 import StorageFile from '../storage/StorageFile';
-import llm from '../../modules/llm';
 import gcs from '../../services/gcs';
 import config from '../../utils/config';
 import Debug from '../../utils/Debug';
@@ -17,7 +18,7 @@ const INPUT_OUTPUT_TEMPLATE = fs
 	.readFileSync('./data/input-output-template.txt', 'utf8')
 	.toString();
 
-export default class Agent {
+export default class Agent implements IEntity {
 	public isReady: boolean = false;
 	private _baseInstructions: string;
 	private _catalog: Catalog;
@@ -31,8 +32,8 @@ export default class Agent {
 	private _temperature: number  = 0;
 
 	static readonly Configuration: {
+		readonly instructions: string;
 		readonly context?: readonly string[];
-		readonly instructions?: string;
 		readonly required?: readonly string[];
 		readonly useHistory?: boolean;
 		readonly temperature?: number | string;
@@ -84,7 +85,7 @@ export default class Agent {
 		return this._catalog;
 	}
 	
-	private async _mapFiles(value: JsonField | DataSourceItem[]): Promise<JsonField> {
+	private async _mapFiles(value: JsonField | DataSourceItem<unknown, unknown>[]): Promise<JsonField> {
 		if (!(value instanceof Array) || !(value[0] instanceof DataSourceItem)) return value as JsonField;
 		
 		const files = await Promise.all(value.map(item => item.getLocalFile()));
@@ -172,8 +173,8 @@ export default class Agent {
 		
 		const response = await status.wrap(`Running ${this.id} agent`, () =>
 			Profiler.run(() =>
-				llm.query(JSON.stringify(this._context, undefined, 2), {
-					systemInstructions: this.instructions,
+				LLM.query(JSON.stringify(this._context, undefined, 2), {
+					instructions: this.instructions,
 					temperature: this._temperature,
 					history: useHistory && History.instance,
 					structuredResponse: true,

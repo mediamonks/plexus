@@ -1,9 +1,16 @@
 import DataSource from './DataSource';
+import DigestTargetDataSource from './target/DigestTargetDataSource';
+import FileTargetDataSource from './target/FileTargetDataSource';
+import RawDataTargetDataSource from './target/RawDataTargetDataSource';
+import RawTextTargetDataSource from './target/RawTextTargetDataSource';
+import DataVectorTargetDataSource from './target/DataVectorTargetDataSource';
+import UnknownError from '../error-handling/UnknownError';
+import UnsupportedError from '../error-handling/UnsupportedError';
 import config from '../../utils/config';
 import hash from '../../utils/hash';
-import RequestContext from '../../utils/RequestContext';
-import UnknownError from '../error-handling/UnknownError';
 import Profiler from '../../utils/Profiler';
+import RequestContext from '../../utils/RequestContext';
+import { JsonObject } from '../../types/common';
 
 export default class DataSources {
 	static readonly Configuration: Record<string, typeof DataSource.Configuration>;
@@ -31,7 +38,7 @@ export default class DataSources {
 		
 		const key = hash(id, JSON.stringify(dataSourceConfiguration));
 		
-		this.dataSources[id] = this._dataSources[key] ?? new DataSource(id, dataSourceConfiguration);
+		this.dataSources[id] = this._dataSources[key] ?? this.create(id, dataSourceConfiguration);
 		
 		if (!this.dataSources[id].isDynamic) this._dataSources[key] = this.dataSources[id];
 		
@@ -44,5 +51,37 @@ export default class DataSources {
 			
 			return Profiler.run(() => this.get(id).ingest(), `ingest data source "${id}"`);
 		}));
+	}
+	
+	private static create(id: string, configuration: JsonObject): DataSource {
+		const { target, dataType } = DataSource.parseConfiguration(configuration);
+		
+		let instance = {
+			[DataSource.TARGET.DIGEST]: new DigestTargetDataSource(id, configuration),
+			[DataSource.TARGET.FILE]: new FileTargetDataSource(id, configuration),
+			[DataSource.TARGET.FILES]: new FileTargetDataSource(id, configuration), // TODO for backwards compatibility
+			[DataSource.TARGET.RAW]: {
+				[DataSource.DATA_TYPE.STRUCTURED]: new RawDataTargetDataSource(id, configuration),
+				[DataSource.DATA_TYPE.UNSTRUCTURED]: new RawTextTargetDataSource(id, configuration),
+			},
+			[DataSource.TARGET.VECTOR]: {
+				[DataSource.DATA_TYPE.STRUCTURED]: new DataVectorTargetDataSource(id, configuration),
+				[DataSource.DATA_TYPE.UNSTRUCTURED]: new DataVectorTargetDataSource(id, configuration),
+			},
+		}[target];
+		
+		if (!instance) {
+			throw new UnsupportedError('data source target', target, Object.values(DataSource.TARGET));
+		}
+		
+		if (!(instance instanceof DataSource)) {
+			instance = instance[dataType];
+			
+			if (!instance) {
+				throw new UnsupportedError(`data source data type for target ${target}`, dataType, Object.values(DataSource.DATA_TYPE));
+			}
+		}
+		
+		return instance;
 	}
 }

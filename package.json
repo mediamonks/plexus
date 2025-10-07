@@ -24,12 +24,10 @@
 	},
 	"dependencies": {
 		"@azure/msal-node": "^2.6.0",
-		"@google-cloud/aiplatform": "^3.34.0",
 		"@google-cloud/firestore": "^7.11.0",
 		"@google-cloud/functions-framework": "^3.4.5",
 		"@google-cloud/storage": "^7.15.2",
 		"@google-cloud/tasks": "^5.5.2",
-		"@google-cloud/vertexai": "^1.9.3",
 		"@google/genai": "^1.16.0",
 		"@lancedb/lancedb": "^0.16.0",
 		"@langchain/core": "^0.3.72",
@@ -43,18 +41,18 @@
 		"open": "^10.1.2",
 		"openai": "^4.82.0",
 		"pdf-parse-debugging-disabled": "^1.1.1",
-		"ts-node": "^10.9.2",
-		"tsx": "^4.20.5",
 		"turndown": "^7.2.0",
-		"typescript": "^5.9.2",
 		"uuid": "^11.1.0",
 		"xlsx": "^0.18.5"
 	},
 	"devDependencies": {
 		"@google-cloud/secret-manager": "^6.0.1",
 		"@types/mime-types": "^3.0.1",
+		"@types/node": "^24.7.0",
 		"express": "^4.21.2",
 		"minimist": "^1.2.8",
+		"ts-node": "^10.9.2",
+		"typescript": "^5.9.2",
 		"yaml": "^2.7.0"
 	},
 	"ts-node": {

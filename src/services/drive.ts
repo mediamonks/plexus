@@ -22,7 +22,7 @@ export default async () => {
 	const drive = google.drive({ version: 'v3', auth });
 	
 	async function createFile(name: string, folderId: string, mimeType: string, body?: Buffer | Readable | string, mediaMimeType?: string): Promise<FileMetaData> {
-		await workspace.quotaDelay(workspace.SERVICE.DRIVE, workspace.OPERATION.WRITE);
+		await workspace.quotaDelay(workspace.SERVICE.GOOGLE_DRIVE, workspace.OPERATION.WRITE);
 		
 		const response = await drive.files.create({
 			requestBody: {
@@ -62,7 +62,7 @@ export default async () => {
 			parents: [parentFolderId],
 		};
 		
-		await workspace.quotaDelay(workspace.SERVICE.DRIVE, workspace.OPERATION.WRITE);
+		await workspace.quotaDelay(workspace.SERVICE.GOOGLE_DRIVE, workspace.OPERATION.WRITE);
 		
 		try {
 			const folder = await drive.files.create({
@@ -204,7 +204,7 @@ export default async () => {
 			
 			Debug.log(`Importing file "${file.name}"`, 'Google Drive');
 			
-			await workspace.quotaDelay(workspace.SERVICE.DRIVE, workspace.OPERATION.WRITE);
+			await workspace.quotaDelay(workspace.SERVICE.GOOGLE_DRIVE, workspace.OPERATION.WRITE);
 			
 			const fileContent = await drive.files.get({
 				fileId: file.id,
@@ -283,7 +283,7 @@ export default async () => {
 			name = file.data.name;
 		}
 		
-		await workspace.quotaDelay(workspace.SERVICE.DRIVE, workspace.OPERATION.WRITE);
+		await workspace.quotaDelay(workspace.SERVICE.GOOGLE_DRIVE, workspace.OPERATION.WRITE);
 		
 		const response = await drive.files.create({
 			requestBody: {
@@ -353,7 +353,7 @@ export default async () => {
 	}
 	
 	async function trashItem(id): Promise<void> {
-		await workspace.quotaDelay(workspace.SERVICE.DRIVE, workspace.OPERATION.WRITE);
+		await workspace.quotaDelay(workspace.SERVICE.GOOGLE_DRIVE, workspace.OPERATION.WRITE);
 		
 		await drive.files.update({
 			fileId: id,
@@ -363,7 +363,7 @@ export default async () => {
 	}
 	
 	async function deleteFile(id): Promise<void> {
-		await workspace.quotaDelay(workspace.SERVICE.DRIVE, workspace.OPERATION.WRITE);
+		await workspace.quotaDelay(workspace.SERVICE.GOOGLE_DRIVE, workspace.OPERATION.WRITE);
 		
 		await drive.files.delete({
 			fileId: id,

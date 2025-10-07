@@ -9,15 +9,15 @@ export default abstract class StorageFile<T> {
 	private readonly _type: string;
 
 	protected abstract readonly _extension: string;
-
-	static readonly TYPE = {
+	
+	public static readonly TYPE = {
 		AGENT_INSTRUCTIONS: 'AGENT_INSTRUCTIONS',
 		DIGEST_INSTRUCTIONS: 'DIGEST_INSTRUCTIONS',
 		STRUCTURED_DATA: 'STRUCTURED_DATA',
 		UNSTRUCTURED_DATA: 'UNSTRUCTURED_DATA',
-	} as const
+	} as const;
 	
-	protected constructor(name: string, type: string) {
+	constructor(name: string, type: StorageFileType) {
 		this._name = name;
 		this._type = type;
 	}
@@ -79,3 +79,5 @@ export default abstract class StorageFile<T> {
 		]);
 	}
 }
+
+export type StorageFileType = typeof StorageFile.TYPE[keyof typeof StorageFile.TYPE];
