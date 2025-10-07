@@ -2,10 +2,10 @@ import CatalogField from './CatalogField';
 import DataSourceCatalogField from './DataSourceCatalogField';
 import InputCatalogField from './InputCatalogField';
 import OutputCatalogField from './OutputCatalogField';
-import config from '../../utils/config';
-import RequestContext from '../../utils/RequestContext';
 import UnknownError from '../error-handling/UnknownError';
 import UnsupportedError from '../error-handling/UnsupportedError';
+import config from '../../utils/config';
+import RequestContext from '../../utils/RequestContext';
 import { JsonObject } from '../../types/common';
 
 export default class Catalog {

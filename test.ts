@@ -1,7 +1,7 @@
 require('dotenv/config');
 const router = require('./src/modules/router.ts').default;
-// const config = require('./config/mantra.json');
-const config = require('./config/test.json');
+const config = require('./config/mantra.json');
+// const config = require('./config/test.json');
 
 process.env.NODE_ENV = 'dev';
 
@@ -65,534 +65,26 @@ async function ingest(namespace, body) {
 	
 	await authentication();
 	
-	await invoke({ config });
-
-// 	await invoke({
-// 		"config": { ...mantraConfig, output: [
-// 				"followUp",
-// 				"outputDeliverables",
-// 				"validatedCriticalProductionBlockers",
-// 				"validatedImportantClarifications",
-// 				"validatedBriefInconsistencies"
-// 		] },
-// 		"fields": {
-// 			"briefFolderUri": "https://drive.google.com/drive/folders/1zOmWGFpsv6gCAehI7TIOduXAsCllWwdL",
-// 			"additionalInfo": [
-// t				"Localization of the EN USA assets, into Spanish-  USA, English  - Canadian, French - Canadian.\nSource files and visual references will be provided later. \nWe need to create the list of deliverables from the brief",
-// 				":60, :30, and :15  -  are durations of the video, please put each duration separately\nplease make a separate line for each market US ES, CA FR, CA EN,\nUS EN assets are masters (source files) and will be provided next week\n",
-// 				"TV, OLV/POLV, Cinema, Social - are channels, put them separately, assume that each video in each duration will be exported for all of them\nassume 16x9 ratio for TV, OLV, Cinema, and 9x16 and 1x1 for Social",
-// 				".\n\n",
-// 				"the brief is added\nplease make a breakdown of deliverables",
-// 				"."
-// 			],
-// 			"now": "2025-09-11T08:56:46.039Z"
-// 		}
-// 	});
-// }());
-
-// 	await invoke({
-// 		"config": {
-// 			"instructionsPath": "gs://monks-mantra/instructions",
-// 			"agents": {
-// 				"gap-identification": {
-// 					"context": [
-// 						"briefFiles",
-// 						"additionalInfo",
-// 						"now",
-// 						"glossary-assets"
-// 					]
-// 				},
-// 				"gap-validation": {
-// 					"context": [
-// 						"criticalProductionBlockers",
-// 						"importantClarifications",
-// 						"briefInconsistencies",
-// 						"briefFiles",
-// 						"additionalInfo",
-// 						"glossary-assets"
-// 					]
-// 				},
-// 				"follow-up-generation": {
-// 					"context": [
-// 						"validatedCriticalProductionBlockers",
-// 						"validatedImportantClarifications",
-// 						"validatedBriefInconsistencies",
-// 						"glossary-assets"
-// 					]
-// 				},
-// 				"info-extraction": {
-// 					"context": [
-// 						"briefFiles",
-// 						"additionalInfo",
-// 						"now",
-// 						"glossary-assets"
-// 					]
-// 				},
-// 				"deliverables-normalization": {
-// 					"context": [
-// 						"inputDeliverables",
-// 						"ratecardFile",
-// 						"ratecardData",
-// 						"glossary-assets"
-// 					]
-// 				},
-// 				"complexity-estimation": {
-// 					"context": [
-// 						"inputDeliverables",
-// 						"inputGaps",
-// 						"glossary-assets"
-// 					]
-// 				},
-// 				"quote-generation": {
-// 					"context": [
-// 						"normalizedDeliverables",
-// 						"complexity",
-// 						"additionalInfo",
-// 						"ratecardFile",
-// 						"ratecardData",
-// 						"glossary-assets"
-// 					]
-// 				},
-// 				"timeline-generation": {
-// 					"context": [
-// 						"complexity",
-// 						"additionalInfo",
-// 						"historicalTimelines",
-// 						"glossary-assets"
-// 					]
-// 				},
-// 				"final-quote-generation": {
-// 					"context": [
-// 						"quoteData",
-// 						"timelineData",
-// 						"additionalInfo",
-// 						"startDate",
-// 						"endDate",
-// 						"glossary-assets"
-// 					]
-// 				}
-// 			},
-// 			"catalog": {
-// 				"now": {
-// 					"type": "input",
-// 					"field": "now",
-// 					"example": "The current date and time.",
-// 					"required": true
-// 				},
-// 				"brief": {
-// 					"type": "data",
-// 					"dataSource": "mantra-brief",
-// 					"example": "The text of the project brief."
-// 				},
-// 				"briefData": {
-// 					"type": "data",
-// 					"dataSource": "mantra-brief-data",
-// 					"example": "Any data related to the project brief."
-// 				},
-// 				"briefFiles": {
-// 					"type": "data",
-// 					"dataSource": "mantra-brief-files",
-// 					"example": "List of files related to the project brief. (Contents sent separately.)"
-// 				},
-// 				"briefFolderId": {
-// 					"type": "input",
-// 					"field": "briefFolderId",
-// 					"example": "The ID of the Google Drive folder containing the project brief.",
-// 					"required": true
-// 				},
-// 				"briefFolderUri": {
-// 					"type": "input",
-// 					"field": "briefFolderUri",
-// 					"example": "The URI to the Google Drive folder containing the project brief.",
-// 					"required": true
-// 				},
-// 				"additionalInfo": {
-// 					"type": "input",
-// 					"field": "additionalInfo",
-// 					"example": [
-// 						"Optional additional information about the brief and the project in general."
-// 					]
-// 				},
-// 				"criticalProductionBlockers": {
-// 					"type": "output",
-// 					"agent": "gap-identification",
-// 					"field": "critical_production_blockers",
-// 					"example": [
-// 						{
-// 							"gap": "Specific missing information",
-// 							"relevance": "Why this matters for the specific deliverables requested",
-// 							"production_impact": "Specific explanation of how this blocks production"
-// 						}
-// 					]
-// 				},
-// 				"importantClarifications": {
-// 					"type": "output",
-// 					"agent": "gap-identification",
-// 					"field": "important_clarifications",
-// 					"example": [
-// 						{
-// 							"gap": "Specific missing information",
-// 							"relevance": "Why this matters for the specific deliverables requested",
-// 							"production_impact": "How this affects quality or efficiency"
-// 						}
-// 					]
-// 				},
-// 				"briefInconsistencies": {
-// 					"type": "output",
-// 					"agent": "gap-identification",
-// 					"field": "brief_inconsistencies",
-// 					"example": [
-// 						{
-// 							"inconsistency": "Conflicting information in brief",
-// 							"conflicting_elements": "Specific sections that contradict",
-// 							"production_impact": "How this creates confusion"
-// 						}
-// 					]
-// 				},
-// 				"validatedCriticalProductionBlockers": {
-// 					"type": "output",
-// 					"agent": "gap-validation",
-// 					"field": "critical_production_blockers",
-// 					"example": [
-// 						{
-// 							"gap": "Specific missing information",
-// 							"relevance": "Why this matters for the specific deliverables requested",
-// 							"production_impact": "Specific explanation of how this blocks production"
-// 						}
-// 					]
-// 				},
-// 				"validatedImportantClarifications": {
-// 					"type": "output",
-// 					"agent": "gap-validation",
-// 					"field": "important_clarifications",
-// 					"example": [
-// 						{
-// 							"gap": "Specific missing information",
-// 							"relevance": "Why this matters for the specific deliverables requested",
-// 							"production_impact": "How this affects quality or efficiency"
-// 						}
-// 					]
-// 				},
-// 				"validatedBriefInconsistencies": {
-// 					"type": "output",
-// 					"agent": "gap-validation",
-// 					"field": "brief_inconsistencies",
-// 					"example": [
-// 						{
-// 							"inconsistency": "Conflicting information in brief",
-// 							"conflicting_elements": "Specific sections that contradict",
-// 							"production_impact": "How this creates confusion"
-// 						}
-// 					]
-// 				},
-// 				"xratecardData": {
-// 					"type": "data",
-// 					"dataSource": "mantra-ratecard",
-// 					"example": "The full rate card (asset types, tier definitions, rates)."
-// 				},
-// 				"ratecardId": {
-// 					"type": "input",
-// 					"field": "ratecardId",
-// 					"example": "The ID of the Google Drive file containing the rate card."
-// 				},
-// 				"ratecardFile": {
-// 					"type": "data",
-// 					"dataSource": "mantra-ratecard-file",
-// 					"example": "Optional: The file containing the rate card. (Contents sent separately.)"
-// 				},
-// 				"ratecardData": {
-// 					"type": "input",
-// 					"field": "ratecardData",
-// 					"example": "Optional: The full rate card (asset types, tier definitions, rates)."
-// 				},
-// 				"inputGaps": {
-// 					"type": "input",
-// 					"field": "gaps",
-// 					"example": "The list of gaps in the brief.",
-// 					"required": true
-// 				},
-// 				"followUp": {
-// 					"type": "output",
-// 					"agent": "follow-up-generation",
-// 					"field": "followUp",
-// 					"example": "The generated email."
-// 				},
-// 				"outputDeliverables": {
-// 					"type": "output",
-// 					"agent": "info-extraction",
-// 					"field": "deliverables",
-// 					"example": [
-// 						{
-// 							"deliverable_number": "A unique identifier for each deliverable in the list. Used for tracking and referencing specific items. Example: 1, 2, 3, etc.. Always required",
-// 							"asset_name": "The main identifier/title of the content being created. Usually the campaign or project name. Example: \"Joy Ride\", \"Summer Campaign\". Always required",
-// 							"asset_type": "The fundamental type of content being created. Kept simple and standardized. Example: video, image, carousel, html, audio, copy. Always required\n",
-// 							"duration": "For video: the runtime in seconds. For other assets: can indicate number of seconds for animations. Example: 15s, 30s, 60s. Required for video and animation assets only",
-// 							"language": "The language version of the deliverable. Critical for localization projects. Example: English, French, Spanish. Required when project involves multiple languages",
-// 							"market": "The specific region or country the deliverable is intended for. Important for regional variations and localization. Example: US, CA (Canada). Required for regional/localized content",
-// 							"changes_needed": "Specifies what modifications are required. Descriptions of work needed. Example: \"Export per specs\", \"Localize the UI screen and end line super\". Required when modifications to base assets are needed",
-// 							"channel": "The platform or medium where the content will be published. Standardized terms for different distribution channels. Example: TV, Cinema, OLV/POV, Social. Always required",
-// 							"placement": "Specific location within a channel where content will appear. Particularly important for social media channels. Example: For Social - Feed, Stories, Reels, Carousel. Example: For Display - Homepage Banner, Sidebar. Required when specific placements need to be tracked",
-// 							"dimensions": "The exact pixel measurements of the deliverable. Written as width x height. Example: 1920x1080, 1080x1920. Required for all visual assets",
-// 							"ratio": "The aspect ratio of the deliverable. Particularly important for social media assets. Example: 16:9, 9:16, 1:1, 4:5. Required for all visual assets if the dimensions are not provided.",
-// 							"technical_specifications": "Technical delivery requirements. Standardized by channel type. Example: Broadcast specs, DCP specs, Digital specs. Requirements vary by channel and asset type",
-// 							"asset_copy": "Indicates if and what type of copy/text work is needed. Particularly important for localization. Example: \"Script copy transcreation\". Only required when copy/text work is needed",
-// 							"frames": "Only used for carousel-type content. Indicates number of frames/slides in the carousel. Example: 3, 4, 5 frames. Required only for carousel-type content",
-// 							"target_audience": "The intended viewer demographic. Helps inform creative decisions. Example: \"18-34 year olds\", \"Young professionals\". Required when specific demographic targeting is needed",
-// 							"delivery_deadline": "Format as 'YYYY-MM-DD' if exact date is given, or leave empty if not specified"
-// 						}
-// 					]
-// 				},
-// 				"inputDeliverables": {
-// 					"type": "input",
-// 					"field": "deliverables",
-// 					"example": "The list of deliverables.",
-// 					"required": true
-// 				},
-// 				"xdeliverablesId": {
-// 					"type": "input",
-// 					"field": "deliverablesId",
-// 					"example": "The ID of the Google Drive file containing the deliverables.",
-// 					"required": true
-// 				},
-// 				"xinputDeliverables": {
-// 					"type": "data",
-// 					"dataSource": "mantra-deliverables",
-// 					"example": "The list of deliverables."
-// 				},
-// 				"normalizedDeliverables": {
-// 					"type": "output",
-// 					"agent": "deliverables-normalization",
-// 					"field": "normalizedDeliverables",
-// 					"example": [
-// 						{
-// 							"deliverable": "exactly as received",
-// 							"number": "exactly as received",
-// 							"client_name": "exactly as received",
-// 							"asset_name": "exactly as received",
-// 							"asset_type": "exactly as received",
-// 							"placement": "exactly as received",
-// 							"duration": "exactly as received",
-// 							"creative_base": "exactly as received",
-// 							"changes_needed_on_creative_base": "exactly as received",
-// 							"asset_copy": "exactly as received",
-// 							"technical_specifications": "exactly as received",
-// 							"channel": "exactly as received",
-// 							"delivery_deadline": "exactly as received",
-// 							"target_audience": "exactly as received",
-// 							"normalized_asset_type": "The asset type as it occurs in the rate card",
-// 							"normalization_reasoning": "A justification for why normalized_asset_type was chosen to match asset_type"
-// 						}
-// 					]
-// 				},
-// 				"complexity": {
-// 					"type": "output",
-// 					"agent": "complexity-estimation",
-// 					"field": "complexity",
-// 					"example": [
-// 						{
-// 							"deliverable": "exactly as received",
-// 							"number": "exactly as received",
-// 							"client_name": "exactly as received",
-// 							"asset_name": "exactly as received",
-// 							"asset_type": "exactly as received",
-// 							"placement": "exactly as received",
-// 							"duration": "exactly as received",
-// 							"creative_base": "exactly as received",
-// 							"changes_needed_on_creative_base": "exactly as received",
-// 							"asset_copy": "exactly as received",
-// 							"technical_specifications": "exactly as received",
-// 							"channel": "exactly as received",
-// 							"delivery_deadline": "exactly as received",
-// 							"target_audience": "exactly as received",
-// 							"normalized_asset_type": "exactly as received",
-// 							"complexity_tier": "Very Simple | Simple | Medium | Complex | Other",
-// 							"complexity_reasoning": "A justification for why the chosen `complexity_tier` was selected"
-// 						}
-// 					]
-// 				},
-// 				"historicalTimelines": {
-// 					"type": "data",
-// 					"dataSource": "mantra-historical-timelines",
-// 					"example": "Historical timelines for this client for reference."
-// 				},
-// 				"historicalTimelinesFolderId": {
-// 					"type": "input",
-// 					"field": "historicalTimelinesFolderId",
-// 					"example": "The ID of the Google Drive folder containing the historical timelines.",
-// 					"required": true
-// 				},
-// 				"outputQuote": {
-// 					"type": "output",
-// 					"agent": "quote-generation",
-// 					"field": "quote",
-// 					"example": [
-// 						{
-// 							"deliverable": "exactly as received",
-// 							"number": "exactly as received",
-// 							"client_name": "exactly as received",
-// 							"asset_name": "exactly as received",
-// 							"asset_type": "exactly as received",
-// 							"placement": "exactly as received",
-// 							"duration": "exactly as received",
-// 							"creative_base": "exactly as received",
-// 							"changes_needed_on_creative_base": "exactly as received",
-// 							"asset_copy": "exactly as received",
-// 							"technical_specifications": "exactly as received",
-// 							"channel": "exactly as received",
-// 							"delivery_deadline": "exactly as received",
-// 							"target_audience": "exactly as received",
-// 							"normalized_asset_type": "exactly as received",
-// 							"complexity_tier": "exactly as received",
-// 							"complexity_reasoning": "exactly as received",
-// 							"rate": "The corresponding rate for the deliverable, based on the rate card and the number of assets. Use a plain number, not a string."
-// 						}
-// 					]
-// 				},
-// 				"outputTimeline": {
-// 					"type": "output",
-// 					"agent": "timeline-generation",
-// 					"field": "timeline",
-// 					"example": [
-// 						{
-// 							"activity": "Activity name",
-// 							"owner": "Owner",
-// 							"startDay": 1,
-// 							"duration": 3
-// 						}
-// 					]
-// 				},
-// 				"quoteData": {
-// 					"type": "input",
-// 					"field": "quoteData",
-// 					"example": "The previously generated quote per asset.",
-// 					"required": true
-// 				},
-// 				"timelineData": {
-// 					"type": "input",
-// 					"field": "timelineData",
-// 					"example": "The previously generated timeline.",
-// 					"required": true
-// 				},
-// 				"startDate": {
-// 					"type": "input",
-// 					"field": "startDate",
-// 					"example": "The start date of the project.",
-// 					"required": true
-// 				},
-// 				"endDate": {
-// 					"type": "input",
-// 					"field": "endDate",
-// 					"example": "The end date of the project.",
-// 					"required": true
-// 				},
-// 				"finalQuote": {
-// 					"type": "output",
-// 					"agent": "final-quote-generation",
-// 					"field": "finalQuote",
-// 					"example": "The final quote."
-// 				},
-// 				"glossary-assets": {
-// 					"type": "data",
-// 					"dataSource": "mantra-glossary-assets",
-// 					"example": "A glossary of terms."
-// 				}
-// 			},
-// 			"data-sources": {
-// 				"mantra-brief": {
-// 					"namespace": "mantra",
-// 					"platform": "drive",
-// 					"source": ":briefFolderId",
-// 					"type": "text:raw",
-// 					"folder": true
-// 				},
-// 				"mantra-brief-data": {
-// 					"namespace": "mantra",
-// 					"platform": "drive",
-// 					"source": ":briefFolderId",
-// 					"type": "data:raw",
-// 					"folder": true
-// 				},
-// 				"mantra-brief-files": {
-// 					"namespace": "mantra",
-// 					"platform": "drive",
-// 					"uri": "{briefFolderUri}",
-// 					"type": "data:files",
-// 					"folder": true,
-// 					"cache": true
-// 				},
-// 				"mantra-ratecard": {
-// 					"namespace": "mantra",
-// 					"platform": "drive",
-// 					"uri": "{ratecardUri}",
-// 					"type": ":raw",
-// 					"cache": true
-// 				},
-// 				"mantra-deliverables": {
-// 					"namespace": "mantra",
-// 					"platform": "drive",
-// 					"uri": "{deliverablesUri}",
-// 					"type": "data:raw",
-// 					"cache": false
-// 				},
-// 				"mantra-historical-timelines": {
-// 					"namespace": "mantra",
-// 					"platform": "drive",
-// 					"uri": "{historicalTimelinesFolderUri}",
-// 					"type": "data:files",
-// 					"folder": true,
-// 					"cache": true
-// 				},
-// 				"mantra-quote": {
-// 					"namespace": "mantra",
-// 					"platform": "drive",
-// 					"uri": "{quoteUri}",
-// 					"type": "text:raw",
-// 					"cache": false
-// 				},
-// 				"mantra-timeline": {
-// 					"namespace": "mantra",
-// 					"platform": "drive",
-// 					"uri": "{timelineUri}",
-// 					"type": "text:raw",
-// 					"cache": false
-// 				},
-// 				"mantra-ratecard-file": {
-// 					"namespace": "mantra",
-// 					"platform": "drive",
-// 					"uri": "{ratecardUri}",
-// 					"type": "data:files",
-// 					"cache": true
-// 				},
-// 				"mantra-glossary-assets": {
-// 					"namespace": "mantra",
-// 					"uri": "gs://monks-mantra/glossary-assets.txt",
-// 					"type": "text:raw",
-// 					"folder": false,
-// 					"cache": true
-// 				}
-// 			},
-// 			"output": [
-// 				"followUp",
-// 				"outputDeliverables",
-// 				"validatedCriticalProductionBlockers",
-// 				"validatedImportantClarifications",
-// 				"validatedBriefInconsistencies"
-// 			]
-// 		},
-// 		"fields": {
-// 			"briefFolderUri": "https://drive.google.com/drive/folders/19_3bkjYuOVu9tUmrucRsZCiaicom5g3F",
-// 			"additionalInfo": [],
-// 			"now": "2025-09-19T08:18:49.752Z"
-// 		}
-// 	});
-
+	await invoke({ config, fields: {
+		briefFolderUri: `https://drive.google.com/drive/folders/1a2_DTNuBIfTFb8Spi6FnQWEt1abTzwgw`,
+		additionalInfo: '',
+		now: new Date().toISOString(),
+	} });
+	
 	// await invoke({
 	// 	"config": {
 	// 		"agents": {
-	// 			"info": {
-	// 				"instructions": "You will receive the contents of a folder with files. These files contain various documents.\n\nWhen writing the filenames extract the full list of names, everything needs to be included. If there is any spreadSheet it also need to be analyzed and included in the response.",
+	// 			"documentAnalyzer": {
+	// 				"instructions": "gs://monks-plexustest/main_prompt.txt",
 	// 				"context": [
-	// 					"documents"
+	// 					"documents",
+	// 					"userDescription"
+	// 				]
+	// 			},
+	// 			"analyst": {
+	// 				"instructions": "You are a briefing analysis assistant. You receive a JSON object containing briefing analysis results with the following schema:\n\n{\n  \"answered_questions\": {\n    \"field_name\": \"extracted_value\"\n  },\n  \"missing_questions\": [\n    \"field_name1\", \"field_name2\"\n  ],\n  \"confidence_scores\": {\n    \"field_name\": 0.9\n  }\n}\n\nYour task is to analyze this data and provide a clear, concise summary that includes:\n1. How many questions were successfully answered from the provided information\n2. How many questions still need to be asked as part of the briefing process\n3. A brief assessment of the extraction quality\n\nProvide your response in a friendly, professional tone that would be suitable for a project briefing context.",
+	// 				"context": [
+	// 					"extractedInfo"
 	// 				]
 	// 			}
 	// 		},
@@ -602,20 +94,56 @@ async function ingest(namespace, body) {
 	// 				"field": "request",
 	// 				"required": true
 	// 			},
-	// 			"infoString": {
+	// 			"documentFolder": {
+	// 				"type": "input",
+	// 				"field": "documentFolder",
+	// 				"required": true
+	// 			},
+	// 			"userDescription": {
+	// 				"type": "input",
+	// 				"field": "request",
+	// 				"required": true
+	// 			},
+	// 			"extractedInfo": {
 	// 				"type": "output",
-	// 				"agent": "info",
+	// 				"agent": "documentAnalyzer",
 	// 				"field": "infoString",
 	// 				"example": {
-	// 					"report": {
-	// 						"summary": "Brief overview of all documents analyzed",
-	// 						"key_themes": ["theme1", "theme2", "theme3"],
-	// 						"main_topics": ["topic1", "topic2"],
-	// 						"important_findings": "Detailed analysis of significant elements found across all documents",
-	// 						"total_files_processed": 0
+	// 					"answered_questions": {
+	// 						"project_name": "Gallery ad",
+	// 						"campaign_purpose": "more ppl come to gallery",
+	// 						"background_problem_statement": "art is hard to sell",
+	// 						"strategy_campaign_idea": "post pictures of paintings online",
+	// 						"objectives_success_metrics": "???"
 	// 					},
-	// 					"document_filenames": ["filename1.txt", "filename2.txt"]
+	// 					"missing_questions": [
+	// 						"project_owner",
+	// 						"quote_approver",
+	// 						"asset_approver",
+	// 						"deadline",
+	// 						"budget_range",
+	// 						"market_language",
+	// 						"delivery_details",
+	// 						"notes_attachments",
+	// 						"project_type",
+	// 						"briefing_template",
+	// 						"key_message",
+	// 						"additional_context"
+	// 					],
+	// 					"confidence_scores": {
+	// 						"project_name": 0.9,
+	// 						"campaign_purpose": 0.9,
+	// 						"background_problem_statement": 0.9,
+	// 						"strategy_campaign_idea": 0.9,
+	// 						"objectives_success_metrics": 0.7
+	// 					}
 	// 				}
+	// 			},
+	// 			"analysisSummary": {
+	// 				"type": "output",
+	// 				"agent": "analyst",
+	// 				"field": "summary",
+	// 				"example": "Based on the analysis, 5 questions were successfully answered with high confidence, while 12 questions still need to be addressed during the briefing process."
 	// 			},
 	// 			"documents": {
 	// 				"type": "data",
@@ -624,21 +152,22 @@ async function ingest(namespace, body) {
 	// 		},
 	// 		"data-sources": {
 	// 			"documents": {
-	// 				"uri": "https://drive.google.com/drive/u/3/folders/1Ldqn9G5kJRCgPSaDBSO0QvFYoHQG0Duz",
+	// 				"uri": "{documentFolder}",
 	// 				"platform": "drive",
 	// 				"dataType": "text",
-	// 				"target": "raw",
+	// 				"target": "file",
 	// 				"cache": false,
-	// 				"folder": true,
-	// 				"namespace": "luis"
+	// 				"folder": true
 	// 			}
 	// 		},
 	// 		"output": [
-	// 			"infoString",
+	// 			"extractedInfo",
+	// 			"analysisSummary"
 	// 		]
 	// 	},
 	// 	"fields": {
-	// 		"request": "analysis"
+	// 		"request": "No additional information provided. Please analyze only the documents in the folder.",
+	// 		"documentFolder": "https://drive.google.com/drive/folders/1Ldqn9G5kJRCgPSaDBSO0QvFYoHQG0Duz?usp=drive_link"
 	// 	}
 	// });
 	

@@ -1,5 +1,5 @@
 import CatalogField from './CatalogField';
-import DataSourceItem from '../data-sources/platform/DataSourceItem';
+import DataSourceItem from '../data-sources/origin/DataSourceItem';
 import CustomError from '../error-handling/CustomError';
 import UnknownError from '../error-handling/UnknownError';
 import config from '../../utils/config';
@@ -29,7 +29,7 @@ export default class InputCatalogField extends CatalogField {
 		return !!this.configuration.required;
 	}
 	
-	protected async populate(): Promise<JsonField | DataSourceItem[]> {
+	protected async populate(): Promise<JsonField | DataSourceItem<unknown, unknown>[]> {
 		Debug.log(`Populating input field "${this.id}"`, 'Catalog');
 		
 		const payload = RequestContext.get('payload') as RequestPayload;

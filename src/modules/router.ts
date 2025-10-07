@@ -16,7 +16,7 @@ function cors(req: any, res: any): boolean {
 	
 	if (isPreflight) {
 		res.set('Access-Control-Allow-Methods', 'GET, POST');
-		res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Api-Key');
+		res.set('Access-Control-Allow-Headers', 'Contents-Type, Authorization, X-Api-Key');
 		res.set('Access-Control-Max-Age', '3600');
 		res.status(204).send('');
 	}

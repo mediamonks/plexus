@@ -14,16 +14,16 @@
 - **Remove backwards compatibility for DataSource.isDynamic** - Currently checking both uri and source formats (`src/entities/data-sources/DataSource.ts:84`)
 - **Remove backwards compatibility for DataSource type parsing** - Currently splitting type string for dataType (`src/entities/data-sources/DataSource.ts:98`)
 - **Remove backwards compatibility for DataSource target parsing** - Currently splitting type string for target (`src/entities/data-sources/DataSource.ts:167`)
-- **Remove backwards compatibility for DriveDataSourceBehavior ID** - Currently falling back to source for ID (`src/entities/data-sources/platform/DriveDataSourceBehavior.ts:29`)
-- **Remove backwards compatibility for GcsDataSourceBehavior URI** - Currently falling back to source for URI (`src/entities/data-sources/platform/GcsDataSourceBehavior.ts:26`)
+- **Remove backwards compatibility for GoogleDriveDataSourceOrigin ID** - Currently falling back to source for ID (`src/entities/data-sources/platform/GoogleDriveDataSourceOrigin.ts:29`)
+- **Remove backwards compatibility for GoogleCloudStorageDataSourceOrigin URI** - Currently falling back to source for URI (`src/entities/data-sources/platform/GoogleCloudStorageDataSourceOrigin.ts:26`)
 
 ### Target Behaviors
 - **Support mixed/unknown data types** - Currently only handles specific data types (`src/entities/data-sources/DataSource.ts:109`)
-- **Add incremental ingesting support** - Vector target currently drops and recreates entire dataset (`src/entities/data-sources/target/VectorTargetDataSourceBehavior.ts:69`)
-- **Implement file copying to GCS** - Files target should ingest by copying files to own GCS bucket (`src/entities/data-sources/target/FileTargetDataSourceBehavior.ts:14`)
+- **Add incremental ingesting support** - Vector target currently drops and recreates entire dataset (`src/entities/data-sources/target/DataVectorTargetDataSource.ts:69`)
+- **Implement file copying to GOOGLE_CLOUD_STORAGE** - Files target should ingest by copying files to own GOOGLE_CLOUD_STORAGE bucket (`src/entities/data-sources/target/FileTargetDataSource.ts:14`)
 - **Add search support for raw text targets** - Currently unclear what should happen for search queries (`src/entities/data-sources/target/RawTextTargetDataSourceBehavior.ts:21`)
-- **Add spreadsheet support for raw data targets** - Currently missing spreadsheet handling (`src/entities/data-sources/target/RawDataTargetDataSourceBehavior.ts:17`)
-- **Implement random selection for unsorted data** - Consider random selection when not sorting results (`src/entities/data-sources/target/RawDataTargetDataSourceBehavior.ts:54`)
+- **Add spreadsheet support for raw data targets** - Currently missing spreadsheet handling (`src/entities/data-sources/target/RawTargetDataSource.ts:17`)
+- **Implement random selection for unsorted data** - Consider random selection when not sorting results (`src/entities/data-sources/target/RawTargetDataSource.ts:54`)
 
 ## Service Improvements
 

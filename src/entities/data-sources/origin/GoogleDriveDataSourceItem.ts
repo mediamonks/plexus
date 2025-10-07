@@ -7,7 +7,7 @@ import sheets from '../../../services/sheets';
 import pdf from '../../../utils/pdf';
 import UnsupportedError from '../../error-handling/UnsupportedError';
 import xlsx from '../../../utils/xlsx';
-import { JsonField, JsonObject, SpreadSheet, ValueOf } from '../../../types/common';
+import { JsonField, SpreadSheet, ValueOf } from '../../../types/common';
 
 const LLM_SUPPORTED_MIME_TYPES = [
 	'application/pdf',
@@ -17,9 +17,10 @@ const LLM_SUPPORTED_MIME_TYPES = [
 	'image/jpeg',
 ];
 
-export default class DriveDataSourceItem extends DataSourceItem {
+export default class GoogleDriveDataSourceItem extends DataSourceItem<string, SpreadSheet> {
 	static readonly TextContent: string;
 	static readonly DataContent: SpreadSheet;
+	static readonly Content: typeof GoogleDriveDataSourceItem.TextContent | typeof GoogleDriveDataSourceItem.DataContent;
 	
 	private readonly _metadata: FileMetaData;
 	private _localFile: Promise<string> | string;
@@ -41,7 +42,7 @@ export default class DriveDataSourceItem extends DataSourceItem {
 		return this._metadata.name;
 	}
 	
-	protected detectDataType(): ValueOf<typeof DataSourceItem.DATA_TYPE> {
+	protected detectDataType(): ValueOf<typeof DataSource.DATA_TYPE> {
 		const mapping = {
 			'application/vnd.google-apps.document': 'text',
 			'application/pdf': 'text',
@@ -75,7 +76,7 @@ export default class DriveDataSourceItem extends DataSourceItem {
 		return driveService.exportFile(metadata, 'pdf', this.allowCache);
 	}
 	
-	public async toText(): Promise<typeof DriveDataSourceItem.TextContent> {
+	public async toText(): Promise<typeof GoogleDriveDataSourceItem.TextContent> {
 		const { metadata } = this;
 		
 		if (metadata.mimeType === 'application/vnd.google-apps.document') {
@@ -95,7 +96,7 @@ export default class DriveDataSourceItem extends DataSourceItem {
 		throw new UnsupportedError('mime type for text extraction', metadata.mimeType);
 	}
 	
-	public async toData(): Promise<typeof DriveDataSourceItem.DataContent> {
+	public async toData(): Promise<typeof GoogleDriveDataSourceItem.DataContent> {
 		const { metadata } = this;
 		
 		if (metadata.mimeType === 'application/vnd.google-apps.spreadsheet') {

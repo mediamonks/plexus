@@ -1,31 +1,27 @@
 import CatalogField from './CatalogField';
 import DataSource from '../data-sources/DataSource';
 import DataSources from '../data-sources/DataSources';
-import StructuredDataSourceBehavior from '../data-sources/data-type/StructuredDataSourceBehavior';
-import DataSourceItem from '../data-sources/platform/DataSourceItem';
+import DataSourceItem from '../data-sources/origin/DataSourceItem';
 import CustomError from '../error-handling/CustomError';
 import Debug from '../../utils/Debug';
 import { JsonField } from '../../types/common';
 
 export default class DataSourceCatalogField extends CatalogField {
-	static readonly Configuration: {
+	public static readonly Configuration: {
 		type: 'data';
 		example: JsonField;
 		dataSource: string;
-		query: {
-			input?: string;
-			limit?: number;
-			filter?: Record<string, string>;
-			fields?: string[];
-			sort?: string;
-		},
-		input?: string; // TODO for backwards compatibility
-		limit?: number; // TODO for backwards compatibility
-		filter?: Record<string, string>; // TODO for backwards compatibility
-		fields?: string[]; // TODO for backwards compatibility
-		sort?: string; // TODO for backwards compatibility
+		query: typeof DataSourceCatalogField.QueryParameters,
+	} & typeof DataSourceCatalogField.QueryParameters // TODO for backwards compatibility;
+	
+	public static readonly QueryParameters: {
+		input?: string;
+		filter?: Record<string, string>;
+		limit?: number;
+		fields?: string[];
+		sort?: string;
 	};
-
+	
 	public get configuration(): typeof DataSourceCatalogField.Configuration {
 		return super.configuration as typeof DataSourceCatalogField.Configuration;
 	}
@@ -44,7 +40,7 @@ export default class DataSourceCatalogField extends CatalogField {
 		return this.configuration.query?.filter ?? this.configuration.filter; // TODO for backwards compatibility
 	}
 	
-	public get queryParameters(): typeof StructuredDataSourceBehavior.QueryParameters {
+	public get queryParameters(): typeof DataSourceCatalogField.QueryParameters {
 		return {
 			limit: this.configuration.query?.limit ?? this.configuration.limit, // TODO for backwards compatibility
 			fields: this.configuration.query?.fields ?? this.configuration.fields, // TODO for backwards compatibility
@@ -56,7 +52,7 @@ export default class DataSourceCatalogField extends CatalogField {
 		return DataSources.get(this.dataSourceId);
 	}
 	
-	protected async populate(): Promise<JsonField | DataSourceItem[]> {
+	protected async populate(): Promise<JsonField | DataSourceItem<unknown, unknown>[]> {
 		Debug.log(`Populating data source field "${this.id}"`, 'Catalog');
 		
 		const promises = [];

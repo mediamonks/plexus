@@ -2,7 +2,7 @@ import { performance } from 'node:perf_hooks';
 
 const DELAY = 1000;
 const SERVICE = {
-	DRIVE: 'drive',
+	GOOGLE_DRIVE: 'drive',
 	SHEETS: 'sheets',
 };
 const OPERATION = {
@@ -13,7 +13,7 @@ const _lastRequest = {};
 const queue = {};
 const _timeout = {}
 
-async function quotaDelay(service: string = SERVICE.DRIVE, operation: string = OPERATION.READ): Promise<void> {
+async function quotaDelay(service: string = SERVICE.GOOGLE_DRIVE, operation: string = OPERATION.READ): Promise<void> {
 	let lastRequest = _lastRequest?.[service]?.[operation];
 	while (lastRequest && performance.now() - lastRequest < DELAY) {
 		await new Promise(resolve => setTimeout(resolve,  lastRequest + DELAY - performance.now()));
@@ -38,7 +38,7 @@ async function performOperation(service: string, operation: string): Promise<voi
 	processQueue(service, operation).then();
 }
 
-async function processQueue(service: string = SERVICE.DRIVE, operation: string = OPERATION.READ): Promise<void> {
+async function processQueue(service: string = SERVICE.GOOGLE_DRIVE, operation: string = OPERATION.READ): Promise<void> {
 	if (!queue[service]?.[operation] || !queue[service]?.[operation].length) return;
 	
 	const lastRequest = _lastRequest?.[service]?.[operation];
@@ -54,7 +54,7 @@ async function processQueue(service: string = SERVICE.DRIVE, operation: string =
 	await performOperation(service, operation);
 }
 
-async function enqueue(fn: () => Promise<any>, service: string = SERVICE.DRIVE, operation: string = OPERATION.READ): Promise<any> {
+async function enqueue(fn: () => Promise<any>, service: string = SERVICE.GOOGLE_DRIVE, operation: string = OPERATION.READ): Promise<any> {
 	return new Promise(resolve => {
 		queue[service] ??= {};
 		queue[service][operation] ??= [];

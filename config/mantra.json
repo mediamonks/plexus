@@ -472,10 +472,17 @@
 		},
 		"mantra-glossary-assets": {
 			"namespace": "mantra",
-			"uri": "gs://monks-plexus/temp/glossary-assets.txt",
+			"uri": "gs://monks-mantra/glossary-assets.txt",
 			"type": "text:raw",
 			"folder": false,
 			"cache": true
 		}
-	}
+	},
+	"output": [
+		"followUp",
+		"outputDeliverables",
+		"validatedCriticalProductionBlockers",
+		"validatedImportantClarifications",
+		"validatedBriefInconsistencies"
+	]
 }
