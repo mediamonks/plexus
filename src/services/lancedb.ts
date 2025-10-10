@@ -1,5 +1,5 @@
 import { performance } from 'node:perf_hooks';
-import lancedb from '@lancedb/lancedb';
+import lancedb, { Connection } from '@lancedb/lancedb';
 import config from '../utils/config';
 import { JsonObject } from '../types/common';
 
@@ -8,13 +8,14 @@ type Configuration = {
 	rateLimitDelayMs?: number;
 };
 
-// const lancedbConfig = require('../../config/lancedb.json');
-const lancedbConfig = config.get('lancedb') as Configuration;
-
-let _db;
-const db = async () => _db ??= await lancedb.connect(lancedbConfig.databaseUri);
+let _db: Connection;
+const db = async () => {
+	if (_db) return _db;
+	const databaseUri = config.get('lancedb/databaseUri') as Configuration['databaseUri'];
+	_db = await lancedb.connect(databaseUri);
+	return _db;
+}
 const _tables = {};
-const RATE_LIMIT_DELAY_MS = lancedbConfig.rateLimitDelayMs ?? 0;
 const lastTableWrites = {};
 const tableRecordBuffers = {};
 const tableWriteTimeouts = {};
@@ -58,11 +59,13 @@ async function writeRecordBuffer(tableName: string): Promise<void> {
 async function append(tableName: string, records: any[]): Promise<any> {
 	if (!records.length) return;
 	
+	const rateLimitDelay = config.get('lancedb/rateLimitDelayMs') as Configuration['rateLimitDelayMs'];
+	
 	tableRecordBuffers[tableName] ??= [];
 	tableRecordBuffers[tableName].push(...records);
 	tableWriteTimeouts[tableName] ??= new Promise(resolve => setTimeout(
 		() => writeRecordBuffer(tableName).then(resolve),
-		Math.max(0, (lastTableWrites[tableName] ?? 0) + RATE_LIMIT_DELAY_MS - performance.now())
+		Math.max(0, (lastTableWrites[tableName] ?? 0) + rateLimitDelay - performance.now())
 	));
 	
 	return tableWriteTimeouts[tableName];
@@ -91,11 +94,6 @@ async function search(tableName: string, embeddings: number[], { limit = 3, filt
 		.distanceType('cosine')
 		.limit(limit)
 		.toArray();
-
-	// const resultArray = [];
-	// for await(const item of results) resultArray.push(item);
-	
-	// return resultArray;
 }
 
 async function ensureTableExists(name: string, schema: any): Promise<void> {

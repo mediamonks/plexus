@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { Firestore, Settings } from '@google-cloud/firestore';
 import config from '../utils/config';
 
-const firestoreConfig = config.get('firestore', true) as Settings;
+const firestoreConfig = config.get('firestore', { includeGlobal: true, includeRequest: false }) as Settings;
 
 const firestore = new Firestore(firestoreConfig);
 

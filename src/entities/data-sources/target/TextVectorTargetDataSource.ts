@@ -1,18 +1,18 @@
 import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
 import DataSource from '../DataSource';
 import DataSourceCatalogField from '../../catalog/DataSourceCatalogField';
-import vectordb from '../../../modules/vectordb';
+import VectorDB from '../../VectorDB';
 
 export default class VectorTargetDataSource extends DataSource {
 	public async ingest(): Promise<void> {
-		await vectordb.drop(this.id);
-		await vectordb.create(this.id, this.generator());
+		await VectorDB.drop(this.id);
+		await VectorDB.create(this.id, this.generator());
 	}
 	
 	public async query({ input, limit }: typeof DataSourceCatalogField.QueryParameters): Promise<string[]> {
-		const embeddings = await vectordb.generateQueryEmbeddings(input);
+		const embeddings = await VectorDB.generateQueryEmbeddings(input);
 		
-		const result = await vectordb.search(this.id, embeddings, { limit, fields: ['text'] });
+		const result = await VectorDB.search(this.id, embeddings, { limit, fields: ['text'] });
 		
 		return result.map(item => item['text'] as string);
 	}
@@ -33,7 +33,7 @@ export default class VectorTargetDataSource extends DataSource {
 			for (const chunk of chunks) {
 				const content = chunk.pageContent;
 				if (!content) continue;
-				yield { text: content, vector: await vectordb.generateDocumentEmbeddings(content) };
+				yield { text: content, vector: await VectorDB.generateDocumentEmbeddings(content) };
 			}
 		}
 	}

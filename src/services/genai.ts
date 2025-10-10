@@ -8,22 +8,31 @@ type Configuration = {
 	projectId: string;
 	location: string;
 	embeddingLocation: string;
+	embeddingModel: string;
 	model: string;
 };
 
-const { projectId: project, location, embeddingLocation } = config.get('genai', true) as Configuration;
+let client: GoogleGenAI;
 
-const { GOOGLE_GENAI_API_KEY } = process.env;
-
-let googleGenAi: GoogleGenAI;
-if (GOOGLE_GENAI_API_KEY) {
-	googleGenAi = new GoogleGenAI({ apiKey: GOOGLE_GENAI_API_KEY });
-} else {
-	googleGenAi = new GoogleGenAI({
-		vertexai: true,
-		project,
-		location
-	});
+// TODO this causes project and location to always be overridden by the API key. needs to be fixed
+function getClient() {
+	if (client) return client;
+	
+	const { projectId: project, location } = config.get('genai', { includeGlobal: true }) as Configuration;
+	
+	const { GOOGLE_GENAI_API_KEY } = process.env;
+	
+	if (GOOGLE_GENAI_API_KEY) {
+		client = new GoogleGenAI({ apiKey: GOOGLE_GENAI_API_KEY });
+	} else {
+		client = new GoogleGenAI({
+			vertexai: true,
+			project,
+			location
+		});
+	}
+	
+	return client;
 }
 
 let last: number;
@@ -69,7 +78,7 @@ async function query(query: string, {
 	
 	let tools = [];
 	for (const datastoreId of datastoreIds) {
-		const datastore = `projects/${config.get('genai/projectId', true)}/locations/${config.get('genai/datastoreLocation', true) ?? 'global'}/collections/default_collection/dataStores/${datastoreId}`;
+		const datastore = `projects/${config.get('genai/projectId', { includeGlobal: true })}/locations/${config.get('genai/datastoreLocation', { includeGlobal: true }) ?? 'global'}/collections/default_collection/dataStores/${datastoreId}`;
 		
 		tools.push({
 			retrieval: {
@@ -83,12 +92,12 @@ async function query(query: string, {
 	model ??= config.get('genai/model') as string;
 	
 	if (last) {
-		const delay = config.get('genai/quotaDelayMs', true) as number ?? 0;
+		const delay = config.get('genai/quotaDelayMs', { includeGlobal: true }) as number ?? 0;
 		while (last + delay > performance.now()) await new Promise(resolve => setTimeout(resolve, last + delay - performance.now()));
 		last = performance.now();
 	}
 	
-	const result = await googleGenAi.models.generateContent({
+	const result = await getClient().models.generateContent({
 		model,
 		contents,
 		config: {
@@ -104,11 +113,14 @@ async function query(query: string, {
 }
 
 async function generateEmbeddings(text: string, model?: string, taskType?: string): Promise<number[]> {
-	model ??= config.get('genai/embeddingModel') as string;
+	const { projectId: project, location, embeddingLocation, embeddingModel } = config.get('genai') as Configuration;
 	
+	model ??= embeddingModel;
+	
+	// TODO this doesn't make sense at all with the API key set
 	let embeddingClient;
 	if (!embeddingLocation || embeddingLocation === location) {
-		embeddingClient = googleGenAi;
+		embeddingClient = getClient();
 	} else {
 		embeddingClient = new GoogleGenAI({
 			vertexai: true,
@@ -118,7 +130,7 @@ async function generateEmbeddings(text: string, model?: string, taskType?: strin
 	}
 	
 	if (last) {
-		const delay = config.get('genai/quotaDelayMs', true) as number ?? 0;
+		const delay = config.get('genai/quotaDelayMs', { includeGlobal: true }) as number ?? 0;
 		while (last + delay > performance.now()) await new Promise(resolve => setTimeout(resolve, last + delay - performance.now()));
 		last = performance.now();
 	}

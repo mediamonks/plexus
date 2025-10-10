@@ -28,6 +28,7 @@ export default class Agent implements IEntity {
 	private readonly _files: string[] = [];
 	private readonly _id: string;
 	private _invocation: Promise<JsonObject>;
+	private _loaded: Promise<void>;
 	private _ready: Promise<void>;
 	private _temperature: number  = 0;
 
@@ -44,7 +45,7 @@ export default class Agent implements IEntity {
 		this._id = id;
 		this._configuration = configuration;
 		
-		this._ready = this._loadBaseInstructions();
+		this._loaded = this._loadBaseInstructions();
 	}
 	
 	public get id(): string {
@@ -117,39 +118,41 @@ export default class Agent implements IEntity {
 	}
 	
 	private async _loadBaseInstructions(): Promise<void> {
-		if (this._baseInstructions) return;
-		
-		const { instructions } = this.configuration;
-		const instructionsPath = config.get('instructionsPath');
-		
-		try {
-			if (instructions) {
-				if (instructions.startsWith('gs://')) {
-					this._baseInstructions = await gcs.cache(this.configuration.instructions);
+		await Profiler.run(async () => {
+			if (this._baseInstructions) return;
+			
+			const { instructions } = this.configuration;
+			const instructionsPath = config.get('instructionsPath');
+			
+			try {
+				if (instructions) {
+					if (instructions.startsWith('gs://')) {
+						this._baseInstructions = await gcs.cache(this.configuration.instructions);
+					} else {
+						this._baseInstructions = instructions;
+					}
+				} else if (instructionsPath) {
+					this._baseInstructions = await gcs.cache(`${instructionsPath}/${this.id}.txt`);
 				} else {
-					this._baseInstructions = instructions;
+					this._baseInstructions = await Storage.get(StorageFile.TYPE.AGENT_INSTRUCTIONS, this.id).read();
 				}
-			} else if (instructionsPath) {
-				this._baseInstructions = await gcs.cache(`${instructionsPath}/${this.id}.txt`);
-			} else {
-				this._baseInstructions = await Storage.get(StorageFile.TYPE.AGENT_INSTRUCTIONS, this.id).read();
+			} catch (error) {
+				throw new CustomError(`Missing instructions for agent "${this._id}"`);
 			}
-		} catch (error) {
-			throw new CustomError(`Missing instructions for agent "${this._id}"`);
-		}
+		}, `load base instructions for agent "${this.id}`);
 	}
 	
 	public prepare(catalog: Catalog): void {
 		if (this._catalog === catalog) return;
 		
-		Debug.log(`Preparing ${this.id}`, 'Agent');
+		Debug.log(`Preparing agent "${this.id}"`, 'Agent');
 		
 		this._invocation = undefined;
 		
 		this._catalog = catalog;
 		
 		this._ready = Promise.all([
-			this._ready,
+			this._loaded,
 			this._prepareContext(catalog),
 			this._determineTemperature(catalog),
 		]).then(() => {

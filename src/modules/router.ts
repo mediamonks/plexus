@@ -1,12 +1,14 @@
 import fs from 'node:fs';
 import mime from 'mime-types';
+import CustomError from '../entities/error-handling/CustomError';
 import ErrorHandler from '../entities/error-handling/ErrorHandler';
 import config from '../utils/config';
+import Debug from '../utils/Debug';
+import Profiler from '../utils/Profiler';
 import RequestContext from '../utils/RequestContext';
-import { RequestPayload } from '../types/common';
-import CustomError from '../entities/error-handling/CustomError';
+import { JsonObject, RequestPayload } from '../types/common';
 
-const routes = config.get('routes');
+const routes = config.get('routes', { includeRequest: false });
 
 function cors(req: any, res: any): boolean {
 	res.set('Access-Control-Allow-Origin', req.get('origin') ?? req.get('host') ?? '*');
@@ -73,16 +75,27 @@ export default async function router(req: any, res: any): Promise<void> {
 		const fn = handlerModule.default;
 		
 		const payload: RequestPayload = req.method === 'POST' ? req.body : req.query;
-		await RequestContext.run({ payload }, async () => {
+		await RequestContext.create({ payload }, async () => {
 			ErrorHandler.initialize();
 			
-			let response = await fn(variables, payload) ?? 'OK';
+			let response: JsonObject;
+			
+			try {
+				response = await fn(variables, payload) ?? 'OK';
+			} catch (error) {
+				ErrorHandler.log(error);
+			}
 			
 			const error = ErrorHandler.get();
-			if (error) {
-				res.status(error instanceof CustomError ? error.status : 500);
-				response = { ...response, error: error.toString() };
-			}
+			
+			response = {
+				...response,
+				error: error?.toString(),
+				performance: Profiler.getReport(),
+				debug: Debug.get(),
+			};
+			
+			if (error) res.status(error instanceof CustomError ? error.status : 500);
 			
 			res.send(response);
 		});

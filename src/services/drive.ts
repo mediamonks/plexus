@@ -11,13 +11,12 @@ import config from '../utils/config';
 import Debug from '../utils/Debug';
 import Profiler from '../utils/Profiler';
 
-const tempPath = config.get('tempPath') as string;
-const downloadPath = path.join(tempPath, 'download', 'drive');
-const tempFolderId = config.get('drive.tempFolderId') as string;
-
 export type FileMetaData = drive_v3.Schema$File;
 
 export default async () => {
+	const tempPath = config.get('tempPath') as string;
+	const downloadPath = path.join(tempPath, 'download', 'drive');
+	const tempFolderId = config.get('drive.tempFolderId') as string;
 	const auth = await authenticate();
 	const drive = google.drive({ version: 'v3', auth });
 	
@@ -73,7 +72,7 @@ export default async () => {
 			
 			return folder.data.id;
 		} catch (error) {
-			console.error('Error creating folder:', error.message);
+			throw new CustomError(`Error creating folder "${folderName}":`, error.message);
 		}
 	}
 	
@@ -116,7 +115,7 @@ export default async () => {
 			
 			return destPath;
 		} catch (error) {
-			console.error(`Error downloading file "${file.name}":`, error.message);
+			throw new CustomError(`Error downloading file "${file.name}":`, error.message);
 		}
 	}
 	

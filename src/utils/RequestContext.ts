@@ -1,12 +1,12 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
+import CustomError from '../entities/error-handling/CustomError';
 
 type RequestState = Record<string, unknown>;
 
 export default class RequestContext {
 	private static _asyncLocalStorage: AsyncLocalStorage<RequestState>;
 	
-	public static run<T>(data: RequestState, fn: () => T): T {
-		console.log('Creating Request Context');
+	public static create<T>(data: RequestState, fn: () => T): T {
 		return this.asyncLocalStorage.run(data, fn);
 	}
 	
@@ -14,15 +14,19 @@ export default class RequestContext {
 		return this._asyncLocalStorage ??= new AsyncLocalStorage<RequestState>();
 	}
 	
-	public static get keys(): RequestState {
-		return this.asyncLocalStorage.getStore();
+	public static get store(): RequestState {
+		const store = this.asyncLocalStorage.getStore();
+		
+		if (!store) throw new CustomError('RequestContext not yet created', 500);
+		
+		return store;
 	}
 	
 	public static get(key: string, defaultValue?: unknown): unknown {
-		return this.keys[key] ??= defaultValue;
+		return this.store[key] ??= defaultValue;
 	}
 	
 	public static set(key: string, value: unknown): void {
-		this.keys[key] = value;
+		this.store[key] = value;
 	}
 }

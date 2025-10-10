@@ -1,9 +1,8 @@
 import Catalog from '../entities/catalog/Catalog';
 import CustomError from '../entities/error-handling/CustomError';
 import config from '../utils/config';
-import Debug, { DebugLogEntry } from '../utils/Debug';
 import History from '../utils/History';
-import Profiler, { ProfilerLogEntry } from '../utils/Profiler';
+import Profiler from '../utils/Profiler';
 import RequestContext from '../utils/RequestContext';
 import { JsonObject, RequestPayload } from '../types/common';
 
@@ -11,8 +10,6 @@ export default async (_: any, payload: any): Promise<{
 	output: JsonObject;
 	threadId: string;
 	fields: JsonObject;
-	performance: ProfilerLogEntry[];
-	debug: DebugLogEntry[];
 }> => {
 	const output = {};
 	
@@ -34,7 +31,5 @@ export default async (_: any, payload: any): Promise<{
 		output,
 		threadId: History.instance.threadId,
 		fields: payload.fields,
-		performance: Profiler.getReport(),
-		debug: Debug.get(),
 	};
 };

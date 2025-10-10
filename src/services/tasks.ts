@@ -8,7 +8,7 @@ type Configuration = {
 	location: string;
 };
 
-const { projectId, location } = config.get('tasks', true) as Configuration;
+const { projectId, location } = config.get('tasks', { includeGlobal: true, includeRequest: false }) as Configuration;
 
 async function create(queue: string, endpoint: string, payload: any): Promise<any> {
 	const parent = client.queuePath(projectId, location, queue);
