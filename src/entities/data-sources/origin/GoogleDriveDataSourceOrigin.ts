@@ -2,8 +2,8 @@ import DataSourceOrigin from './DataSourceOrigin';
 import GoogleDriveDataSourceItem from './GoogleDriveDataSourceItem';
 import CustomError from '../../error-handling/CustomError';
 import drive, { FileMetaData } from '../../../services/drive';
-import { JsonObject, SpreadSheet } from '../../../types/common';
-import GoogleCloudStorageDataSourceItem from './GoogleCloudStorageDataSourceItem';
+import Debug from '../../../utils/Debug';
+import { JsonObject } from '../../../types/common';
 
 const GOOGLE_DRIVE_URI_PATTERN = /^https?:\/\/(?:drive|docs)\.google\.com\/(?:drive\/(?:u\/\d+\/)?(folders)|(?:file|document|spreadsheets|presentation)\/d)\/([\w\-]+)/;
 
@@ -30,6 +30,8 @@ export default class GoogleDriveDataSourceOrigin extends DataSourceOrigin {
 	
 	public async getItems(): Promise<GoogleDriveDataSourceItem[]> {
 		const files = await this.getFiles();
+		
+		Debug.dump(`Data source "${this.dataSource.id}" files`, files);
 		
 		return files.map(metadata => new GoogleDriveDataSourceItem(this.dataSource, metadata));
 	}

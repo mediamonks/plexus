@@ -27,7 +27,7 @@ export default class History {
 		this._threadId = threadId;
 		
 		// TODO _ready is not actually used, so race conditions can occur
-		this._ready = Profiler.run(() => this._load(), 'load history');
+		this._ready = this._load();
 	}
 	
 	public get threadId() {
@@ -35,27 +35,29 @@ export default class History {
 	}
 	
 	private async _load(): Promise<void> {
-		let history;
+		await Profiler.run(async () => {
+			let history;
 		
-		if (this._threadId) {
-			const thread = await Profiler.run(() => firestore.getDocument('threads', this._threadId), 'retrieve thread');
+			if (this._threadId) {
+				const thread = await Profiler.run(() => firestore.getDocument('threads', this._threadId), 'retrieve thread');
+				
+				if (!thread) throw new CustomError('Invalid threadId');
+				
+				({ history } = thread);
+			}
 			
-			if (!thread) throw new CustomError('Invalid threadId');
+			if (!history || !history.length) return;
 			
-			({ history } = thread);
-		}
-		
-		if (!history || !history.length) return;
-		
-		if (history[0].parts) {
-			this._history = history;
-			return;
-		}
-		
-		this._history = history.map(item => ({
-			role: item.role,
-			parts: [{ text: item.content }]
-		}));
+			if (history[0].parts) {
+				this._history = history;
+				return;
+			}
+			
+			this._history = history.map(item => ({
+				role: item.role,
+				parts: [{ text: item.content }]
+			}));
+		}, 'load history');
 	}
 	
 	public async save(output: any): Promise<void> {

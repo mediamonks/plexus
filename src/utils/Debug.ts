@@ -54,7 +54,7 @@ export default class Debug {
 		
 		fs.mkdir(dumpFilePath, { recursive: true }).then(() => {
 			const content = typeof data === 'object' ? JSON.stringify(data, null, 2) : data;
-			return fs.writeFile(path.join(dumpFilePath, `${label}.json`), content);
+			return fs.writeFile(path.join(dumpFilePath, `${label.replace(/\W/g, '_')}.json`), content);
 		});
 		
 		if (process.env.NODE_ENV !== 'dev') return;

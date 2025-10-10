@@ -18,9 +18,8 @@ export default class Profiler {
 		if (process.env.NODE_ENV === 'dev') console.debug('[PERF]', `[${label}]`, ms);
 	}
 
-	public static run<T>(fn: () => T, label?: string): T;
-	public static run<T>(fn: () => T, args: any[], label?: string): T;
-
+	public static async run<T>(fn: () => T, label?: string): Promise<T>;
+	public static async run<T>(fn: () => T, args: any[], label?: string): Promise<T>;
 	public static async run<T, K>(fn: () => T, argsOrLabel?: K[] | string, label?: string): Promise<T> {
 		if (typeof argsOrLabel === 'string') {
 			label = argsOrLabel;

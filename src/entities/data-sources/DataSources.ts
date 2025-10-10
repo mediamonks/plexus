@@ -7,6 +7,7 @@ import DataVectorTargetDataSource from './target/DataVectorTargetDataSource';
 import UnknownError from '../error-handling/UnknownError';
 import UnsupportedError from '../error-handling/UnsupportedError';
 import config from '../../utils/config';
+import Debug from '../../utils/Debug';
 import hash from '../../utils/hash';
 import Profiler from '../../utils/Profiler';
 import RequestContext from '../../utils/RequestContext';
@@ -30,13 +31,24 @@ export default class DataSources {
 	}
 	
 	public static get(id: string): DataSource {
-		if (this.dataSources[id]) return this.dataSources[id];
+		Debug.log(`Requesting data source "${id}"`, 'DataSources');
+		
+		if (this.dataSources[id]) {
+			Debug.log(`Returning data source "${id}" from request cache`, 'DataSources');
+			return this.dataSources[id];
+		}
 		
 		const dataSourceConfiguration = this.configuration[id];
 		
 		if (!dataSourceConfiguration) throw new UnknownError('data source', id, this.configuration);
 		
+		Debug.dump(`Data source "${id}" configuration`, dataSourceConfiguration);
+		
 		const key = hash(id, JSON.stringify(dataSourceConfiguration));
+		
+		if (this._dataSources[key]) {
+			Debug.log(`Returning data source "${id}" from memory cache`, 'DataSources');
+		}
 		
 		this.dataSources[id] = this._dataSources[key] ?? this.create(id, dataSourceConfiguration);
 		
@@ -54,6 +66,8 @@ export default class DataSources {
 	}
 	
 	private static create(id: string, configuration: JsonObject): DataSource {
+		Debug.log(`Creating data source "${id}"`, 'DataSources');
+		
 		const { target, dataType } = DataSource.parseConfiguration(configuration);
 		
 		let instance = {

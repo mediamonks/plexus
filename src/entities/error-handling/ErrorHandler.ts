@@ -26,6 +26,7 @@ export default class ErrorHandler {
 	
 	public static log(error: Error) {
 		this._log.push(error);
+		console.error(error);
 	}
 	
 	public static getAll(): Error[] {

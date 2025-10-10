@@ -9,7 +9,7 @@ const modules = ['agents', 'azure', 'catalog', 'data-sources', 'drive', 'firesto
 let _config: Configuration;
 
 function getRequestConfig(): Configuration {
-	return (RequestContext.keys?.payload as RequestPayload)?.config ?? {};
+	return (RequestContext.store?.payload as RequestPayload)?.config ?? {};
 }
 
 function createStaticConfig(): any {
@@ -40,10 +40,10 @@ function merge(key: string, value1: any, value2: any): any {
 }
 
 // TODO use flag to determine whether global config should be included
-function get(name?: string, includeGlobal: boolean = false): JsonField {
+function get(name?: string, { includeGlobal = false, includeRequest = true }: { includeGlobal?: boolean, includeRequest?: boolean } = {}): JsonField {
 	//TODO this whole function needs refactoring based on all possible use-cases
 	const staticConfig = getStaticConfig();
-	const requestConfig = getRequestConfig();
+	const requestConfig = includeRequest ? getRequestConfig() : {};
 	
 	if (!name) return { ...staticConfig, ...requestConfig };
 	
