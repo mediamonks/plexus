@@ -7,16 +7,16 @@ import { Readable } from 'stream';
 import authenticate from './auth';
 import workspace from './workspace';
 import CustomError from '../entities/error-handling/CustomError';
-import config from '../utils/config';
-import Debug from '../utils/Debug';
-import Profiler from '../utils/Profiler';
+import Config from '../core/Config';
+import Debug from '../core/Debug';
+import Profiler from '../core/Profiler';
 
 export type FileMetaData = drive_v3.Schema$File;
 
 export default async () => {
-	const tempPath = config.get('tempPath') as string;
+	const tempPath = Config.get('tempPath') as string;
 	const downloadPath = path.join(tempPath, 'download', 'drive');
-	const tempFolderId = config.get('drive.tempFolderId') as string;
+	const tempFolderId = Config.get('drive.tempFolderId') as string;
 	const auth = await authenticate();
 	const drive = google.drive({ version: 'v3', auth });
 	
@@ -38,7 +38,7 @@ export default async () => {
 					}
 				}) : body,
 			},
-			fields: 'id, name, webViewLink, webContentLink',
+			fields: 'id, name, webViewLink, webContentLink, mimeType',
 			supportsAllDrives: true
 		});
 		
@@ -97,19 +97,26 @@ export default async () => {
 		
 		try {
 			const fileStream = await drive.files.get(
-					{ fileId: file.id, alt: 'media' },
-					{ responseType: 'stream' }
+					{ fileId: file.id, alt: 'media', supportsAllDrives: true },
+					{ responseType: 'stream' },
 			);
 			
 			destPath ??= path.join(downloadPath, `${file.id}${path.extname(file.name)}`);
 			fs.mkdirSync(path.dirname(destPath), { recursive: true });
 			
-			const writeStream = fs.createWriteStream(destPath, { encoding: null });
-			
-			await new Promise((resolve, reject) => {
+			await new Promise<void>((resolve, reject) => {
+				const writeStream = fs.createWriteStream(destPath, { encoding: null });
+				
+				writeStream
+					.on('error', error => {
+						reject(new CustomError(`Error writing file "${destPath}": ${error.message}`, 500));
+					})
+					.on('finish', resolve);
+				
 				fileStream.data
-						.on('end', resolve)
-						.on('error', reject)
+						.on('error', error => {
+							reject(new CustomError(`Error reading file "${file.name}": ${error.message}`, 500));
+						})
 						.pipe(writeStream);
 			});
 			
@@ -370,6 +377,14 @@ export default async () => {
 		});
 	}
 	
+	async function convertToPdf(localPath: string, allowCache: boolean) {
+		let metadata = await uploadFile(localPath, tempFolderId);
+		
+		metadata = await importFile(metadata, allowCache);
+		
+		return await exportFile(metadata, 'pdf', allowCache);
+	}
+	
 	return {
 		uploadFile,
 		createFolder,
@@ -379,6 +394,7 @@ export default async () => {
 		downloadFolderContents,
 		exportFolderContents,
 		exportFile,
+		convertToPdf,
 		createFile,
 		createLink,
 		createCsvFile,

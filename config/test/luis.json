@@ -1,0 +1,93 @@
+{
+	"agents": {
+		"documentAnalyzer": {
+			"instructions": "gs://monks-plexustest/main_prompt.txt",
+			"context": [
+				"documents",
+				"userDescription"
+			]
+		},
+		"analyst": {
+			"instructions": "You are a briefing analysis assistant. You receive a JSON object containing briefing analysis results with the following schema:\n\n{\n  \"answered_questions\": {\n    \"field_name\": \"extracted_value\"\n  },\n  \"missing_questions\": [\n    \"field_name1\", \"field_name2\"\n  ],\n  \"confidence_scores\": {\n    \"field_name\": 0.9\n  }\n}\n\nYour task is to analyze this data and provide a clear, concise summary that includes:\n1. How many questions were successfully answered from the provided information\n2. How many questions still need to be asked as part of the briefing process\n3. A brief assessment of the extraction quality\n\nProvide your response in a friendly, professional tone that would be suitable for a project briefing context.",
+			"context": [
+				"extractedInfo"
+			]
+		}
+	},
+	"catalog": {
+		"request": {
+			"type": "input",
+			"field": "request",
+			"required": true
+		},
+		"documentFolder": {
+			"type": "input",
+			"field": "documentFolder",
+			"required": true
+		},
+		"userDescription": {
+			"type": "input",
+			"field": "request",
+			"required": true
+		},
+		"extractedInfo": {
+			"type": "output",
+			"agent": "documentAnalyzer",
+			"field": "infoString",
+			"example": {
+				"answered_questions": {
+					"project_name": "Gallery ad",
+					"campaign_purpose": "more ppl come to gallery",
+					"background_problem_statement": "art is hard to sell",
+					"strategy_campaign_idea": "post pictures of paintings online",
+					"objectives_success_metrics": "???"
+				},
+				"missing_questions": [
+					"project_owner",
+					"quote_approver",
+					"asset_approver",
+					"deadline",
+					"budget_range",
+					"market_language",
+					"delivery_details",
+					"notes_attachments",
+					"project_type",
+					"briefing_template",
+					"key_message",
+					"additional_context"
+				],
+				"confidence_scores": {
+					"project_name": 0.9,
+					"campaign_purpose": 0.9,
+					"background_problem_statement": 0.9,
+					"strategy_campaign_idea": 0.9,
+					"objectives_success_metrics": 0.7
+				}
+			}
+		},
+		"analysisSummary": {
+			"type": "output",
+			"agent": "analyst",
+			"field": "summary",
+			"example": "Based on the analysis, 5 questions were successfully answered with high confidence, while 12 questions still need to be addressed during the briefing process."
+		},
+		"documents": {
+			"type": "data",
+			"dataSource": "documents"
+		}
+	},
+	"data-sources": {
+		"documents": {
+			"uri": "{documentFolder}",
+			"platform": "drive",
+			"dataType": "text",
+			"target": "file",
+			"cache": false,
+			"folder": true
+		}
+	},
+	"output": [
+		"extractedInfo",
+		"analysisSummary"
+	]
+}

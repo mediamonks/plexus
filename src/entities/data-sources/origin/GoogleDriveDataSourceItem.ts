@@ -8,14 +8,7 @@ import pdf from '../../../utils/pdf';
 import UnsupportedError from '../../error-handling/UnsupportedError';
 import xlsx from '../../../utils/xlsx';
 import { JsonField, SpreadSheet, ValueOf } from '../../../types/common';
-
-const LLM_SUPPORTED_MIME_TYPES = [
-	'application/pdf',
-	'text/plain',
-	'application/json',
-	'image/png',
-	'image/jpeg',
-];
+import LLM from '../../../services/llm/LLM';
 
 export default class GoogleDriveDataSourceItem extends DataSourceItem<string, SpreadSheet> {
 	static readonly TextContent: string;
@@ -67,7 +60,7 @@ export default class GoogleDriveDataSourceItem extends DataSourceItem<string, Sp
 		
 		let metadata = this.metadata;
 		
-		if (LLM_SUPPORTED_MIME_TYPES.includes(this.mimeType))
+		if (LLM.supportedMimeTypes.includes(this.mimeType))
 			return (this.allowCache ? driveService.cacheFile(metadata) : driveService.downloadFile(metadata));
 		
 		if (!this.mimeType.startsWith('application/vnd.google-apps.'))

@@ -1,6 +1,6 @@
 import { performance } from 'node:perf_hooks';
 import lancedb, { Connection } from '@lancedb/lancedb';
-import config from '../utils/config';
+import Config from '../core/Config';
 import { JsonObject } from '../types/common';
 
 type Configuration = {
@@ -11,7 +11,7 @@ type Configuration = {
 let _db: Connection;
 const db = async () => {
 	if (_db) return _db;
-	const databaseUri = config.get('lancedb/databaseUri') as Configuration['databaseUri'];
+	const databaseUri = Config.get('lancedb/databaseUri') as Configuration['databaseUri'];
 	_db = await lancedb.connect(databaseUri);
 	return _db;
 }
@@ -59,7 +59,7 @@ async function writeRecordBuffer(tableName: string): Promise<void> {
 async function append(tableName: string, records: any[]): Promise<any> {
 	if (!records.length) return;
 	
-	const rateLimitDelay = config.get('lancedb/rateLimitDelayMs') as Configuration['rateLimitDelayMs'];
+	const rateLimitDelay = Config.get('lancedb/rateLimitDelayMs') as Configuration['rateLimitDelayMs'];
 	
 	tableRecordBuffers[tableName] ??= [];
 	tableRecordBuffers[tableName].push(...records);

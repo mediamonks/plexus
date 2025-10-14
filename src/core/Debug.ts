@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import config from './config';
+import Config from './Config';
 import RequestContext from './RequestContext';
 import { JsonField } from '../types/common';
 
@@ -50,7 +50,7 @@ export default class Debug {
 	public static dump(label: string, data: any): void {
 		this._log.push({ ts: Date.now(), type: 'dump', label, data });
 		
-		const dumpFilePath = path.join(config.get('tempPath') as string, 'dump');
+		const dumpFilePath = path.join(Config.get('tempPath') as string, 'dump');
 		
 		fs.mkdir(dumpFilePath, { recursive: true }).then(() => {
 			const content = typeof data === 'object' ? JSON.stringify(data, null, 2) : data;

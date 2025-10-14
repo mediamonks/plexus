@@ -1,16 +1,13 @@
 import fs from 'node:fs';
 import IEntity from '../Entity';
+import Instructions from '../Instructions';
 import Catalog from '../catalog/Catalog';
 import DataSourceItem from '../data-sources/origin/DataSourceItem';
 import CustomError from '../error-handling/CustomError';
-import LLM from '../LLM';
-import Storage from '../storage/Storage';
-import StorageFile from '../storage/StorageFile';
-import gcs from '../../services/gcs';
-import config from '../../utils/config';
-import Debug from '../../utils/Debug';
-import History from '../../utils/History';
-import Profiler from '../../utils/Profiler';
+import Debug from '../../core/Debug';
+import History from '../../core/History';
+import Profiler from '../../core/Profiler';
+import LLM from '../../services/llm/LLM';
 import status from '../../utils/status';
 import { JsonField, JsonObject } from '../../types/common';
 
@@ -20,7 +17,7 @@ const INPUT_OUTPUT_TEMPLATE = fs
 
 export default class Agent implements IEntity {
 	public isReady: boolean = false;
-	private _baseInstructions: string;
+	private _baseInstructions: Instructions;
 	private _catalog: Catalog;
 	private readonly _configuration: typeof Agent.Configuration;
 	private readonly _context: Record<string, Promise<void> | JsonField> = {};
@@ -31,7 +28,7 @@ export default class Agent implements IEntity {
 	private _loaded: Promise<void>;
 	private _ready: Promise<void>;
 	private _temperature: number  = 0;
-
+	
 	static readonly Configuration: {
 		readonly instructions: string;
 		readonly context?: readonly string[];
@@ -79,11 +76,15 @@ export default class Agent implements IEntity {
 				.replace(/\{input}/, JSON.stringify(inputSchema, undefined, 2))
 				.replace(/\{output}/, JSON.stringify(outputSchema, undefined, 2));
 	
-		return [this._baseInstructions, this.configuration.paginationRule, inputOutput].join('\n\n');
+		return [this.baseInstructions, this.configuration.paginationRule, inputOutput].join('\n\n');
 	}
 	
 	public get catalog(): Catalog {
 		return this._catalog;
+	}
+	
+	protected get baseInstructions() {
+		return this._baseInstructions ??= new Instructions(this);
 	}
 	
 	private async _mapFiles(value: JsonField | DataSourceItem<unknown, unknown>[]): Promise<JsonField> {
@@ -119,23 +120,8 @@ export default class Agent implements IEntity {
 	
 	private async _loadBaseInstructions(): Promise<void> {
 		await Profiler.run(async () => {
-			if (this._baseInstructions) return;
-			
-			const { instructions } = this.configuration;
-			const instructionsPath = config.get('instructionsPath');
-			
 			try {
-				if (instructions) {
-					if (instructions.startsWith('gs://')) {
-						this._baseInstructions = await gcs.cache(this.configuration.instructions);
-					} else {
-						this._baseInstructions = instructions;
-					}
-				} else if (instructionsPath) {
-					this._baseInstructions = await gcs.cache(`${instructionsPath}/${this.id}.txt`);
-				} else {
-					this._baseInstructions = await Storage.get(StorageFile.TYPE.AGENT_INSTRUCTIONS, this.id).read();
-				}
+				await this.baseInstructions.load();
 			} catch (error) {
 				throw new CustomError(`Missing instructions for agent "${this._id}"`);
 			}
@@ -170,14 +156,16 @@ export default class Agent implements IEntity {
 		
 		if (required) for (const requiredField of required)	if (this._context[requiredField] === undefined) return {};
 		
-		Debug.dump(`agent ${this.id} instructions`, this.instructions);
+		const instructions = this.instructions;
+		
+		Debug.dump(`agent ${this.id} instructions`, instructions);
 		Debug.dump(`agent ${this.id} prompt`, this._context);
 		Debug.dump(`agent ${this.id} files`, this._files);
 		
 		const response = await status.wrap(`Running ${this.id} agent`, () =>
 			Profiler.run(() =>
 				LLM.query(JSON.stringify(this._context, undefined, 2), {
-					instructions: this.instructions,
+					instructions,
 					temperature: this._temperature,
 					history: useHistory && History.instance,
 					structuredResponse: true,

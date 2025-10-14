@@ -2,9 +2,9 @@ import CatalogField from './CatalogField';
 import DataSourceItem from '../data-sources/origin/DataSourceItem';
 import CustomError from '../error-handling/CustomError';
 import UnknownError from '../error-handling/UnknownError';
-import config from '../../utils/config';
-import Debug from '../../utils/Debug';
-import RequestContext from '../../utils/RequestContext';
+import Config from '../../core/Config';
+import Debug from '../../core/Debug';
+import RequestContext from '../../core/RequestContext';
 import { JsonField, RequestPayload, Configuration } from '../../types/common';
 
 export default class InputCatalogField extends CatalogField {
@@ -42,7 +42,7 @@ export default class InputCatalogField extends CatalogField {
 			return;
 		}
 		
-		const inputFields = config.get('input-fields') as Configuration['input-fields'];
+		const inputFields = Config.get('input-fields') as Configuration['input-fields'];
 		const fieldValues = inputFields[this.payloadField];
 		
 		if (fieldValues) {

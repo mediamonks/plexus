@@ -1,5 +1,5 @@
 import { v4 as uuid } from 'uuid';
-import config from './config';
+import Config from './Config';
 import Profiler from './Profiler';
 import RequestContext from './RequestContext';
 import firestore from '../services/firestore';
@@ -66,7 +66,7 @@ export default class History {
 			history: this.toJSON(),
 		}), 'update thread');
 		
-		if (config.get('waitForThreadUpdate')) await threadUpdate;
+		if (Config.get('waitForThreadUpdate')) await threadUpdate;
 	}
 	
 	public toVertexAi(): any[] {

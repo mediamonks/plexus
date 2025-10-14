@@ -1,7 +1,7 @@
 import Agent from './Agent';
 import Catalog from '../catalog/Catalog';
 import UnknownError from '../error-handling/UnknownError';
-import config from '../../utils/config';
+import Config from '../../core/Config';
 import hash from '../../utils/hash';
 import { JsonObject } from '../../types/common';
 
@@ -9,7 +9,7 @@ export default class Agents {
 	private static readonly _agents: Record<string, Agent> = {};
 	
 	public static get(id: string, catalog: Catalog): Agent {
-		const configuration = config.get(`agents`) as JsonObject;
+		const configuration = Config.get(`agents`) as JsonObject;
 		
 		if (!configuration[id]) throw new UnknownError('agent', id, configuration);
 		

@@ -2,7 +2,7 @@ import DataSourceOrigin from './DataSourceOrigin';
 import GoogleDriveDataSourceItem from './GoogleDriveDataSourceItem';
 import CustomError from '../../error-handling/CustomError';
 import drive, { FileMetaData } from '../../../services/drive';
-import Debug from '../../../utils/Debug';
+import Debug from '../../../core/Debug';
 import { JsonObject } from '../../../types/common';
 
 const GOOGLE_DRIVE_URI_PATTERN = /^https?:\/\/(?:drive|docs)\.google\.com\/(?:drive\/(?:u\/\d+\/)?(folders)|(?:file|document|spreadsheets|presentation)\/d)\/([\w\-]+)/;

@@ -1,5 +1,5 @@
 import { v2 } from '@google-cloud/tasks';
-import config from '../utils/config';
+import Config from '../core/Config';
 
 const client = new v2.CloudTasksClient();
 
@@ -8,7 +8,7 @@ type Configuration = {
 	location: string;
 };
 
-const { projectId, location } = config.get('tasks', { includeGlobal: true, includeRequest: false }) as Configuration;
+const { projectId, location } = Config.get('tasks', { includeGlobal: true, includeRequest: false }) as Configuration;
 
 async function create(queue: string, endpoint: string, payload: any): Promise<any> {
 	const parent = client.queuePath(projectId, location, queue);
