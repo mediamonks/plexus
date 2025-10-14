@@ -21,22 +21,28 @@
 				"response": {
 					"type": "object",
 					"properties": {
+						"result": {
+							"type": "object",
+							"description": "The result of the pipeline execution",
+							"properties": {
+								"output": {
+									"type": "object",
+									"description": "Generated values for the pipeline's output fields"
+								},
+								"threadId": {
+									"type": "string",
+									"format": "uuid",
+									"description": "Unique identifier for the thread."
+								},
+								"fields": {
+									"type": "object",
+									"description": "Values of the pipeline's input fields"
+								}
+							}
+						},
 						"error": {
 							"type": "string",
 							"description": "Error message if applicable, otherwise null."
-						},
-						"threadId": {
-							"type": "string",
-							"format": "uuid",
-							"description": "Unique identifier for the thread."
-						},
-						"output": {
-							"type": "object",
-							"description": "Generated values for the pipeline's output fields"
-						},
-						"fields": {
-							"type": "object",
-							"description": "Values of the pipeline's input fields"
 						},
 						"performance": {
 							"type": "array",

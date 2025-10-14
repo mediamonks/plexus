@@ -1,8 +1,8 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import gcs from '../../services/gcs';
-import config from '../../utils/config';
-import Debug from '../../utils/Debug';
+import GoogleCloudStorage from '../../services/google-cloud/GoogleCloudStorage';
+import Config from '../../core/Config';
+import Debug from '../../core/Debug';
 
 export default abstract class StorageFile<T> {
 	private readonly _name: string;
@@ -52,11 +52,11 @@ export default abstract class StorageFile<T> {
 	}
 	
 	public get localPath() {
-		return path.join(config.get('tempPath') as string, 'storage', ...this.typeBasedPath.split('/'), this.fileName);
+		return path.join(Config.get('tempPath') as string, 'storage', ...this.typeBasedPath.split('/'), this.fileName);
 	}
 	
 	public get uri() {
-		return `gs://${config.get('storage.bucket')}/${this.remotePath}`;
+		return `gs://${Config.get('storage.bucket')}/${this.remotePath}`;
 	}
 	
 	protected async cache(): Promise<void> {
@@ -64,7 +64,7 @@ export default abstract class StorageFile<T> {
 			await fs.access(this.localPath);
 		} catch (error) {
 			Debug.log(`Caching storage file "${this.remotePath}"`, 'FS');
-			await gcs.download(this.uri, this.localPath);
+			await GoogleCloudStorage.download(this.uri, this.localPath);
 		}
 	}
 	
@@ -74,7 +74,7 @@ export default abstract class StorageFile<T> {
 
 	protected async writeText(text: string): Promise<void> {
 		await Promise.all([
-			gcs.write(this.uri, text),
+			GoogleCloudStorage.write(this.uri, text),
 			fs.unlink(this.localPath).catch(() => {}),
 		]);
 	}

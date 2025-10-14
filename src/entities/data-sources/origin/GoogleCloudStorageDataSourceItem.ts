@@ -1,12 +1,17 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import mimeTypes from 'mime-types';
 import DataSourceItem from './DataSourceItem';
 import DataSource from '../DataSource';
 import UnsupportedError from '../../error-handling/UnsupportedError';
-import gcs from '../../../services/gcs';
+import GoogleCloudStorage from '../../../services/google-cloud/GoogleCloudStorage';
 import jsonl from '../../../utils/jsonl';
 import pdf from '../../../utils/pdf';
 import { JsonField, JsonObject, ValueOf } from '../../../types/common';
+import LLM from '../../../services/llm/LLM';
+import CustomError from '../../error-handling/CustomError';
+import drive from '../../../services/drive';
+import Config from '../../../core/Config';
 
 export default class GoogleCloudStorageDataSourceItem extends DataSourceItem<string, AsyncGenerator<JsonObject>> {
 	private readonly _uri: string;
@@ -29,6 +34,12 @@ export default class GoogleCloudStorageDataSourceItem extends DataSourceItem<str
 		return path.basename(this.uri);
 	}
 	
+	private get mimeType(): string {
+		const mimeType = mimeTypes.lookup(this.uri);
+		if (!mimeType) throw new CustomError(`Failed detecting mime type for file "${this.uri}"`);
+		return mimeType;
+	}
+	
 	protected detectDataType(): ValueOf<typeof DataSource.DATA_TYPE> {
 		return {
 			pdf: DataSource.DATA_TYPE.UNSTRUCTURED,
@@ -38,7 +49,13 @@ export default class GoogleCloudStorageDataSourceItem extends DataSourceItem<str
 	}
 	
 	public async getLocalFile(): Promise<string> {
-		return this.allowCache ? await gcs.cache(this.uri) : gcs.download(this.uri);
+		const localPath = this.allowCache ? await GoogleCloudStorage.cache(this.uri) : await GoogleCloudStorage.download(this.uri);
+		
+		if (LLM.supportedMimeTypes.includes(this.mimeType)) return localPath;
+		
+		const driveService = await drive();
+		
+		return await driveService.convertToPdf(localPath, this.allowCache);
 	}
 	
 	public async toText(): Promise<string> {

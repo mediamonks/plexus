@@ -1,5 +1,5 @@
 import DataSource from '../DataSource';
-import LLM from '../../LLM';
+import LLM from '../../../services/llm/LLM';
 import Storage from '../../storage/Storage';
 import StorageFile from '../../storage/StorageFile';
 import IEntity from '../../Entity';

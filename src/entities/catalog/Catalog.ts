@@ -4,8 +4,8 @@ import InputCatalogField from './InputCatalogField';
 import OutputCatalogField from './OutputCatalogField';
 import UnknownError from '../error-handling/UnknownError';
 import UnsupportedError from '../error-handling/UnsupportedError';
-import config from '../../utils/config';
-import RequestContext from '../../utils/RequestContext';
+import Config from '../../core/Config';
+import RequestContext from '../../core/RequestContext';
 import { JsonObject } from '../../types/common';
 
 export default class Catalog {
@@ -19,7 +19,7 @@ export default class Catalog {
 	}
 	
 	public get configuration(): JsonObject {
-		return this._configuration ??= config.get('catalog') as typeof Catalog.Configuration;
+		return this._configuration ??= Config.get('catalog') as typeof Catalog.Configuration;
 	}
 	
 	public createField(fieldId: string): CatalogField {

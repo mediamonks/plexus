@@ -1,7 +1,9 @@
 import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
 import DataSource from '../DataSource';
 import DataSourceCatalogField from '../../catalog/DataSourceCatalogField';
-import VectorDB from '../../VectorDB';
+import LLM from '../../../services/llm/LLM';
+import VectorDB from '../../../services/vector-db/VectorDB';
+import CustomError from '../../error-handling/CustomError';
 
 export default class VectorTargetDataSource extends DataSource {
 	public async ingest(): Promise<void> {
@@ -10,11 +12,14 @@ export default class VectorTargetDataSource extends DataSource {
 	}
 	
 	public async query({ input, limit }: typeof DataSourceCatalogField.QueryParameters): Promise<string[]> {
-		const embeddings = await VectorDB.generateQueryEmbeddings(input);
+		try {
+			const result = await VectorDB.search(this.id, input, { limit, fields: ['text'] });
+			
+			return result.map(item => item['text'] as string);
+		} catch (error) {
+			throw new CustomError(`Vector search failed on data source "${this.id}". Likely no ingested data exists for the current embedding model. (${error})`);
+		}
 		
-		const result = await VectorDB.search(this.id, embeddings, { limit, fields: ['text'] });
-		
-		return result.map(item => item['text'] as string);
 	}
 	
 	private async *generator(): AsyncGenerator<{ text: string, vector: number[] }> {
@@ -33,7 +38,7 @@ export default class VectorTargetDataSource extends DataSource {
 			for (const chunk of chunks) {
 				const content = chunk.pageContent;
 				if (!content) continue;
-				yield { text: content, vector: await VectorDB.generateDocumentEmbeddings(content) };
+				yield { text: content, vector: await LLM.generateDocumentEmbeddings(content) };
 			}
 		}
 	}

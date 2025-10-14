@@ -6,11 +6,11 @@ import RawTextTargetDataSource from './target/RawTextTargetDataSource';
 import DataVectorTargetDataSource from './target/DataVectorTargetDataSource';
 import UnknownError from '../error-handling/UnknownError';
 import UnsupportedError from '../error-handling/UnsupportedError';
-import config from '../../utils/config';
-import Debug from '../../utils/Debug';
+import Config from '../../core/Config';
+import Debug from '../../core/Debug';
 import hash from '../../utils/hash';
-import Profiler from '../../utils/Profiler';
-import RequestContext from '../../utils/RequestContext';
+import Profiler from '../../core/Profiler';
+import RequestContext from '../../core/RequestContext';
 import { JsonObject } from '../../types/common';
 
 export default class DataSources {
@@ -19,7 +19,7 @@ export default class DataSources {
 	private static readonly _dataSources: Record<string, DataSource> = {};
 	
 	public static get configuration(): typeof DataSources.Configuration {
-		return config.get('data-sources') as typeof DataSources.Configuration;
+		return Config.get('data-sources') as typeof DataSources.Configuration;
 	}
 	
 	public static get dataSources(): Record<string, DataSource> {

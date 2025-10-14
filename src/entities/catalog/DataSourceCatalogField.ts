@@ -3,16 +3,17 @@ import DataSource from '../data-sources/DataSource';
 import DataSources from '../data-sources/DataSources';
 import DataSourceItem from '../data-sources/origin/DataSourceItem';
 import CustomError from '../error-handling/CustomError';
-import Debug from '../../utils/Debug';
+import Debug from '../../core/Debug';
 import { JsonField } from '../../types/common';
 
 export default class DataSourceCatalogField extends CatalogField {
 	public static readonly Configuration: {
 		type: 'data';
 		example: JsonField;
-		dataSource: string;
+		source: string;
+		dataSource: string; // TODO for backwards compatibility
 		query: typeof DataSourceCatalogField.QueryParameters,
-	} & typeof DataSourceCatalogField.QueryParameters // TODO for backwards compatibility;
+	} & typeof DataSourceCatalogField.QueryParameters; // TODO for backwards compatibility
 	
 	public static readonly QueryParameters: {
 		input?: string;
@@ -27,9 +28,11 @@ export default class DataSourceCatalogField extends CatalogField {
 	}
 
 	public get dataSourceId(): string {
-		if (!this.configuration.dataSource) throw new CustomError(`Missing 'dataSource' property for data field "${this.id}"`);
+		const source = this.configuration.source ?? this.configuration.dataSource; // TODO for backwards compatibility
 		
-		return this.configuration.dataSource;
+		if (!source) throw new CustomError(`Missing 'source' property for data field "${this.id}"`);
+		
+		return source;
 	}
 	
 	public get inputField(): string {

@@ -1,15 +1,21 @@
 {
 	"agents": {
 		"hello": {
-			"instructions": "gs://monks-plexus/system-instructions/hello.txt",
+			"instructions": "gs://monks-plexustest/hello.txt",
 			"context": [
 				"names"
 			]
 		},
 		"names": {
-			"instructions": "gs://monks-plexus/system-instructions/names.txt",
+			"instructions": "gs://monks-plexustest/names.txt",
 			"context": [
 				"documents"
+			]
+		},
+		"test": {
+			"instructions": "gs://monks-plexustest/hello.txt",
+			"context": [
+				"gcs-export"
 			]
 		}
 	},
@@ -37,6 +43,16 @@
 				"John",
 				"Pete"
 			]
+		},
+		"gcs-export": {
+			"type": "data",
+			"source": "gcs-export"
+		},
+		"output": {
+			"type": "output",
+			"agent": "test",
+			"field": "output",
+			"example": "the output string"
 		}
 	},
 	"data-sources": {
@@ -46,9 +62,15 @@
 			"platform": "drive",
 			"target": "raw",
 			"folder": true
+		},
+		"gcs-export": {
+			"namespace": "test",
+			"uri": "gs://monks-plexustest/gcs-export",
+			"target": "file",
+			"folder": true
 		}
 	},
 	"output": [
-		"documents"
+		"output"
 	]
 }

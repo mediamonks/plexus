@@ -1,4 +1,4 @@
-import RequestContext from '../../utils/RequestContext';
+import RequestContext from '../../core/RequestContext';
 
 export default class ErrorHandler {
 	private static initialized = false;

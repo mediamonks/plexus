@@ -1,6 +1,5 @@
 import fs from 'node:fs/promises';
 import StorageFile from './StorageFile';
-import Profiler from '../../utils/Profiler';
 
 export default class StorageTextFile extends StorageFile<string> {
 	protected readonly _extension = 'txt';

@@ -28,13 +28,15 @@ The following file types are currently supported:
 
 - **PDF** (unstructured)
 - **TXT** (unstructured)
-- **Google Doc** (unstructured, Google Drive only)
-- **DOCX** (unstructured, Google Drive only)
 - **JSON** (structured)
-- **Google Sheet** (structured, Google Drive only)
-- **XLSX** (structured, Google Drive only)
 - **PNG** (`file` target only)
 - **JPEG** (`file` target only)
+- **DOCX** (unstructured, Google Drive origin only)
+- **PPTX** (unstructured, Google Drive origin only)
+- **XLSX** (structured, Google Drive origin only)
+- **Google Doc** (unstructured, Google Drive origin only)
+- **Google Slides** (unstructured, Google Drive origin only)
+- **Google Sheet** (structured, Google Drive origin only)
 
 ### Ingesting
 Data sources can be ingested using the `/ingest` endpoint. This is necessary for `vector`-target data sources and recommended for all data sources that are not dynamic.
@@ -85,30 +87,32 @@ Invokes an agent workflow.
 **Response:**
 ```json
 {
-  "error": null,
-	"output": {
-		// Output field values as defined in your output configuration
+	"result": {
+		"output": {
+			// Output field values as defined in your output configuration
+		},
+		"threadId": "uuid-string",
+		"fields": {
+			// Field values as provided in the request payload
+		}
 	},
-	"threadId": "uuid-string",
-	"fields": {
-		// Field values as provided in the request payload
+	"debug": {
+		// Debug information
 	},
 	"performance": {
 		// Performance metrics
 	},
-	"debug": {
-		// Debug information
-	}
+	"error": null
 }
 ```
 
 **Response Fields:**
-- **`error`** (string|null): Error message if applicable, otherwise null
-- **`output`** (object): Output field values as defined in your `output` configuration
-- **`threadId`** (string): Unique identifier for the conversation thread
-- **`fields`** (object): Field values as provided in the request payload
-- **`performance`** (object): Performance metrics
+- **`result.output`** (object): Output field values as defined in your `output` configuration
+- **`result.threadId`** (string): Unique identifier for the conversation thread
+- **`result.fields`** (object): Field values as provided in the request payload
 - **`debug`** (object): Debug information
+- **`performance`** (object): Performance metrics
+- **`error`** (string|null): Error message if applicable, otherwise null
 
 ### GET `/fields/{field}`
 

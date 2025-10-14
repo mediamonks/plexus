@@ -7,7 +7,7 @@ import Catalog from '../catalog/Catalog';
 import DataSourceCatalogField from '../catalog/DataSourceCatalogField';
 import CustomError from '../error-handling/CustomError';
 import UnsupportedError from '../error-handling/UnsupportedError';
-import RequestContext from '../../utils/RequestContext';
+import RequestContext from '../../core/RequestContext';
 import { JsonField, JsonObject, ValueOf } from '../../types/common';
 
 export default abstract class DataSource {

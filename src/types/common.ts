@@ -2,6 +2,10 @@ import Agent from '../entities/agents/Agent';
 import Catalog from '../entities/catalog/Catalog';
 import DataSources from '../entities/data-sources/DataSources';
 
+export function staticImplements<T>() {
+	return <U extends T>(constructor: U) => constructor;
+}
+
 export type JsonPrimitive = string | number | boolean | null;
 export type JsonArray = JsonField[];
 export type JsonField = JsonPrimitive | JsonArray | JsonObject;

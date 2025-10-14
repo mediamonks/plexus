@@ -1,9 +1,9 @@
 import Catalog from '../entities/catalog/Catalog';
 import CustomError from '../entities/error-handling/CustomError';
-import config from '../utils/config';
-import History from '../utils/History';
-import Profiler from '../utils/Profiler';
-import RequestContext from '../utils/RequestContext';
+import Config from '../core/Config';
+import History from '../core/History';
+import Profiler from '../core/Profiler';
+import RequestContext from '../core/RequestContext';
 import { JsonObject, RequestPayload } from '../types/common';
 
 export default async (_: any, payload: any): Promise<{
@@ -17,7 +17,7 @@ export default async (_: any, payload: any): Promise<{
 	
 	History.create(threadId as string);
 	
-	const outputFields = config.get('output') as string[];
+	const outputFields = Config.get('output') as string[];
 	
 	if (!outputFields || !outputFields.length) throw new CustomError('No output specified');
 	

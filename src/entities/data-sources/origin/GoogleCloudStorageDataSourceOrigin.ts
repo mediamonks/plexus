@@ -1,6 +1,6 @@
 import DataSourceOrigin from './DataSourceOrigin';
 import GoogleCloudStorageDataSourceItem from './GoogleCloudStorageDataSourceItem';
-import gcs from '../../../services/gcs';
+import GoogleCloudStorage from '../../../services/google-cloud/GoogleCloudStorage';
 import { JsonObject } from '../../../types/common';
 
 export default class GoogleCloudStorageDataSourceOrigin extends DataSourceOrigin {
@@ -34,9 +34,9 @@ export default class GoogleCloudStorageDataSourceOrigin extends DataSourceOrigin
 		const uri = await this.getUri();
 		let isFolder = this.dataSource.configuration.isFolder;
 		
-		isFolder ??= gcs.isFolder(uri);
+		isFolder ??= GoogleCloudStorage.isFolder(uri);
 		
-		if (isFolder) return await gcs.list(uri);
+		if (isFolder) return await GoogleCloudStorage.list(uri);
 		
 		return [uri];
 	}
