@@ -13,6 +13,11 @@ export default class CatalogField {
 	private _configuration: typeof CatalogField.Configuration;
 	protected _value: Promise<JsonField | DataSourceItem<unknown, unknown>[]> | JsonField | DataSourceItem<unknown, unknown>[];
 
+	static readonly BaseConfiguration: {
+		type: 'input' | 'output' | 'data',
+		example: string,
+	};
+	
 	static readonly Configuration: typeof DataSourceCatalogField.Configuration
 		| typeof InputCatalogField.Configuration
 		| typeof OutputCatalogField.Configuration;

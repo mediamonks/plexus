@@ -28,7 +28,8 @@
 		"userDescription": {
 			"type": "input",
 			"field": "request",
-			"required": true
+			"required": true,
+			"example": "The user input"
 		},
 		"extractedInfo": {
 			"type": "output",
@@ -36,11 +37,372 @@
 			"field": "infoString",
 			"example": {
 				"answered_questions": {
-					"project_name": "Gallery ad",
-					"campaign_purpose": "more ppl come to gallery",
-					"background_problem_statement": "art is hard to sell",
-					"strategy_campaign_idea": "post pictures of paintings online",
-					"objectives_success_metrics": "???"
+					"project_name": {
+						"description": "Free text, no restrictions",
+						"type": "text",
+						"required": true,
+						"section": "project_information",
+						"options": []
+					},
+					"project_owner": {
+						"description": "Select from ASML staff directory (31 options)",
+						"type": "dropdown",
+						"required": true,
+						"section": "project_information",
+						"options": [
+							{
+								"text": "adam.murphy@asml.com",
+								"value": "adamMurphy"
+							},
+							{
+								"text": "christine.middleton@asml.com",
+								"value": "christineMiddleton"
+							},
+							{
+								"text": "bas.griffioen@asml.com",
+								"value": "basGriffioen"
+							},
+							{
+								"text": "claudia.voigtlander@asml.com",
+								"value": "claudiaVoigtlander"
+							},
+							{
+								"text": "corinna.baschirotto@asml.com",
+								"value": "corinnaBaschirotto"
+							},
+							{
+								"text": "christel.van.der.sterren@asml.com",
+								"value": "christelVanDerSterren"
+							},
+							{
+								"text": "edita.mujovic@asml.com",
+								"value": "editaMujovic"
+							},
+							{
+								"text": "eliza.menzel@asml.com",
+								"value": "elizaMenzel"
+							},
+							{
+								"text": "fatih.boyla@asml.com",
+								"value": "fatihBoyla"
+							},
+							{
+								"text": "iris.teichmann@asml.com",
+								"value": "irisTeichmann"
+							},
+							{
+								"text": "johan.van.beers@asml.com",
+								"value": "johanVanBeers"
+							},
+							{
+								"text": "jojanneke.meewis@asml.com",
+								"value": "jojannekeMeewis"
+							},
+							{
+								"text": "karen.lo@asml.com",
+								"value": "karenLo"
+							},
+							{
+								"text": "kevin.sproete@asml.com",
+								"value": "kevinSproete"
+							},
+							{
+								"text": "ks.kim@asml.com",
+								"value": "ksKim"
+							},
+							{
+								"text": "laura.losse@asml.com",
+								"value": "lauraLosse"
+							},
+							{
+								"text": "lisa.feng@asml.com",
+								"value": "lisaFeng"
+							},
+							{
+								"text": "madelon.damen@asml.com",
+								"value": "madelonDamen"
+							},
+							{
+								"text": "marieclaire.de.haas@asml.com",
+								"value": "marieclaireDeHaas"
+							},
+							{
+								"text": "marisol.alvarez@asml.com",
+								"value": "marisolAlvarez"
+							},
+							{
+								"text": "marleen.bonouvrie@asml.com",
+								"value": "marleenBonouvrie"
+							},
+							{
+								"text": "myra.biusing@asml.com",
+								"value": "myraBiusing"
+							},
+							{
+								"text": "natasja.gielen@asml.com",
+								"value": "natasjaGielen"
+							},
+							{
+								"text": "oresta.druiven@asml.com",
+								"value": "orestaDruiven"
+							},
+							{
+								"text": "ron.van.amelsfoort@asml.com",
+								"value": "ronVanAmelsfoort"
+							},
+							{
+								"text": "shawn.liu-slnd@asml.com",
+								"value": "shawnLiuSlnd"
+							},
+							{
+								"text": "verena.thiele@asml.com",
+								"value": "verenaThiele"
+							},
+							{
+								"text": "vivian.zhou@asml.com",
+								"value": "vivianZhou"
+							},
+							{
+								"text": "wencke.schulz@asml.com",
+								"value": "wenckeSchulz"
+							},
+							{
+								"text": "wendy.losse@asml.com",
+								"value": "wendyLosse"
+							},
+							{
+								"text": "Other",
+								"value": "other"
+							}
+						]
+					},
+					"quote_approver": {
+						"description": "Can start with a predefined list",
+						"type": "dropdown",
+						"required": false,
+						"section": "project_information",
+						"options": []
+					},
+					"asset_approver": {
+						"description": "Can start with a predefined list",
+						"type": "dropdown",
+						"required": false,
+						"section": "project_information",
+						"options": []
+					},
+					"deadline": {
+						"description": "Preferably YYYY-MM-DD format",
+						"type": "date",
+						"required": true,
+						"section": "project_information",
+						"options": []
+					},
+					"budget_range": {
+						"description": "Free text, can be any range",
+						"type": "text",
+						"required": true,
+						"section": "project_information",
+						"options": []
+					},
+					"market_language": {
+						"description": "Select target market and language (16 options)",
+						"type": "dropdown",
+						"required": true,
+						"section": "project_information",
+						"options": [
+							{
+								"text": "Master asset ENG - US",
+								"value": "master"
+							},
+							{
+								"text": "The Netherlands - NL",
+								"value": "NetherlandsNL"
+							},
+							{
+								"text": "The Netherlands - EN",
+								"value": "NetherlandsEN"
+							},
+							{
+								"text": "United States - EN",
+								"value": "UnitedStatesEN"
+							},
+							{
+								"text": "Germany - DE",
+								"value": "GermanyDE"
+							},
+							{
+								"text": "Germany - EN",
+								"value": "GermanyEN"
+							},
+							{
+								"text": "United Kingdom - EN",
+								"value": "UnitedKingdomEN"
+							},
+							{
+								"text": "China - ZH",
+								"value": "ChinaZH"
+							},
+							{
+								"text": "China - EN",
+								"value": "ChinaEN"
+							},
+							{
+								"text": "Japan - JA",
+								"value": "JapanJA"
+							},
+							{
+								"text": "Japan - EN",
+								"value": "JapanEN"
+							},
+							{
+								"text": "South Korea - KO",
+								"value": "SouthKoreaKO"
+							},
+							{
+								"text": "South Korea - EN",
+								"value": "SouthKoreaEN"
+							},
+							{
+								"text": "Taiwan - TW",
+								"value": "TaiwanTW"
+							},
+							{
+								"text": "Taiwan - EN",
+								"value": "TaiwanEN"
+							},
+							{
+								"text": "Other",
+								"value": "other"
+							}
+						]
+					},
+					"delivery_details": {
+						"description": "Client should provide an Asset Matrix",
+						"type": "textarea",
+						"required": false,
+						"section": "project_information",
+						"options": []
+					},
+					"notes_attachments": {
+						"description": "Free text, and any files",
+						"type": "textarea",
+						"required": false,
+						"section": "project_information",
+						"options": []
+					},
+					"project_type": {
+						"description": "Select project type (7 options)",
+						"type": "dropdown",
+						"required": true,
+						"section": "project_information",
+						"options": [
+							{
+								"text": "EU campaign",
+								"value": "euCampaign"
+							},
+							{
+								"text": "US campaign",
+								"value": "usCampaign"
+							},
+							{
+								"text": "Asia campaign",
+								"value": "asiaCampaign"
+							},
+							{
+								"text": "China campaign",
+								"value": "chinaCampaign"
+							},
+							{
+								"text": "Event",
+								"value": "event"
+							},
+							{
+								"text": "PPT",
+								"value": "PPT"
+							},
+							{
+								"text": "Other",
+								"value": "other"
+							}
+						]
+					},
+					"briefing_template": {
+						"description": "Select briefing form template (5 options)",
+						"type": "dropdown",
+						"required": true,
+						"section": "project_information",
+						"options": [
+							{
+								"text": "Campaign",
+								"value": "campaign"
+							},
+							{
+								"text": "Adaptation",
+								"value": "adaptation"
+							},
+							{
+								"text": "Organic Social Media",
+								"value": "organicSocialMedia"
+							},
+							{
+								"text": "Event Assets",
+								"value": "events"
+							},
+							{
+								"text": "Miscellaneous",
+								"value": "miscellaneous"
+							}
+						]
+					},
+					"campaign_purpose": {
+						"description": "Free text, no restrictions",
+						"type": "textarea",
+						"required": true,
+						"section": "campaign_details",
+						"options": []
+					},
+					"background_problem_statement": {
+						"description": "Free text, no restrictions",
+						"type": "textarea",
+						"required": true,
+						"section": "campaign_details",
+						"options": []
+					},
+					"strategy_campaign_idea": {
+						"description": "Free text, no restrictions",
+						"type": "textarea",
+						"required": true,
+						"section": "campaign_details",
+						"options": []
+					},
+					"objectives_success_metrics": {
+						"description": "Free text, no restrictions",
+						"type": "textarea",
+						"required": true,
+						"section": "campaign_details",
+						"options": []
+					},
+					"target_audience": {
+						"description": "Free text, no restrictions",
+						"type": "textarea",
+						"required": true,
+						"section": "campaign_details",
+						"options": []
+					},
+					"key_message": {
+						"description": "Free text, no restrictions",
+						"type": "textarea",
+						"required": true,
+						"section": "campaign_details",
+						"options": []
+					},
+					"additional_context": {
+						"description": "Free text, no restrictions",
+						"type": "textarea",
+						"required": false,
+						"section": "campaign_details",
+						"options": []
+					}
 				},
 				"missing_questions": [
 					"project_owner",
@@ -73,7 +435,8 @@
 		},
 		"documents": {
 			"type": "data",
-			"dataSource": "documents"
+			"dataSource": "documents",
+			"example": "The list of documents"
 		}
 	},
 	"data-sources": {

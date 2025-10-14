@@ -16,23 +16,25 @@ export default class Instructions {
 	}
 	
 	public async load(): Promise<void> {
-		const instructionsPath = Config.get('instructionsPath');
-		const { instructions } = this._parent.configuration;
-		
-		if (instructions) {
-			if (instructions.startsWith('gs://')) {
-				this._instructions = await GoogleCloudStorage.read(instructions);
-			} else {
-				this._instructions = instructions;
-			}
-		} else if (instructionsPath) {
-			this._instructions = await GoogleCloudStorage.read(`${instructionsPath}/${this._parent.id}.txt`);
-		} else {
-			this._instructions = await Storage.get(StorageFile.TYPE.AGENT_INSTRUCTIONS, this._parent.id).read();
-		}
+		this._instructions = await this.read();
 	}
 	
 	public toString(): string {
 		return this._instructions;
+	}
+	
+	private async read(): Promise<string> {
+		const instructionsPath = Config.get('instructionsPath');
+		const { instructions } = this._parent.configuration;
+		
+		if (instructions) {
+			if (instructions.startsWith('gs://')) return await GoogleCloudStorage.read(instructions);
+			
+			return instructions;
+		}
+		
+		if (instructionsPath) return await GoogleCloudStorage.read(`${instructionsPath}/${this._parent.id}.txt`);
+		
+		return await Storage.get(StorageFile.TYPE.AGENT_INSTRUCTIONS, this._parent.id).read();
 	}
 }

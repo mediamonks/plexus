@@ -7,12 +7,11 @@ import Debug from '../../core/Debug';
 import { JsonField } from '../../types/common';
 
 export default class DataSourceCatalogField extends CatalogField {
-	public static readonly Configuration: {
+	public static readonly Configuration: typeof CatalogField.BaseConfiguration & {
 		type: 'data';
-		example: JsonField;
-		source: string;
-		dataSource: string; // TODO for backwards compatibility
-		query: typeof DataSourceCatalogField.QueryParameters,
+		source?: string;
+		dataSource?: string; // TODO for backwards compatibility
+		query?: typeof DataSourceCatalogField.QueryParameters,
 	} & typeof DataSourceCatalogField.QueryParameters; // TODO for backwards compatibility
 	
 	public static readonly QueryParameters: {

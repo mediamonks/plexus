@@ -67,7 +67,9 @@ export default class Agent implements IEntity {
 	public get instructions(): string {
 		const inputSchema = {};
 		for (const fieldId of this.context) {
-			inputSchema[fieldId] = this.catalog.get(fieldId).example;
+			const { example } = this.catalog.get(fieldId);
+			if (!example) throw new CustomError(`Missing example for catalog field "${fieldId}"`);
+			inputSchema[fieldId] = example;
 		}
 		
 		const outputSchema = this.catalog.getAgentOutputSchema(this.id);
