@@ -53,8 +53,14 @@ export default class Debug {
 		const dumpFilePath = path.join(Config.get('tempPath') as string, 'dump');
 		
 		fs.mkdir(dumpFilePath, { recursive: true }).then(() => {
-			const content = typeof data === 'object' ? JSON.stringify(data, null, 2) : data;
-			return fs.writeFile(path.join(dumpFilePath, `${label.replace(/\W/g, '_')}.json`), content);
+			let content = data;
+			let extension = 'txt';
+			if (typeof data === 'object') {
+				content = JSON.stringify(data, null, 2);
+				extension = 'json';
+			}
+			const filename = label.replace(/\W/g, '_');
+			return fs.writeFile(path.join(dumpFilePath, `${filename}.${extension}`), content);
 		});
 		
 		if (process.env.NODE_ENV !== 'dev') return;

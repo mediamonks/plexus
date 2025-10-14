@@ -6,9 +6,8 @@ import Debug from '../../core/Debug';
 import { JsonField } from '../../types/common';
 
 export default class OutputCatalogField extends CatalogField {
-	static readonly Configuration: {
+	static readonly Configuration: typeof CatalogField.BaseConfiguration & {
 		type: 'output';
-		example: JsonField;
 		agent: string;
 		field: string;
 	};

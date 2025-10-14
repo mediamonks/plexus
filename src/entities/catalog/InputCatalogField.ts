@@ -8,9 +8,8 @@ import RequestContext from '../../core/RequestContext';
 import { JsonField, RequestPayload, Configuration } from '../../types/common';
 
 export default class InputCatalogField extends CatalogField {
-	static readonly Configuration: {
+	static readonly Configuration: typeof CatalogField.BaseConfiguration & {
 		type: 'input';
-		example: JsonField;
 		field: string;
 		required?: boolean;
 	};

@@ -2,8 +2,8 @@ require('dotenv/config');
 const Router = require('./src/core/Router.ts').default;
 // const config = require('./config/test/copydesk.json');
 // const config = require('./config/test/mantra.json');
-// const config = require('./config/test/luis.json');
-const config = require('./config/test/test.json');
+const config = require('./config/test/luis.json');
+// const config = require('./config/test/test.json');
 const gcs = require('./src/services/google-cloud/GoogleCloudStorage.ts').default;
 
 process.env.NODE_ENV = 'dev';
@@ -15,7 +15,7 @@ async function authentication() {
 	try {
 		
 		try {
-			await gcs.list('gs://monks-mantra/');
+			await gcs.list('gs://monks-plexus/');
 		} catch (error) {
 		}
 		
@@ -77,7 +77,7 @@ async function ingest(namespace, body) {
 		"config": config,
 		"fields": {
 			"request": "No additional information provided. Please analyze only the documents in the folder.",
-			"documentFolder": "https://drive.google.com/drive/folders/1Ldqn9G5kJRCgPSaDBSO0QvFYoHQG0Duz?usp=drive_link"
+			"documentFolder": "https://drive.google.com/drive/folders/13kI3QJVBZ1nqnX4cFmKhHOL61KfKp_pF?usp=drive_link"
 		}
 	});
 	

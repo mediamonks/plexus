@@ -7,6 +7,7 @@ import UnsupportedError from '../error-handling/UnsupportedError';
 import Config from '../../core/Config';
 import RequestContext from '../../core/RequestContext';
 import { JsonObject } from '../../types/common';
+import CustomError from '../error-handling/CustomError';
 
 export default class Catalog {
 	private readonly _fields: Record<string, CatalogField> = {};
@@ -48,9 +49,11 @@ export default class Catalog {
 		const schema = {};
 		
 		for (const key in this.configuration) {
-			const fieldConfig = this.configuration[key] as typeof OutputCatalogField.Configuration;
+			const fieldConfig = this.configuration[key] as typeof CatalogField.Configuration;
 			
 			if (fieldConfig.type !== CatalogField.TYPE.OUTPUT || fieldConfig.agent !== agentId) continue;
+			
+			if (!fieldConfig.example) throw new CustomError(`Missing example for catalog field "${key}"`);
 			
 			schema[fieldConfig.field] = fieldConfig.example;
 		}

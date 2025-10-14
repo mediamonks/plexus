@@ -102,17 +102,14 @@ Invokes an agent workflow.
 	"performance": {
 		// Performance metrics
 	},
-	"error": null
+	"error": null // Error message if applicable
 }
 ```
 
 **Response Fields:**
-- **`result.output`** (object): Output field values as defined in your `output` configuration
-- **`result.threadId`** (string): Unique identifier for the conversation thread
-- **`result.fields`** (object): Field values as provided in the request payload
-- **`debug`** (object): Debug information
-- **`performance`** (object): Performance metrics
-- **`error`** (string|null): Error message if applicable, otherwise null
+- **`output`** (object): Output field values as defined in your `output` configuration
+- **`threadId`** (string): Unique identifier for the conversation thread
+- **`fields`** (object): Field values as provided in the request payload
 
 ### GET `/fields/{field}`
 
@@ -123,13 +120,22 @@ Retrieves available options for a specific input field.
 
 **Response:**
 ```json
-[
-  {
-    "id": "option-id",
-    "label": "Option Label",
-    "description": "Option description"
-  }
-]
+{
+	"result": [
+		{
+			"id": "option-id",
+			"label": "Option Label",
+			"description": "Option description"
+		}
+	],
+	"debug": {
+		// Debug information
+	},
+	"performance": {
+		// Performance metrics
+	},
+	"error": null // Error message if applicable
+}
 ```
 
 **Response Fields:**
@@ -147,12 +153,21 @@ Retrieves a conversation thread with its history and last interaction details.
 **Response:**
 ```json
 {
-  "history": [
-    // Array of conversation history items
-  ],
-  "output": {
-    // Generated output from last interaction
-  }
+	"result": {
+		"history": [
+			// Array of conversation history items
+		],
+		"output": {
+			// Generated output from last interaction
+		}
+	},
+	"debug": {
+		// Debug information
+	},
+	"performance": {
+		// Performance metrics
+	},
+	"error": null // Error message if applicable
 }
 ```
 
@@ -186,7 +201,16 @@ Retrieves the default configuration for the service.
 **Response:**
 ```json
 {
-  // Complete configuration object
+  "result":  {
+		// Complete configuration object
+	},
+	"debug": {
+		// Debug information
+	},
+	"performance": {
+		// Performance metrics
+	},
+	"error": null // Error message if applicable
 }
 ```
 
@@ -328,7 +352,7 @@ Defines all fields that exist in the workflow and maps them to input parameters,
 
 **Common Properties:**
 - **`type`** (string): Field type ("input", "output", or "data")
-- **`example`** (any, optional): Example value used to provide instructions to the LLM about how to interpret and/or populate a field
+- **`example`** (any): Example value used to provide instructions to the LLM about how to interpret and/or populate a field
 
 **Input Fields:**
 These take their value directly from the request payload.
@@ -342,7 +366,7 @@ These take their value from the output object of an agent.
 
 **Data Fields:**
 These take their value from a data source.
-- **`dataSource`** (string): Data source identifier, points to a data source defined in the `data-sources` section
+- **`source`** (string): Data source identifier, points to a data source defined in the `data-sources` section
 - **`query`** (object, optional): Properties that determine if and how the data from the data source should be queried. If not specified, the source data will always be used in its entirety (after `target`-based processing applies).
   - **`limit`** (number, optional): Maximum number of results for any type of query.
   - **`input`** (string, optional): Performs a text search against an unstructured data source, using the value of the given catalog field as input.
