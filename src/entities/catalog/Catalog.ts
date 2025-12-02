@@ -19,8 +19,8 @@ export default class Catalog {
 		return (RequestContext.store.catalog as Catalog) ??= new this();
 	}
 	
-	public get configuration(): JsonObject {
-		return this._configuration ??= Config.get('catalog') as typeof Catalog.Configuration;
+	public get configuration(): typeof Catalog.Configuration {
+		return this._configuration ??= Config.get('catalog');
 	}
 	
 	public createField(fieldId: string): CatalogField {

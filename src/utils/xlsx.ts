@@ -1,7 +1,7 @@
 import XLSX from 'xlsx';
-import { SpreadSheet } from '../types/common';
+import { SpreadSheetData } from '../types/common';
 
-async function getData(path: string): Promise<SpreadSheet> {
+async function getData(path: string): Promise<SpreadSheetData> {
 	const workbook = XLSX.readFile(path);
 	
 	const sheets = [];

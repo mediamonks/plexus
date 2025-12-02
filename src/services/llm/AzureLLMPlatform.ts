@@ -6,19 +6,19 @@ import Config from '../../core/Config';
 import { staticImplements } from '../../types/common';
 import History from '../../core/History';
 
-type Configuration = {
-	baseUrl: string;
-	apiVersion: string;
-	deploymentName: string;
-	embeddingApiVersion: string;
-	embeddingModel: string;
-};
-
 const { AZURE_TENANT_ID, AZURE_CLIENT_ID, AZURE_CLIENT_SECRET } = process.env;
 const ACCESS_TOKEN_TTL_MS = 60000;
 
 @staticImplements<ILLMPlatform>()
 export default class AzureLLMPlatform {
+	public static Configuration: {
+		baseUrl: string;
+		apiVersion: string;
+		model?: string;
+		embeddingApiVersion: string;
+		embeddingModel?: string;
+	};
+	
 	private static _client: OpenAI;
 	private static _embeddingClient: OpenAI;
 	private static _accessToken: string;
@@ -34,16 +34,17 @@ export default class AzureLLMPlatform {
 		model,
 		files
 	}: QueryOptions = {}): Promise<string> {
+		// TODO implement support
 		if (files && files.length) throw new CustomError('Azure OpenAI file content not yet supported');
 		
 		const messages = [
 			...history.toOpenAi(),
 			{ role: 'user', content: query }
-		];
+		] as OpenAI.ChatCompletionMessageParam[];
 		
 		if (systemInstructions) messages.unshift({ role: 'system', content: systemInstructions });
 		
-		model ??= this.configuration.deploymentName;
+		model ??= this.configuration.model;
 		
 		const client = await this.getClient(model);
 		
@@ -70,8 +71,8 @@ export default class AzureLLMPlatform {
 		return this.configuration.embeddingModel;
 	}
 	
-	private static get configuration(): Configuration {
-		return Config.get('azure', { includeGlobal: true }) as Configuration;
+	private static get configuration(): typeof AzureLLMPlatform.Configuration {
+		return Config.get('azure', { includeGlobal: true });
 	}
 	
 	private static async generateEmbeddings(input: string, model?: string): Promise<number[]> {
@@ -98,9 +99,9 @@ export default class AzureLLMPlatform {
 		
 		const token = await this.getAccessToken();
 		
-		const { deploymentName, baseUrl, apiVersion } = this.configuration;
+		const { model: configModel, baseUrl, apiVersion } = this.configuration;
 		
-		model ??= deploymentName;
+		model ??= configModel;
 		
 		const baseURL = `${baseUrl}/openai/deployments/${model}`;
 		

@@ -2,17 +2,17 @@ import DataSource from '../DataSource';
 import LLM from '../../../services/llm/LLM';
 import Storage from '../../storage/Storage';
 import StorageFile from '../../storage/StorageFile';
-import IEntity from '../../Entity';
+import IHasInstructions from '../../IHasInstructions';
 import Instructions from '../../Instructions';
 
-export default class DigestTargetDataSource extends DataSource implements IEntity {
+export default class DigestTargetDataSource extends DataSource implements IHasInstructions {
 	public static Configuration: typeof DataSource.Configuration & {
 		instructions: string;
 	}
 	
 	private _instructions: Instructions;
 	
-	protected get instructions() {
+	protected get instructions(): Instructions {
 		return this._instructions ??= new Instructions(this);
 	}
 	
@@ -45,4 +45,4 @@ export default class DigestTargetDataSource extends DataSource implements IEntit
 			temperature: 0,
 		});
 	}
-}
+};

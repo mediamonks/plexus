@@ -18,9 +18,9 @@ export default class Profiler {
 		if (process.env.NODE_ENV === 'dev') console.debug('[PERF]', `[${label}]`, ms);
 	}
 
-	public static async run<T>(fn: () => T, label?: string): Promise<T>;
-	public static async run<T>(fn: () => T, args: any[], label?: string): Promise<T>;
-	public static async run<T, K>(fn: () => T, argsOrLabel?: K[] | string, label?: string): Promise<T> {
+	public static async run<TReturnValue>(fn: () => TReturnValue, label?: string): Promise<TReturnValue>;
+	public static async run<TReturnValue>(fn: () => TReturnValue, args: any[], label?: string): Promise<TReturnValue>;
+	public static async run<TReturnValue>(fn: () => TReturnValue, argsOrLabel?: any[] | string, label?: string): Promise<TReturnValue> {
 		if (typeof argsOrLabel === 'string') {
 			label = argsOrLabel;
 			argsOrLabel = [];

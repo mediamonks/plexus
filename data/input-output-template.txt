@@ -5,4 +5,5 @@
 {input}
 
 ### **Output Format (JSON)**
+Output only JSON. Do not output markdown.
 {output}

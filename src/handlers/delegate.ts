@@ -18,4 +18,4 @@ export default async ({}, { fn, args = [] }: { fn: string; args?: any[] }): Prom
 	}
 	
 	await (functionName ? module[functionName] : module.default)(...args);
-}
+};

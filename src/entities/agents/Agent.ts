@@ -1,5 +1,5 @@
 import fs from 'node:fs';
-import IEntity from '../Entity';
+import IHasInstructions from '../IHasInstructions';
 import Instructions from '../Instructions';
 import Catalog from '../catalog/Catalog';
 import DataSourceItem from '../data-sources/origin/DataSourceItem';
@@ -7,15 +7,15 @@ import CustomError from '../error-handling/CustomError';
 import Debug from '../../core/Debug';
 import History from '../../core/History';
 import Profiler from '../../core/Profiler';
+import Status from '../../core/Status';
 import LLM from '../../services/llm/LLM';
-import status from '../../utils/status';
 import { JsonField, JsonObject } from '../../types/common';
 
 const INPUT_OUTPUT_TEMPLATE = fs
 	.readFileSync('./data/input-output-template.txt', 'utf8')
 	.toString();
 
-export default class Agent implements IEntity {
+export default class Agent implements IHasInstructions {
 	public isReady: boolean = false;
 	private _baseInstructions: Instructions;
 	private _catalog: Catalog;
@@ -85,7 +85,7 @@ export default class Agent implements IEntity {
 		return this._catalog;
 	}
 	
-	protected get baseInstructions() {
+	protected get baseInstructions(): Instructions {
 		return this._baseInstructions ??= new Instructions(this);
 	}
 	
@@ -94,7 +94,7 @@ export default class Agent implements IEntity {
 		
 		const files = await Promise.all(value.map(item => item.getLocalFile()));
 		
-		this._files.push(...files);
+		this.files.push(...files);
 		
 		return value.map(item => item.fileName);
 	}
@@ -162,16 +162,16 @@ export default class Agent implements IEntity {
 		
 		Debug.dump(`agent ${this.id} instructions`, instructions);
 		Debug.dump(`agent ${this.id} prompt`, this._context);
-		Debug.dump(`agent ${this.id} files`, this._files);
+		Debug.dump(`agent ${this.id} files`, this.files);
 		
-		const response = await status.wrap(`Running ${this.id} agent`, () =>
+		const response = await Status.wrap(`Running ${this.id} agent`, () =>
 			Profiler.run(() =>
 				LLM.query(JSON.stringify(this._context, undefined, 2), {
 					instructions,
 					temperature: this._temperature,
 					history: useHistory && History.instance,
 					structuredResponse: true,
-					files: this._files,
+					files: this.files,
 				}),
 				`invoke agent "${this.id}"`
 			)
@@ -179,7 +179,7 @@ export default class Agent implements IEntity {
 		
 		Debug.dump(`agent ${this.id} response`, response);
 		
-		let output;
+		let output: JsonObject;
 		try {
 			output = JSON.parse(response);
 		} catch (error) {
@@ -195,7 +195,7 @@ export default class Agent implements IEntity {
 		return this._invocation ??= this._invoke();
 	}
 	
-	public get files(): readonly string[] {
+	public get files(): string[] {
 		return this._files;
 	}
 }

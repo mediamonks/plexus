@@ -1,29 +1,29 @@
 import fs from 'node:fs/promises';
 import DataSourceItem from './DataSourceItem';
 import DataSource from '../DataSource';
-import docs from '../../../services/docs';
-import drive, { FileMetaData } from '../../../services/drive';
-import sheets from '../../../services/sheets';
-import pdf from '../../../utils/pdf';
 import UnsupportedError from '../../error-handling/UnsupportedError';
-import xlsx from '../../../utils/xlsx';
-import { JsonField, SpreadSheet, ValueOf } from '../../../types/common';
+import GoogleDocs from '../../../services/google-drive/GoogleDocs';
+import GoogleDrive, { Metadata } from '../../../services/google-drive/GoogleDrive';
 import LLM from '../../../services/llm/LLM';
+import GoogleSheets from '../../../services/google-drive/GoogleSheets';
+import pdf from '../../../utils/pdf';
+import xlsx from '../../../utils/xlsx';
+import { JsonField, SpreadSheetData, ValueOf } from '../../../types/common';
 
-export default class GoogleDriveDataSourceItem extends DataSourceItem<string, SpreadSheet> {
+export default class GoogleDriveDataSourceItem extends DataSourceItem<string, SpreadSheetData> {
 	static readonly TextContent: string;
-	static readonly DataContent: SpreadSheet;
+	static readonly DataContent: SpreadSheetData;
 	static readonly Content: typeof GoogleDriveDataSourceItem.TextContent | typeof GoogleDriveDataSourceItem.DataContent;
 	
-	private readonly _metadata: FileMetaData;
-	private _localFile: Promise<string> | string;
+	private readonly _metadata: Metadata;
+	private _localFile: Promise<string>;
 
-	public constructor(dataSource: DataSource, metadata: FileMetaData) {
+	public constructor(dataSource: DataSource, metadata: Metadata) {
 		super(dataSource);
 		this._metadata = metadata;
 	}
 	
-	public get metadata(): FileMetaData {
+	public get metadata(): Metadata {
 		return this._metadata;
 	}
 	
@@ -35,46 +35,15 @@ export default class GoogleDriveDataSourceItem extends DataSourceItem<string, Sp
 		return this._metadata.name;
 	}
 	
-	protected detectDataType(): ValueOf<typeof DataSource.DATA_TYPE> {
-		const mapping = {
-			'application/vnd.google-apps.document': 'text',
-			'application/pdf': 'text',
-			'text/plain': 'text',
-			'application/vnd.google-apps.spreadsheet': 'data',
-			'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'data',
-		};
-		
-		const dataType = mapping[this.mimeType];
-		
-		if (!dataType) throw new UnsupportedError('Google Drive data source mime type', this.mimeType, Object.keys(mapping));
-		
-		return dataType;
-	}
-	
-	public getLocalFile(): Promise<string> | string {
+	public getLocalFile(): Promise<string> {
 		return this._localFile ??= this._getLocalFile();
-	}
-	
-	private async _getLocalFile(): Promise<string> {
-		const driveService = await drive();
-		
-		let metadata = this.metadata;
-		
-		if (LLM.supportedMimeTypes.includes(this.mimeType))
-			return (this.allowCache ? driveService.cacheFile(metadata) : driveService.downloadFile(metadata));
-		
-		if (!this.mimeType.startsWith('application/vnd.google-apps.'))
-			metadata = await driveService.importFile(metadata, this.allowCache);
-		
-		return driveService.exportFile(metadata, 'pdf', this.allowCache);
 	}
 	
 	public async toText(): Promise<typeof GoogleDriveDataSourceItem.TextContent> {
 		const { metadata } = this;
 		
 		if (metadata.mimeType === 'application/vnd.google-apps.document') {
-			const docsService = await docs();
-			return await docsService.getMarkdown(metadata.id);
+			return await GoogleDocs.getMarkdown(metadata.id);
 		}
 		
 		const file = (await this.getLocalFile()) as string;
@@ -93,18 +62,47 @@ export default class GoogleDriveDataSourceItem extends DataSourceItem<string, Sp
 		const { metadata } = this;
 		
 		if (metadata.mimeType === 'application/vnd.google-apps.spreadsheet') {
-			const sheetsService = await sheets();
-			return await sheetsService.getData(metadata.id);
+			return await GoogleSheets.getData(metadata.id);
 		}
 		
 		const file = await this.getLocalFile();
 		
 		if (metadata.mimeType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') return await xlsx.getData(file);
 		
+		// TODO add JSON & JSONL support
+		
 		throw new UnsupportedError('mime type for data extraction', metadata.mimeType);
 	}
 	
 	public toJSON(): JsonField {
 		return this.metadata as JsonField;
+	}
+	
+	private async _getLocalFile(): Promise<string> {
+		let metadata = this.metadata;
+		
+		if (LLM.supportedMimeTypes.includes(this.mimeType))
+			return (this.allowCache ? GoogleDrive.cache(metadata) : GoogleDrive.download(metadata));
+		
+		if (!this.mimeType.startsWith('application/vnd.google-apps.'))
+			metadata = await GoogleDrive.import(metadata, this.allowCache);
+		
+		return GoogleDrive.exportToPdf(metadata, this.allowCache);
+	}
+	
+	private detectDataType(): ValueOf<typeof DataSource.DATA_TYPE> {
+		const mapping = {
+			'application/vnd.google-apps.document': 'text',
+			'application/pdf': 'text',
+			'text/plain': 'text',
+			'application/vnd.google-apps.spreadsheet': 'data',
+			'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'data',
+		};
+		
+		const dataType = mapping[this.mimeType];
+		
+		if (!dataType) throw new UnsupportedError('Google Drive data source mime type', this.mimeType, Object.keys(mapping));
+		
+		return dataType;
 	}
 }

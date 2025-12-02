@@ -6,4 +6,4 @@ export default class UnknownError extends CustomError {
 		super(message);
 		this.name = 'UnknownError';
 	}
-}
+};

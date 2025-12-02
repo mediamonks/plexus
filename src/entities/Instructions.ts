@@ -1,11 +1,11 @@
-import IEntity from './Entity';
+import IHasInstructions from './IHasInstructions';
 import Storage from './storage/Storage';
 import StorageFile from './storage/StorageFile';
-import GoogleCloudStorage from '../services/google-cloud/GoogleCloudStorage';
+import CloudStorage from '../services/google-cloud/CloudStorage';
 import Config from '../core/Config';
 
 export default class Instructions {
-	constructor(private readonly _parent: IEntity) {}
+	constructor(private readonly _parent: IHasInstructions) {}
 	
 	private _instructions: string;
 	
@@ -28,13 +28,13 @@ export default class Instructions {
 		const { instructions } = this._parent.configuration;
 		
 		if (instructions) {
-			if (instructions.startsWith('gs://')) return await GoogleCloudStorage.read(instructions);
+			if (instructions.startsWith('gs://')) return await CloudStorage.read(instructions);
 			
 			return instructions;
 		}
 		
-		if (instructionsPath) return await GoogleCloudStorage.read(`${instructionsPath}/${this._parent.id}.txt`);
+		if (instructionsPath) return await CloudStorage.read(`${instructionsPath}/${this._parent.id}.txt`);
 		
 		return await Storage.get(StorageFile.TYPE.AGENT_INSTRUCTIONS, this._parent.id).read();
 	}
-}
+};

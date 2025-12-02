@@ -8,13 +8,15 @@ import Config from '../../core/Config';
 import History from '../../core/History';
 import EMBEDDING_MODELS from '../../../data/embedding-models.json';
 
-type Configuration = {
-	platform: string;
-	model: string;
-	temperature?: number;
-};
-
 export default class LLM {
+	public static Configuration: {
+		platform: string;
+		model?: string;
+		embeddingPlatform: string;
+		embeddingModel?: string;
+		temperature?: number;
+	};
+	
 	public static async query(prompt: string, { instructions, temperature, history, structuredResponse, files }: {
 		instructions?: string;
 		temperature?: number;
@@ -22,7 +24,7 @@ export default class LLM {
 		structuredResponse?: boolean;
 		files?: any[];
 	}): Promise<string> {
-		const { model, temperature: configTemperature } = Config.get('llm', { includeGlobal: true }) as Configuration;
+		const { model, temperature: configTemperature } = this.configuration;
 		
 		temperature ??= configTemperature;
 		
@@ -37,15 +39,15 @@ export default class LLM {
 	}
 	
 	public static async generateDocumentEmbeddings(text: string): Promise<number[]> {
-		return await this.embeddingPlatform.generateDocumentEmbeddings(text);
+		return await this.embeddingPlatform.generateDocumentEmbeddings(text, this.configuration.embeddingModel);
 	}
 	
 	public static async generateQueryEmbeddings(text: string): Promise<number[]> {
-		return await this.embeddingPlatform.generateQueryEmbeddings(text);
+		return await this.embeddingPlatform.generateQueryEmbeddings(text, this.configuration.embeddingModel);
 	}
 	
 	public static get embeddingModel(): string {
-		return this.embeddingPlatform.embeddingModel;
+		return this.embeddingPlatform.embeddingModel ?? this.configuration.embeddingModel;
 	}
 	
 	public static get dimensions(): number {
@@ -65,12 +67,16 @@ export default class LLM {
 		];
 	}
 	
+	private static get configuration(): typeof LLM.Configuration {
+		return Config.get('llm', { includeGlobal: true });
+	}
+	
 	private static get platform(): ILLMPlatform {
-		return this.getPlatformClass(Config.get('llm/platform', { includeGlobal: true }) as Configuration['platform']);
+		return this.getPlatformClass(this.configuration.platform);
 	}
 	
 	private static get embeddingPlatform(): ILLMPlatform {
-		return this.getPlatformClass(Config.get('llm/embeddingPlatform', { includeGlobal: true }) as Configuration['platform']);
+		return this.getPlatformClass(this.configuration.embeddingPlatform);
 	}
 	
 	private static getPlatformClass(platform: string): ILLMPlatform {

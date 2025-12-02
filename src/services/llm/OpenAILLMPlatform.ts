@@ -25,12 +25,13 @@ export default class OpenAILLMPlatform {
 		model,
 		files
 	}: QueryOptions = {}): Promise<string> {
+		// TODO implement support
 		if (files && files.length) throw new CustomError('OpenAI file content not yet supported');
 		
 		const messages = [
 			...history.toOpenAi(),
 			{ role: 'user', content: query }
-		];
+		] as OpenAI.ChatCompletionMessageParam[];
 		
 		if (systemInstructions) messages.unshift({ role: 'system', content: systemInstructions });
 		

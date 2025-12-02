@@ -50,18 +50,7 @@ export default class Debug {
 	public static dump(label: string, data: any): void {
 		this._log.push({ ts: Date.now(), type: 'dump', label, data });
 		
-		const dumpFilePath = path.join(Config.get('tempPath') as string, 'dump');
-		
-		fs.mkdir(dumpFilePath, { recursive: true }).then(() => {
-			let content = data;
-			let extension = 'txt';
-			if (typeof data === 'object') {
-				content = JSON.stringify(data, null, 2);
-				extension = 'json';
-			}
-			const filename = label.replace(/\W/g, '_');
-			return fs.writeFile(path.join(dumpFilePath, `${filename}.${extension}`), content);
-		});
+		void this.writeDumpFile(label, data);
 		
 		if (process.env.NODE_ENV !== 'dev') return;
 		
@@ -71,4 +60,23 @@ export default class Debug {
 	public static get(): DebugLogEntry[] {
 		return this._log;
 	}
-}
+	
+	private static async writeDumpFile(label: string, data: string | object): Promise<void> {
+		const dumpFilePath: string = path.join(Config.get('tempPath') as string, 'dump');
+		
+		await fs.mkdir(dumpFilePath, { recursive: true });
+		
+		let content: string;
+		let extension: string = 'txt';
+		if (typeof data === 'object') {
+			content = JSON.stringify(data, null, 2);
+			extension = 'json';
+		} else {
+			content = data;
+		}
+		
+		const filename: string = label.replace(/\W/g, '_');
+		
+		return fs.writeFile(path.join(dumpFilePath, `${filename}.${extension}`), content);
+	}
+};

@@ -34,4 +34,4 @@ export default class Storage {
 		
 		return storageFile;
 	}
-}
+};

@@ -1,6 +1,6 @@
 import DataSourceItem from './DataSourceItem';
 import DataSource from '../DataSource';
-import { JsonObject, SpreadSheet } from '../../../types/common';
+import { JsonObject, SpreadSheetData } from '../../../types/common';
 
 export default abstract class DataSourceOrigin {
 	private readonly _dataSource: DataSource;
@@ -23,5 +23,5 @@ export default abstract class DataSourceOrigin {
 	
 	public abstract getData(): Promise<AsyncGenerator<JsonObject>>;
 	
-	public abstract getItems(): Promise<DataSourceItem<string, AsyncGenerator<JsonObject> | SpreadSheet>[] | never>;
+	public abstract getItems(): Promise<DataSourceItem<string, AsyncGenerator<JsonObject> | SpreadSheetData>[] | never>;
 }

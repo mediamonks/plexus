@@ -1,76 +1,78 @@
 {
-	"agents": {
-		"hello": {
-			"instructions": "gs://monks-plexustest/hello.txt",
-			"context": [
-				"names"
-			]
+	"config": {
+		"agents": {
+			"hello": {
+				"instructions": "gs://monks-plexustest/hello.txt",
+				"context": [
+					"names"
+				]
+			},
+			"names": {
+				"instructions": "gs://monks-plexustest/names.txt",
+				"context": [
+					"documents"
+				]
+			},
+			"test": {
+				"instructions": "gs://monks-plexustest/hello.txt",
+				"context": [
+					"gcs-export"
+				]
+			}
 		},
-		"names": {
-			"instructions": "gs://monks-plexustest/names.txt",
-			"context": [
-				"documents"
-			]
+		"catalog": {
+			"name": {
+				"type": "input",
+				"field": "name",
+				"required": true
+			},
+			"helloString": {
+				"type": "output",
+				"agent": "hello",
+				"field": "helloString",
+				"example": "the output string"
+			},
+			"documents": {
+				"type": "data",
+				"dataSource": "documents"
+			},
+			"names": {
+				"type": "output",
+				"agent": "names",
+				"field": "names",
+				"example": [
+					"John",
+					"Pete"
+				]
+			},
+			"gcs-export": {
+				"type": "data",
+				"source": "gcs-export"
+			},
+			"output": {
+				"type": "output",
+				"agent": "test",
+				"field": "output",
+				"example": "the output string"
+			}
 		},
-		"test": {
-			"instructions": "gs://monks-plexustest/hello.txt",
-			"context": [
-				"gcs-export"
-			]
-		}
-	},
-	"catalog": {
-		"name": {
-			"type": "input",
-			"field": "name",
-			"required": true
+		"data-sources": {
+			"documents": {
+				"namespace": "test",
+				"uri": "https://drive.google.com/drive/folders/1o8kMT0Fra7KpZHkB9Ud7CkjbzlEaJtFG",
+				"platform": "drive",
+				"target": "raw",
+				"folder": true
+			},
+			"gcs-export": {
+				"namespace": "test",
+				"uri": "gs://monks-plexustest/gcs-export",
+				"target": "file",
+				"folder": true
+			}
 		},
-		"helloString": {
-			"type": "output",
-			"agent": "hello",
-			"field": "helloString",
-			"example": "the output string"
-		},
-		"documents": {
-			"type": "data",
-			"dataSource": "documents"
-		},
-		"names": {
-			"type": "output",
-			"agent": "names",
-			"field": "names",
-			"example": [
-				"John",
-				"Pete"
-			]
-		},
-		"gcs-export": {
-			"type": "data",
-			"source": "gcs-export"
-		},
-		"output": {
-			"type": "output",
-			"agent": "test",
-			"field": "output",
-			"example": "the output string"
-		}
-	},
-	"data-sources": {
-		"documents": {
-			"namespace": "test",
-			"uri": "https://drive.google.com/drive/folders/1o8kMT0Fra7KpZHkB9Ud7CkjbzlEaJtFG",
-			"platform": "drive",
-			"target": "raw",
-			"folder": true
-		},
-		"gcs-export": {
-			"namespace": "test",
-			"uri": "gs://monks-plexustest/gcs-export",
-			"target": "file",
-			"folder": true
-		}
-	},
-	"output": [
-		"output"
-	]
+		"output": [
+			"output"
+		]
+	}
 }

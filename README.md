@@ -22,21 +22,7 @@ This means the workflow is essentially built backwards, at runtime.
 When a data type field value is requested, the corresponding data source will be queried. More on this in the Data Sources section. 
 
 ## Data Sources
-
-Data sources point to a specific online resource. This can be a Google Drive file or folder, or a Google Cloud Storage Bucket object or folder.
-The following file types are currently supported:
-
-- **PDF** (unstructured)
-- **TXT** (unstructured)
-- **JSON** (structured)
-- **PNG** (`file` target only)
-- **JPEG** (`file` target only)
-- **DOCX** (unstructured, Google Drive origin only)
-- **PPTX** (unstructured, Google Drive origin only)
-- **XLSX** (structured, Google Drive origin only)
-- **Google Doc** (unstructured, Google Drive origin only)
-- **Google Slides** (unstructured, Google Drive origin only)
-- **Google Sheet** (structured, Google Drive origin only)
+Data sources point to a specific online resource. This can be a Google Drive file or folder, a Google Cloud Storage Bucket object or folder, or an API.
 
 ### Ingesting
 Data sources can be ingested using the `/ingest` endpoint. This is necessary for `vector`-target data sources and recommended for all data sources that are not dynamic.
@@ -47,16 +33,42 @@ A data source becomes dynamic by using any amount of catalog field placeholders 
 
 ### Targets
 Data sources can be processed in several ways, determined by their `target` property:
-#### Raw text/data: `raw`
+#### Raw (structured/unstructured): `raw`
 The data source will be ingested as plain text or jsonl data, which can be fed as such directly into an agent.
-#### Vector embeddings (text/unstructured): `vector`
+#### Vector embeddings (unstructured): `vector`
 Vector embeddings will be generated for distinct chunks of each document in the data source. These embeddings are then stored alongside their source text in a vector database, which can be queried as part of a catalog field's query configuration. The catalog field represents the resulting set of text chunks which can then be used by an agent. This option requires ingestion prior to invocation.
-#### Vector embeddings (data/structured): `vector`
+#### Vector embeddings (structured): `vector`
 The data will be converted to JSONL and vector embeddings will be generated for each record based on a specific field in the data set, determined by the `searchField` property of the data source configuration. These embeddings are then stored alongside their source record in a vector database, which can be queried as part of a catalog field's query configuration. The catalog field represents the resulting set of records which can then be used by an agent. This option requires ingestion prior to invocation.
-#### Digest (text only): `digest`
+#### Digest (unstructured only): `digest`
 The combined text of the data source will be run through an LLM to generate a digest or summary. `instructions` can be provided as part of the data source configuration to instruct the LLM how to summarize. If omitted, a basic summarization prompt is used. The resulting digest can then be used by an agent.
 #### File (Google GenAI only): `file`
 The files in the data source will be converted to a mime type supported by the selected LLM if necessary, and when used by an agent, will be passed as-is to the LLM, including its original file name for context.
+
+### Data Types
+Most targets require you to specify whether the data source should be processed as unstructured data (text) or structured data (data).
+This is specified in the `dataType` property of the data source configuration and determines how the data is interpreted and fed to the LLM, as well has how vector searches are performed.
+
+### Supported File Types
+When using an origin that contains files (Google Drive or Google Cloud Storage), certain file types are supported depending on the target and data type.
+The following table shows which combinations of file type and target or data type are currently supported:
+
+| File type       | dataType: text | dataType: data | target: file |
+|-----------------|:---------------|:---------------|:-------------|
+| PDF             | Yes            | No             | Yes          |
+| TXT             | Yes            | No             | Yes          |
+| JSON            | No             | No             | Yes          |
+| JSONL           | No             | Yes*           | No           |
+| DOCX            | Yes            | No             | Yes          |
+| XLSX            | No             | Yes**          | Yes          |
+| PPTX            | No             | No             | Yes          |
+| Google Doc      | Yes**          | No             | Yes**        |
+| Google Sheet    | No             | Yes**          | Yes**        | 
+| Google Slides   | No             | No             | Yes**        |
+| PNG             | No             | No             | Yes          |
+| JPEG            | No             | No             | Yes          |
+*: `gcs` origin only
+
+**: `drive` origin only
 
 ## API Reference
 
@@ -226,7 +238,7 @@ Plexus uses a flexible, hierarchical configuration system that supports multiple
 - **Flexible Structure**: Configuration can be provided as one large object or divided across multiple files
 - **Merge Strategy**: Static and runtime configurations are automatically merged to determine the final runtime configuration
 
-**Note**: Plexus is currently available as a service. While it will be made available as a library in the near future, implementation-specific configuration currently can only be passed as part of the request payload.
+**Note**: Plexus is currently available as a service. While it will be made available as a library in the future, implementation-specific configuration currently can only be passed in the request payload.
 
 ### Configuration Structure
 
@@ -258,7 +270,6 @@ The configuration object has the following top-level structure. All fields are o
   "input-fields": { /* input field options */ },
   "lancedb": { /* vector database settings */ },
   "openai": { /* OpenAI settings */ },
-  "routes": { /* API route definitions */ },
   "storage": { /* internal file storage settings */ }
 }
 ```
@@ -283,7 +294,7 @@ The following top-level configuration options are internal and not relevant when
 
 ## Entities
 
-These are the core entities within Plexus: Agents, Data Sources, and the Catalog. Their configuration determine the actual functionality of the implementation.
+These are the core entities within Plexus: **Agents**, **Data Sources**, and the **Catalog**. Their configuration determine the actual functionality of the implementation.
 
 ### `agents`
 
@@ -305,7 +316,7 @@ Defines behavior and context for each AI agent in your workflow. Each agent is i
 
 **Agent Properties:**
 - **`instructions`** (string): GOOGLE_CLOUD_STORAGE path to the file containing the instructions (system prompt) for the agent, or the literal instructions themselves. If omitted, the agent will attempt to read its instructions from a path constructed as follows: `{instructionsPath from global config}/{agent id}.txt`. **Note**: input and output format instructions are automatically added by Plexus, based on the Catalog configuration.
-- **`context`** (array): List of context fields the agent should receive.
+- **`context`** (array): List of catalog fields the agent should receive.
 - **`temperature`** (number, optional): AI model temperature setting (0.0-1.0).
 - **`useHistory`** (boolean, optional): Whether to provide the agent with the conversation history.
 - **`required`** (array, optional): Required (typically `input`-type) context fields for the agent. If a required field is left empty, the agent will not run and will simply return an empty response object, but the workflow will continue as normal.
@@ -398,9 +409,9 @@ Defines available data sources and their properties:
 - **`target`** (string): Target for the data source: "raw" for raw text or data, "vector" for vector embeddings, "file" for unprocessed files (to feed as-is into an LLM, currently supported for Google GenAI only), "digest" for AI-generated summaries ("text" only).
 - **`dataType`** (string, optional): Type of data in the source: "text" for unstructured data, "data" for structured data. Required for `target` types: "raw" and "vector". Ignored for `digest` and `file`.
 - **`namespace`** (string, optional): Logical grouping namespace, only used for batch ingestion.
-- **`platform`** (string, optional): Storage platform ("gcs", "drive", etc.), will be derived from the URI if not specified.
-- **`folder`** (boolean, optional): Whether the data source is a folder. Detected if not specified.
+- **`origin`** (string, optional): Data origin platform ("gcs", "drive", "api"), will be derived from the URI if not specified.
 - **`cache`** (boolean, optional): Whether to cache the data source, defaults to true. Set this to `false` for data sources of which the content can change between invocations.
+- **`folder`** (boolean, optional): Whether the `gcs` or `drive` origin data source is a folder. Detected if not specified.
 - **`instructions`** (string, optional): Processing instructions for a `digest`-type data source.
 - **`searchField`** (string, optional): Name of the field against which to perform vector searches for a `data`-type, `vector`-target data source.
 
@@ -431,9 +442,30 @@ Defines available options for input fields in your application:
 
 Field types and options can be customized to match your specific domain and use case requirements.
 
-## Platforms
+## LLM
 
-Configurations for the various AI platforms.
+Configuration of the LLM and the various LLM services. 
+
+### `llm`
+
+Configuration for the LLM. Can also be set at the global level.
+
+```json
+{
+  "llm": {
+		"platform": "google",
+		"embeddingPlatform": "google",
+		"model": "gemini-2.5-flash-lite",
+    "temperature": 0.7
+  }
+}
+```
+
+- **`platform`** (string): Primary AI platform ("google", "azure", "openai")
+- **`model`** (string, optional): Primary model name, can also be set at the platform level
+- **`embeddingPlatform`** (string): AI platform for text embeddings ("google", "azure", "openai")
+- **`embeddingModel`** (string, optional): Embedding model name, can also be set at the platform level
+- **`temperature`** (number, optional): Default AI model temperature setting (0.0-1.0), defaults to 0
 
 ### `azure`
 
@@ -444,8 +476,8 @@ Configuration for Azure OpenAI services:
   "azure": {
     "baseUrl": "https://your-resource.openai.azure.com/",
     "apiVersion": "2025-01-01-preview",
-    "embeddingApiVersion": "2023-05-15",
-    "deploymentName": "gpt-4o-mini",
+		"model": "gpt-4o-mini",
+		"embeddingApiVersion": "2023-05-15",
     "embeddingModel": "text-embedding-ada-002"
   }
 }
@@ -453,9 +485,9 @@ Configuration for Azure OpenAI services:
 
 - **`baseUrl`** (string): Azure OpenAI endpoint URL
 - **`apiVersion`** (string): API version for chat completions
+- **`model`** (string, optional): Name of the deployed model, can also be set at the `llm` level
 - **`embeddingApiVersion`** (string): API version for embeddings
-- **`deploymentName`** (string): Name of the deployed model
-- **`embeddingModel`** (string): Model name for text embeddings
+- **`embeddingModel`** (string, optional): Model name for text embeddings, can also be set at the `llm` level
 
 ### `genai`
 
@@ -478,11 +510,13 @@ Google Generative AI (Gemini) configuration:
 }
 ```
 
-- **`model`** (string): Primary model name
-- **`embeddingModel`** (string): Embedding model name
-- **`embeddingLocation`** (string, optional): Region for embedding API
+- **`projectId`** (string, optional): GCP project to use, defaults to the project associated with the API key, can also be set at the global level
+- **`location`** (string, optional): GCP location to use, defaults to the location associated with the API key, can also be set at the global level
+- **`model`** (string, optional): Primary model name, can also be set at the `llm` level
+- **`embeddingModel`** (string, optional): Embedding model name, can also be set at the `llm` level
+- **`embeddingLocation`** (string, optional): Region for embedding API, defaults to `genai.location`
 - **`quotaDelayMs`** (number, optional): Delay between API calls for quota management
-- **`safetySettings`** (array): Contents safety configuration
+- **`safetySettings`** (array, optional): Contents safety configuration
 	- **`category`** (string): Safety category
 	- **`threshold`** (string): Blocking threshold
 
@@ -493,24 +527,24 @@ OpenAI API configuration:
 ```json
 {
   "openai": {
-    "model": "gpt-4o-mini",
-    "apiVersion": "2024-11-20",
+		"apiVersion": "2024-11-20",
+		"model": "gpt-4o-mini",
     "embeddingModel": "text-embedding-3-small"
   }
 }
 ```
 
-- **`model`** (string): Primary model name
 - **`apiVersion`** (string): API version
-- **`embeddingModel`** (string): Embedding model name
+- **`model`** (string, optional): Primary model name, can also be set at the `llm` level
+- **`embeddingModel`** (string, optional): Embedding model name, can also be set at the `llm` level
 
 ## Internal
 
-Various internal settings which are only relevant when using Plexus as a library.
+Various internal settings.
 
 ### `drive`
 
-Google Drive integration settings:
+Google Drive integration settings. Can also be set at the global level:
 
 ```json
 {
@@ -524,23 +558,23 @@ Google Drive integration settings:
 
 ### `firestore`
 
-Firestore database settings:
+Firestore database settings. Can also be set at the global level:
 
 ```json
 {
   "firestore": {
-    "databaseId": "your-database",
-    "ignoreUndefinedProperties": true
+		"databaseId": "your-database",
+		"projectId": "your-project-id"
   }
 }
 ```
 
 - **`databaseId`** (string): Firestore database identifier
-- **`ignoreUndefinedProperties`** (boolean): Whether to ignore undefined properties when writing
+- **`projectId`** (string, optional): GCP project hosting the Firestore instance, defaults to the global `projectId`
 
 ### `lancedb`
 
-Vector database configuration:
+LanceDB configuration:
 
 ```json
 {
@@ -551,54 +585,8 @@ Vector database configuration:
 }
 ```
 
-- **`databaseUri`** (string): Database URI
-- **`rateLimitDelayMs`** (number): Delay between operations for rate limiting
-
-### `routes`
-
-API endpoint definitions with OpenAPI-style specifications:
-
-```json
-{
-  "routes": {
-    "/endpoint": {
-      "parameters": {
-        "param": {
-          "type": "string",
-          "description": "Parameter description"
-        }
-      },
-      "methods": {
-        "post": {
-          "summary": "Endpoint summary",
-          "description": "Detailed description",
-          "handler": "handlerFunction",
-          "payload": {
-            "field": {
-              "type": "string"
-            }
-          },
-          "response": {
-            "type": "object"
-          }
-        }
-      }
-    }
-  }
-}
-```
-
-**Route Properties:**
-- **`parameters`** (object, optional): URL path parameters
-- **`methods`** (object): HTTP methods (get, post, etc.)
-- **`hidden`** (boolean, optional): Whether to hide from API documentation
-
-**Method Properties:**
-- **`summary`** (string): Brief description
-- **`description`** (string): Detailed description  
-- **`handler`** (string): Handler function name
-- **`payload`** (object, optional): Request payload schema
-- **`response`** (object): Response schema
+- **`databaseUri`** (string, optional): Where LanceDB stores its files. If not set, `gs://<storage.bucket>/lancedb` is used.
+- **`rateLimitDelayMs`** (number, optional): Delay between operations for quota management
 
 ### `storage`
 
@@ -607,37 +595,9 @@ Cloud storage settings:
 ```json
 {
   "storage": {
-    "bucket": "your-gcs-bucket"
+    "bucket": "your-bucket"
   }
 }
 ```
 
-- **`bucket`** (string): Google Cloud Storage bucket name
-
-## Configuration Usage
-
-### Runtime Configuration Overrides
-
-Configuration can be overridden at runtime by including a `config` object in request payloads:
-
-```json
-{
-  "config": {
-    "genai": {
-      "model": "gemini-2.0-flash-thinking-exp"
-    },
-    "agents": {
-      "draft": {
-        "temperature": 0.7
-      }
-    }
-  }
-}
-```
-
-### Configuration Hierarchy
-
-The configuration system follows this precedence order (highest to lowest):
-1. Runtime configuration from request payload
-2. Static configuration from JSON files
-3. Global configuration defaults
+- **`bucket`** (string): Google Cloud Storage bucket used for storing generated files, e.g. ingested data.

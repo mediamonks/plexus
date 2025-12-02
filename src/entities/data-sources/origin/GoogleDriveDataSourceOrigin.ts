@@ -1,9 +1,9 @@
 import DataSourceOrigin from './DataSourceOrigin';
 import GoogleDriveDataSourceItem from './GoogleDriveDataSourceItem';
 import CustomError from '../../error-handling/CustomError';
-import drive, { FileMetaData } from '../../../services/drive';
 import Debug from '../../../core/Debug';
 import { JsonObject } from '../../../types/common';
+import GoogleDrive, { Metadata } from '../../../services/google-drive/GoogleDrive';
 
 const GOOGLE_DRIVE_URI_PATTERN = /^https?:\/\/(?:drive|docs)\.google\.com\/(?:drive\/(?:u\/\d+\/)?(folders)|(?:file|document|spreadsheets|presentation)\/d)\/([\w\-]+)/;
 
@@ -36,16 +36,14 @@ export default class GoogleDriveDataSourceOrigin extends DataSourceOrigin {
 		return files.map(metadata => new GoogleDriveDataSourceItem(this.dataSource, metadata));
 	}
 	
-	private async getFiles(): Promise<FileMetaData[]> {
-		const driveService = await drive();
-		
+	private async getFiles(): Promise<Metadata[]> {
 		const id = await this.getId();
 		
-		const isFolder = this.dataSource.configuration.isFolder ?? await driveService.isFolder(id);
+		const isFolder = this.dataSource.configuration.isFolder ?? await GoogleDrive.isFolder(id);
 		
-		if (isFolder) return await driveService.listFolderContents(id);
+		if (isFolder) return await GoogleDrive.list(id);
 		
-		return [await driveService.getFileMetadata(id)];
+		return [await GoogleDrive.getMetadata(id)];
 	}
 	
 	private async getId(): Promise<string> {
