@@ -49,4 +49,4 @@ export default class DataVectorTargetDataSource extends DataSource {
 			}
 		}
 	}
-}
+};

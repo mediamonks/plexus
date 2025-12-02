@@ -13,4 +13,4 @@ export default class StorageTextFile extends StorageFile<string> {
 	public async write(contents: string): Promise<void> {
 		await this.writeText(contents);
 	}
-}
+};

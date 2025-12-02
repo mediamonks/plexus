@@ -2,18 +2,26 @@ import { v4 as uuid } from 'uuid';
 import Config from './Config';
 import Profiler from './Profiler';
 import RequestContext from './RequestContext';
-import firestore from '../services/firestore';
+import Firestore from '../services/google-cloud/Firestore';
 import CustomError from '../entities/error-handling/CustomError';
 
+type HistoryItem = {
+	role: string;
+	parts: { text: string }[];
+};
+
+type OpenAIHistoryItem = {
+	role: string;
+	content: string;
+	name?: string;
+}
+
 export default class History {
-	private _history: {
-		role: string;
-		parts: { text: string }[]
-	}[] = [];
+	public ready: Promise<void>;
+	private _history: HistoryItem[] = [];
 	private _threadId: string;
-	private _ready: Promise<void>;
 	
-	public static get instance() {
+	public static get instance(): History {
 		return RequestContext.get('history') as History;
 	}
 	
@@ -26,20 +34,20 @@ export default class History {
 	public constructor (threadId?: string) {
 		this._threadId = threadId;
 		
-		// TODO _ready is not actually used, so race conditions can occur
-		this._ready = this._load();
+		// TODO ready is not actually used, so race conditions can occur
+		this.ready = this._load();
 	}
 	
-	public get threadId() {
+	public get threadId(): string {
 		return this._threadId ??= uuid();
 	}
 	
 	private async _load(): Promise<void> {
 		await Profiler.run(async () => {
-			let history;
+			let history: HistoryItem[];
 		
 			if (this._threadId) {
-				const thread = await Profiler.run(() => firestore.getDocument('threads', this._threadId), 'retrieve thread');
+				const thread = await Profiler.run(() => Firestore.getDocument('threads', this._threadId), 'retrieve thread');
 				
 				if (!thread) throw new CustomError('Invalid threadId');
 				
@@ -48,20 +56,12 @@ export default class History {
 			
 			if (!history || !history.length) return;
 			
-			if (history[0].parts) {
-				this._history = history;
-				return;
-			}
-			
-			this._history = history.map(item => ({
-				role: item.role,
-				parts: [{ text: item.content }]
-			}));
+			this._history = history;
 		}, 'load history');
 	}
 	
 	public async save(output: any): Promise<void> {
-		const threadUpdate = Profiler.run(() => firestore.updateDocument('threads', this._threadId, {
+		const threadUpdate = Profiler.run(() => Firestore.updateDocument('threads', this._threadId, {
 			output,
 			history: this.toJSON(),
 		}), 'update thread');
@@ -69,14 +69,21 @@ export default class History {
 		if (Config.get('waitForThreadUpdate')) await threadUpdate;
 	}
 	
-	public toVertexAi(): any[] {
+	public toVertexAi(): HistoryItem[] {
 		return this._history;
 	}
 	
-	public toOpenAi(): any[] {
+	public toOpenAi(): OpenAIHistoryItem[] {
 		return this._history.map(item => ({
 			role: item.role,
 			content: item.parts[0].text
+		}));
+	}
+	
+	public fromOpenAi(history: OpenAIHistoryItem[]): void {
+		this._history = history.map(item => ({
+			role: item.role,
+			parts: [{ text: item.content }]
 		}));
 	}
 	
@@ -87,16 +94,15 @@ export default class History {
 		})
 	}
 	
-	public toJSON(): any[] {
+	public toJSON(): HistoryItem[] {
 		return this._history;
 	}
 	
-	public get length() {
+	public get length(): number {
 		return this._history.length;
 	}
 	
-	public get last() {
-		const last = this._history[this._history.length - 1];
-		return { role: last.role, content: last.parts[0].text };
+	public get last(): HistoryItem {
+		return this._history[this._history.length - 1];
 	}
 }

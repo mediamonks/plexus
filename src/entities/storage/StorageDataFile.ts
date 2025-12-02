@@ -15,4 +15,4 @@ export default class StorageDataFile extends StorageFile<AsyncGenerator<JsonObje
 		for await (const item of reader) contents.push(item);
 		await this.writeText(contents.map(item => JSON.stringify(item)).join('\n'));
 	}
-}
+};

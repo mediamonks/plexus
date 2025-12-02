@@ -1,10 +1,10 @@
 require('dotenv/config');
 const Router = require('./src/core/Router.ts').default;
-// const config = require('./config/test/copydesk.json');
-// const config = require('./config/test/mantra.json');
-const config = require('./config/test/luis.json');
-// const config = require('./config/test/test.json');
-const gcs = require('./src/services/google-cloud/GoogleCloudStorage.ts').default;
+// const payload = require('./config/test/copydesk.json');
+const payload = require('./config/test/mantra.json');
+// const payload = require('./config/test/luis.json');
+// const payload = require('./config/test/test.json');
+const gcs = require('./src/services/google-cloud/CloudStorage.ts').default;
 
 process.env.NODE_ENV = 'dev';
 
@@ -67,18 +67,6 @@ async function ingest(namespace, body) {
 	
 	await authentication();
 	
-	// await invoke({ config, fields: {
-	// 	briefFolderUri: `https://drive.google.com/drive/folders/1a2_DTNuBIfTFb8Spi6FnQWEt1abTzwgw`,
-	// 	additionalInfo: '',
-	// 	now: new Date().toISOString(),
-	// } });
-	
-	await invoke({
-		"config": config,
-		"fields": {
-			"request": "No additional information provided. Please analyze only the documents in the folder.",
-			"documentFolder": "https://drive.google.com/drive/folders/13kI3QJVBZ1nqnX4cFmKhHOL61KfKp_pF?usp=drive_link"
-		}
-	});
+	await invoke(payload);
 	
 }());

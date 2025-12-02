@@ -9,13 +9,13 @@ type QueryResult = JsonObject[];
 
 export default class RawDataTargetDataSource extends DataSource {
 	public async ingest(): Promise<void> {
-		const data = await this.origin.getData();
+		const data: AsyncGenerator<JsonObject> = await this.origin.getData();
 		
 		await Storage.get(StorageFile.TYPE.STRUCTURED_DATA, this.id).write(data);
 	}
 	
 	public async query({ filter, limit, fields, sort }: typeof DataSourceCatalogField.QueryParameters): Promise<QueryResult> {
-		let data;
+		let data: AsyncGenerator<JsonObject>;
 		try {
 			data = await Storage.get(StorageFile.TYPE.STRUCTURED_DATA, this.id).read();
 		} catch (error) {

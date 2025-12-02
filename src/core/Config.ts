@@ -1,6 +1,6 @@
 import RequestContext from './RequestContext';
 import CustomError from '../entities/error-handling/CustomError';
-import { JsonField, JsonObject, RequestPayload } from '../types/common';
+import { Configuration, RequestPayload, ValueOf } from '../types/common';
 import global from '../../config/global.json';
 
 const MODULES = [
@@ -18,15 +18,23 @@ const MODULES = [
 	'storage',
 ];
 
+type GetOptions = {
+	includeGlobal?: boolean;
+	includeRequest?: boolean
+};
+
 export default class Config {
-	static _staticConfig: JsonObject;
-	static _staticGlobalConfig: JsonObject;
+	static _staticConfig: Configuration;
+	static _staticGlobalConfig: Configuration;
 	
-	public static get(name?: string, { includeGlobal = false, includeRequest = true }: { includeGlobal?: boolean, includeRequest?: boolean } = {}) {
+	public static get(): Configuration;
+	public static get<TKey extends keyof Configuration>(name: TKey, options?: GetOptions): Configuration[TKey];
+	public static get(name: string, options?: GetOptions): ValueOf<Configuration>;
+	public static get(name?: string, { includeGlobal = false, includeRequest = true }: GetOptions = {}): Configuration | ValueOf<Configuration> {
 		try {
 			let result = includeRequest ? this.merge(this.staticConfig, this.requestConfig) : this.staticConfig;
 			
-			if (!name) return result;
+			if (!name) return result as Configuration;
 			
 			const keys = name.split(/[.\/]/);
 			
@@ -47,13 +55,13 @@ export default class Config {
 				result = result[key];
 			}
 			
-			return result;
+			return result as ValueOf<Configuration>;
 		} catch (error) {
 			throw new CustomError(`Configuration conflict in key "${name}": ${error}`);
 		}
 	}
 	
-	private static get staticConfig() {
+	private static get staticConfig(): Configuration {
 		if (this._staticConfig) return this._staticConfig;
 		
 		const config = { ...global };
@@ -68,21 +76,21 @@ export default class Config {
 		return this._staticConfig = config;
 	}
 	
-	private static get requestConfig(): JsonObject {
-		return (RequestContext.store?.payload as RequestPayload)?.config ?? {} as JsonObject;
+	private static get requestConfig(): Configuration {
+		return (RequestContext.store?.payload as RequestPayload)?.config ?? {} as Configuration;
 	}
 	
-	private static get staticGlobalConfig(): JsonObject {
+	private static get staticGlobalConfig(): Configuration {
 		if (this._staticGlobalConfig) return this._staticGlobalConfig;
 		
 		return this._staticGlobalConfig = this.globalOnly(this.staticConfig);
 	}
 	
-	private static get requestGlobalConfig(): JsonObject {
+	private static get requestGlobalConfig(): Configuration {
 		return this.globalOnly(this.requestConfig);
 	}
 	
-	private static loadModuleConfig(module: string): JsonObject {
+	private static loadModuleConfig(module: string): ValueOf<Configuration> {
 		try {
 			return require(`../../config/modules/${module}.json`);
 		} catch {
@@ -90,7 +98,7 @@ export default class Config {
 		}
 	}
 	
-	private static merge(value1: JsonField, value2: JsonField, strict: boolean = false): JsonField {
+	private static merge(value1: Configuration | ValueOf<Configuration>, value2: Configuration | ValueOf<Configuration>, strict: boolean = false): Configuration | Configuration[keyof Configuration]{
 		if (value2 === undefined) return value1;
 		if (value1 === undefined) return value2;
 		
@@ -114,17 +122,17 @@ export default class Config {
 		}
 		
 		// Deep merge objects recursively
-		const result: JsonObject = { ...value1 as JsonObject };
+		const result: Configuration = { ...value1 as Configuration };
 		
-		for (const key in value2 as JsonObject) {
+		for (const key in value2 as Configuration) {
 			result[key] = this.merge(value1[key], value2[key], strict);
 		}
 		
 		return result;
 	}
 	
-	private static globalOnly(config: JsonObject): JsonObject {
-		const result: JsonObject = {};
+	private static globalOnly(config: Configuration): Configuration {
+		const result: Configuration = {};
 		for (const key in config) {
 			if (MODULES.includes(key)) continue;
 			result[key] = config[key];

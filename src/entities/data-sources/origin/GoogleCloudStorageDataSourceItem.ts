@@ -4,14 +4,13 @@ import mimeTypes from 'mime-types';
 import DataSourceItem from './DataSourceItem';
 import DataSource from '../DataSource';
 import UnsupportedError from '../../error-handling/UnsupportedError';
-import GoogleCloudStorage from '../../../services/google-cloud/GoogleCloudStorage';
+import CloudStorage from '../../../services/google-cloud/CloudStorage';
 import jsonl from '../../../utils/jsonl';
 import pdf from '../../../utils/pdf';
 import { JsonField, JsonObject, ValueOf } from '../../../types/common';
+import GoogleDrive from '../../../services/google-drive/GoogleDrive';
 import LLM from '../../../services/llm/LLM';
 import CustomError from '../../error-handling/CustomError';
-import drive from '../../../services/drive';
-import Config from '../../../core/Config';
 
 export default class GoogleCloudStorageDataSourceItem extends DataSourceItem<string, AsyncGenerator<JsonObject>> {
 	private readonly _uri: string;
@@ -40,22 +39,12 @@ export default class GoogleCloudStorageDataSourceItem extends DataSourceItem<str
 		return mimeType;
 	}
 	
-	protected detectDataType(): ValueOf<typeof DataSource.DATA_TYPE> {
-		return {
-			pdf: DataSource.DATA_TYPE.UNSTRUCTURED,
-			txt: DataSource.DATA_TYPE.UNSTRUCTURED,
-			jsonl: DataSource.DATA_TYPE.STRUCTURED,
-		}[this.extension];
-	}
-	
 	public async getLocalFile(): Promise<string> {
-		const localPath = this.allowCache ? await GoogleCloudStorage.cache(this.uri) : await GoogleCloudStorage.download(this.uri);
+		const localPath = this.allowCache ? await CloudStorage.cache(this.uri) : await CloudStorage.download(this.uri);
 		
 		if (LLM.supportedMimeTypes.includes(this.mimeType)) return localPath;
 		
-		const driveService = await drive();
-		
-		return await driveService.convertToPdf(localPath, this.allowCache);
+		return await GoogleDrive.convertToPdf(localPath, this.allowCache);
 	}
 	
 	public async toText(): Promise<string> {
@@ -78,5 +67,13 @@ export default class GoogleCloudStorageDataSourceItem extends DataSourceItem<str
 	
 	public toJSON(): JsonField {
 		return this.uri;
+	}
+	
+	private detectDataType(): ValueOf<typeof DataSource.DATA_TYPE> {
+		return {
+			pdf: DataSource.DATA_TYPE.UNSTRUCTURED,
+			txt: DataSource.DATA_TYPE.UNSTRUCTURED,
+			jsonl: DataSource.DATA_TYPE.STRUCTURED,
+		}[this.extension];
 	}
 }

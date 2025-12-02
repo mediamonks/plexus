@@ -1,4 +1,4 @@
-export default interface IEntity {
+export default interface IHasInstructions {
 	id: string;
 	configuration: { instructions: string };
-}
+};

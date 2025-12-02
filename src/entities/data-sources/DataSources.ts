@@ -1,9 +1,10 @@
 import DataSource from './DataSource';
+import DataVectorTargetDataSource from './target/DataVectorTargetDataSource';
 import DigestTargetDataSource from './target/DigestTargetDataSource';
 import FileTargetDataSource from './target/FileTargetDataSource';
 import RawDataTargetDataSource from './target/RawDataTargetDataSource';
 import RawTextTargetDataSource from './target/RawTextTargetDataSource';
-import DataVectorTargetDataSource from './target/DataVectorTargetDataSource';
+import TextVectorTargetDataSource from './target/TextVectorTargetDataSource';
 import UnknownError from '../error-handling/UnknownError';
 import UnsupportedError from '../error-handling/UnsupportedError';
 import Config from '../../core/Config';
@@ -19,7 +20,7 @@ export default class DataSources {
 	private static readonly _dataSources: Record<string, DataSource> = {};
 	
 	public static get configuration(): typeof DataSources.Configuration {
-		return Config.get('data-sources') as typeof DataSources.Configuration;
+		return Config.get('data-sources');
 	}
 	
 	public static get dataSources(): Record<string, DataSource> {
@@ -68,7 +69,9 @@ export default class DataSources {
 	private static create(id: string, configuration: JsonObject): DataSource {
 		Debug.log(`Creating data source "${id}"`, 'DataSources');
 		
-		const { target, dataType } = DataSource.parseConfiguration(configuration);
+		let { target, dataType } = DataSource.parseConfiguration(configuration);
+		
+		target ??= DataSource.TARGET.RAW;
 		
 		let instance = {
 			[DataSource.TARGET.DIGEST]: new DigestTargetDataSource(id, configuration),
@@ -80,7 +83,7 @@ export default class DataSources {
 			},
 			[DataSource.TARGET.VECTOR]: {
 				[DataSource.DATA_TYPE.STRUCTURED]: new DataVectorTargetDataSource(id, configuration),
-				[DataSource.DATA_TYPE.UNSTRUCTURED]: new DataVectorTargetDataSource(id, configuration),
+				[DataSource.DATA_TYPE.UNSTRUCTURED]: new TextVectorTargetDataSource(id, configuration),
 			},
 		}[target];
 		
@@ -89,13 +92,13 @@ export default class DataSources {
 		}
 		
 		if (!(instance instanceof DataSource)) {
-			instance = instance[dataType];
-			
-			if (!instance) {
-				throw new UnsupportedError(`data source data type for target ${target}`, dataType, Object.values(DataSource.DATA_TYPE));
+			if (!instance[dataType]) {
+				throw new UnsupportedError(`data source data type for target "${target}"`, dataType, Object.keys(instance));
 			}
+			
+			instance = instance[dataType];
 		}
 		
 		return instance;
 	}
-}
+};

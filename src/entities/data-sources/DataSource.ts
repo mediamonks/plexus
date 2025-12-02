@@ -140,4 +140,4 @@ export default abstract class DataSource {
 		
 		return origin;
 	}
-}
+};

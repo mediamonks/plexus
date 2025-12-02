@@ -1,10 +1,10 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import GoogleCloudStorage from '../../services/google-cloud/GoogleCloudStorage';
+import CloudStorage from '../../services/google-cloud/CloudStorage';
 import Config from '../../core/Config';
 import Debug from '../../core/Debug';
 
-export default abstract class StorageFile<T> {
+export default abstract class StorageFile<TContent> {
 	private readonly _name: string;
 	private readonly _type: string;
 
@@ -64,20 +64,20 @@ export default abstract class StorageFile<T> {
 			await fs.access(this.localPath);
 		} catch (error) {
 			Debug.log(`Caching storage file "${this.remotePath}"`, 'FS');
-			await GoogleCloudStorage.download(this.uri, this.localPath);
+			await CloudStorage.download(this.uri, this.localPath);
 		}
 	}
 	
-	public abstract read(): Promise<T>;
+	public abstract read(): Promise<TContent>;
 
-	public abstract write(data: T): Promise<void>;
+	public abstract write(data: TContent): Promise<void>;
 
 	protected async writeText(text: string): Promise<void> {
 		await Promise.all([
-			GoogleCloudStorage.write(this.uri, text),
+			CloudStorage.write(this.uri, text),
 			fs.unlink(this.localPath).catch(() => {}),
 		]);
 	}
-}
+};
 
 export type StorageFileType = typeof StorageFile.TYPE[keyof typeof StorageFile.TYPE];

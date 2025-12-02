@@ -6,19 +6,19 @@ import Config from '../../core/Config';
 import { staticImplements } from '../../types/common';
 import History from '../../core/History';
 
-type Configuration = {
-	projectId: string;
-	location: string;
-	model: string;
-	embeddingLocation: string;
-	embeddingModel: string;
-	quotaDelayMs: number;
-};
-
 const { GOOGLE_GENAI_API_KEY } = process.env;
 
 @staticImplements<ILLMPlatform>()
 export default class GoogleLLMPlatform {
+	public static Configuration: {
+		projectId: string;
+		location: string;
+		model: string;
+		embeddingLocation: string;
+		embeddingModel: string;
+		quotaDelayMs: number;
+	};
+	
 	private static _client: GoogleGenAI;
 	private static _embeddingClient: GoogleGenAI;
 	private static _lastQuery: number;
@@ -75,8 +75,8 @@ export default class GoogleLLMPlatform {
 		return this.configuration.embeddingModel;
 	}
 	
-	private static get configuration(): Configuration {
-		return Config.get('genai', { includeGlobal: true }) as Configuration;
+	private static get configuration(): typeof GoogleLLMPlatform.Configuration {
+		return Config.get('genai', { includeGlobal: true });
 	}
 	
 	private static async generateEmbeddings(input: string, model?: string, taskType?: string): Promise<number[]> {
@@ -133,12 +133,15 @@ export default class GoogleLLMPlatform {
 		
 		if (embeddingLocation === location) return this._embeddingClient = this.client;
 		
-		return this._embeddingClient = new GoogleGenAI({
-			apiKey: GOOGLE_GENAI_API_KEY,
-			vertexai: !GOOGLE_GENAI_API_KEY,
-			project,
-			location: embeddingLocation
-		});
+		if (project && embeddingLocation) {
+			return this._embeddingClient = new GoogleGenAI({
+				vertexai: true,
+				project,
+				location: embeddingLocation
+			});
+		}
+		
+		return this._embeddingClient = new GoogleGenAI({ apiKey: GOOGLE_GENAI_API_KEY });
 	}
 	
 	private static async getFileParts(files: string[]): Promise<Part[]> {

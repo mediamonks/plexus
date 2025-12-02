@@ -3,10 +3,11 @@ import path from 'node:path';
 import { Storage, File, Bucket } from '@google-cloud/storage';
 import Config from '../../core/Config';
 import Profiler from '../../core/Profiler';
+import CustomError from '../../entities/error-handling/CustomError';
 
 const GS_URI_PATTERN = /gs:\/\/([^/]+)\/(.*)/;
 
-export default class GoogleCloudStorage {
+export default class CloudStorage {
 	private static _client: Storage;
 	
 	public static async read(uri: string): Promise<string> {
@@ -86,11 +87,13 @@ export default class GoogleCloudStorage {
 		return uri.endsWith('/');
 	}
 	
-	private static get client() {
+	private static get client(): Storage {
 		return this._client ??= new Storage();
 	}
 	
 	private static uri(uri: string): { bucket: string; path: string } {
+		const components = GS_URI_PATTERN.exec(decodeURIComponent(uri));
+		if (!components) throw new CustomError(`Invalid Google Cloud Storage URI: ${uri}`);
 		const [, bucket, path] = GS_URI_PATTERN.exec(decodeURIComponent(uri));
 		return { bucket, path };
 	}

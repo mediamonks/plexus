@@ -12,7 +12,7 @@ export type QueryOptions = {
 
 export default interface ILLMPlatform {
 	query(query: string, options?: QueryOptions): Promise<string>;
-	generateQueryEmbeddings(query: string): Promise<number[]>;
-	generateDocumentEmbeddings(document: string): Promise<number[]>;
+	generateQueryEmbeddings(query: string, model?: string): Promise<number[]>;
+	generateDocumentEmbeddings(document: string, model?: string): Promise<number[]>;
 	embeddingModel: string;
 };

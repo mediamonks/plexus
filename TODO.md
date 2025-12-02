@@ -41,7 +41,7 @@
 - **Add OCR capability for image-heavy PDFs** - Support PDFs with mostly text in images through OCR (`src/utils/pdf.ts:13`)
 
 ### History Management
-- **Fix race condition in History class** - The _ready flag is not actually used, allowing race conditions (`src/utils/History.ts:25`)
+- **Fix race condition in History class** - The ready flag is not actually used, allowing race conditions (`src/utils/History.ts:25`)
 
 ## Type System
 - **Improve RequestPayload type definition** - The RequestPayload type need more thinking about its structure (`src/types/common.ts:14`)

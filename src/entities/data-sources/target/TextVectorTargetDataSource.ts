@@ -5,7 +5,7 @@ import LLM from '../../../services/llm/LLM';
 import VectorDB from '../../../services/vector-db/VectorDB';
 import CustomError from '../../error-handling/CustomError';
 
-export default class VectorTargetDataSource extends DataSource {
+export default class TextVectorTargetDataSource extends DataSource {
 	public async ingest(): Promise<void> {
 		await VectorDB.drop(this.id);
 		await VectorDB.create(this.id, this.generator());
@@ -42,4 +42,4 @@ export default class VectorTargetDataSource extends DataSource {
 			}
 		}
 	}
-}
+};
