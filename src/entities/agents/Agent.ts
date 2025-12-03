@@ -22,7 +22,7 @@ export default class Agent implements IHasInstructions {
 	private readonly _configuration: typeof Agent.Configuration;
 	private readonly _context: Record<string, Promise<void> | JsonField> = {};
 	private _displayName: string;
-	private readonly _files: string[] = [];
+	private readonly _files: DataSourceItem<unknown, unknown>[] = [];
 	private readonly _id: string;
 	private _invocation: Promise<JsonObject>;
 	private _loaded: Promise<void>;
@@ -92,11 +92,11 @@ export default class Agent implements IHasInstructions {
 	private async _mapFiles(value: JsonField | DataSourceItem<unknown, unknown>[]): Promise<JsonField> {
 		if (!(value instanceof Array) || !(value[0] instanceof DataSourceItem)) return value as JsonField;
 		
-		const files = await Promise.all(value.map(item => item.getLocalFile()));
+		const items = value as DataSourceItem<unknown, unknown>[];
 		
-		this.files.push(...files);
+		this.files.push(...items);
 		
-		return value.map(item => item.fileName);
+		return items.map(item => item.fileName);
 	}
 	
 	private async _prepareContext(catalog: Catalog): Promise<void> {
@@ -195,7 +195,7 @@ export default class Agent implements IHasInstructions {
 		return this._invocation ??= this._invoke();
 	}
 	
-	public get files(): string[] {
+	public get files(): DataSourceItem<unknown, unknown>[] {
 		return this._files;
 	}
 }

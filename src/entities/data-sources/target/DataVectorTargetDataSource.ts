@@ -1,25 +1,20 @@
-import DataSource from '../DataSource';
+import VectorTargetDataSource from './VectorTargetDataSource';
 import DataSourceCatalogField from '../../catalog/DataSourceCatalogField';
 import CustomError from '../../error-handling/CustomError';
 import { JsonObject } from '../../../types/common';
 import LLM from '../../../services/llm/LLM';
 import VectorDB from '../../../services/vector-db/VectorDB';
 
-export default class DataVectorTargetDataSource extends DataSource {
-	public static Configuration: typeof DataSource.Configuration & {
-		searchField: string;
+export default class DataVectorTargetDataSource extends VectorTargetDataSource {
+	public static Configuration: typeof VectorTargetDataSource.Configuration & {
+		searchField?: string;
 	}
 	
 	get configuration(): typeof DataVectorTargetDataSource.Configuration {
 		return {
 			...super.configuration,
-			searchField: this._configuration.searchField as string,
-		};
-	}
-	
-	public async ingest(): Promise<void> {
-		await VectorDB.drop(this.id);
-		await VectorDB.create(this.id, this.generator());
+			searchField: this._configuration.searchField,
+		} as typeof DataVectorTargetDataSource.Configuration;
 	}
 	
 	public async query({ input, limit, filter, fields }: typeof DataSourceCatalogField.QueryParameters): Promise<JsonObject[]> {
@@ -30,7 +25,7 @@ export default class DataVectorTargetDataSource extends DataSource {
 		}
 	}
 	
-	private async *generator(): AsyncGenerator<JsonObject & { vector: number[] }> {
+	protected async *generator(): AsyncGenerator<JsonObject & { _vector: number[], _id: string }> {
 		const items = await this.origin.getItems();
 		
 		for await (const item of items) {
@@ -45,7 +40,7 @@ export default class DataVectorTargetDataSource extends DataSource {
 				
 				if (typeof text !== 'string') throw new CustomError('Vector target data source search field must be of type string');
 				
-				yield { ...record, vector: await LLM.generateDocumentEmbeddings(text) };
+				yield { ...record, _vector: await LLM.generateDocumentEmbeddings(text), _id: item.id };
 			}
 		}
 	}

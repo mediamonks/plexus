@@ -410,7 +410,7 @@ Defines available data sources and their properties:
 - **`dataType`** (string, optional): Type of data in the source: "text" for unstructured data, "data" for structured data. Required for `target` types: "raw" and "vector". Ignored for `digest` and `file`.
 - **`namespace`** (string, optional): Logical grouping namespace, only used for batch ingestion.
 - **`origin`** (string, optional): Data origin platform ("gcs", "drive", "api"), will be derived from the URI if not specified.
-- **`cache`** (boolean, optional): Whether to cache the data source, defaults to true. Set this to `false` for data sources of which the content can change between invocations.
+- **`get`** (boolean, optional): Whether to get the data source, defaults to true. Set this to `false` for data sources of which the content can change between invocations.
 - **`folder`** (boolean, optional): Whether the `gcs` or `drive` origin data source is a folder. Detected if not specified.
 - **`instructions`** (string, optional): Processing instructions for a `digest`-type data source.
 - **`searchField`** (string, optional): Name of the field against which to perform vector searches for a `data`-type, `vector`-target data source.

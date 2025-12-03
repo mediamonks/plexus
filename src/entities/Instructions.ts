@@ -24,7 +24,6 @@ export default class Instructions {
 	}
 	
 	private async read(): Promise<string> {
-		const instructionsPath = Config.get('instructionsPath');
 		const { instructions } = this._parent.configuration;
 		
 		if (instructions) {
@@ -33,6 +32,7 @@ export default class Instructions {
 			return instructions;
 		}
 		
+		const instructionsPath = Config.get('instructionsPath');
 		if (instructionsPath) return await CloudStorage.read(`${instructionsPath}/${this._parent.id}.txt`);
 		
 		return await Storage.get(StorageFile.TYPE.AGENT_INSTRUCTIONS, this._parent.id).read();

@@ -1,12 +1,16 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { Storage, File, Bucket } from '@google-cloud/storage';
+import IHasLocalFileCache from '../IHasLocalFileCache';
+import LocalFileCache from '../LocalFileCache';
 import Config from '../../core/Config';
 import Profiler from '../../core/Profiler';
 import CustomError from '../../entities/error-handling/CustomError';
+import { staticImplements } from '../../types/common';
 
 const GS_URI_PATTERN = /gs:\/\/([^/]+)\/(.*)/;
 
+@staticImplements<IHasLocalFileCache<string>>()
 export default class CloudStorage {
 	private static _client: Storage;
 	
@@ -58,21 +62,9 @@ export default class CloudStorage {
 	}
 	
 	public static async cache(uri: string, destination?: string): Promise<string> {
-		destination ??= path.join(
-			Config.get('tempPath') as string,
-			'download',
-			'gcs',
-			this.uri(uri).bucket,
-			this.uri(uri).path,
-		);
+		destination ??= path.join(this.downloadPath, this.uri(uri).bucket, this.uri(uri).path);
 		
-		try {
-			await fs.access(destination);
-		} catch (error) {
-			await this.download(uri, destination);
-		}
-		
-		return destination;
+		return LocalFileCache.get(uri, destination, this);
 	}
 	
 	public static async cacheAll(uri: string, destination?: string): Promise<string[]> {
@@ -89,6 +81,10 @@ export default class CloudStorage {
 	
 	private static get client(): Storage {
 		return this._client ??= new Storage();
+	}
+	
+	private static get downloadPath(): string {
+		return path.join(Config.get('tempPath'), 'download', 'gcs');
 	}
 	
 	private static uri(uri: string): { bucket: string; path: string } {

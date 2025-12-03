@@ -5,11 +5,13 @@ import mime from 'mime-types';
 import { Readable } from 'stream';
 import GoogleAuthClient from './GoogleAuthClient';
 import GoogleWorkspace from './GoogleWorkspace';
+import IHasLocalFileCache from '../IHasLocalFileCache';
+import LocalFileCache from '../LocalFileCache';
 import Config from '../../core/Config';
 import Debug from '../../core/Debug';
 import Profiler from '../../core/Profiler';
 import CustomError from '../../entities/error-handling/CustomError';
-import { Configuration, JsonObject } from '../../types/common';
+import { Configuration, JsonObject, staticImplements } from '../../types/common';
 
 const FIELDS = ['id', 'name', 'mimeType'];
 
@@ -53,6 +55,7 @@ type MethodResponse<TOperation extends OperationType> =
 	TOperation extends 'update' ? void :
 	never;
 
+@staticImplements<IHasLocalFileCache<Metadata>>()
 export default class GoogleDrive {
 	private static _client: drive_v3.Drive;
 	
@@ -163,17 +166,11 @@ export default class GoogleDrive {
 			alt: 'media'
 		}, { responseType: 'stream' }) as Readable;
 		
-		const chunks = [];
-		for await (const chunk of fileContent) {
-			chunks.push(chunk);
-		}
-		const buffer = Buffer.concat(chunks); // TODO use fileContent.data directly?
-		
 		const importedFile = await this.createFile(
 			newName,
 			this.tempFolderId,
 			targetMimeType,
-			buffer,
+			fileContent,
 			metadata.mimeType,
 		);
 		
@@ -233,19 +230,11 @@ export default class GoogleDrive {
 		}) as Metadata;
 	}
 	
-	// TODO abstract common file cache logic (see CloudStorage.ts) with a LocalCache class
+	// TODO abstract common file get logic (see CloudStorage.ts) with a LocalFileCache class
 	public static async cache(metadata: Metadata): Promise<string> {
-		const filePath = path.join(this.downloadPath, `${metadata.id}.${mime.extension(metadata.mimeType)}`);
+		const destination = path.join(this.downloadPath, `${metadata.id}.${mime.extension(metadata.mimeType)}`);
 		
-		fs.mkdirSync(this.downloadPath, { recursive: true });
-		
-		try {
-			fs.accessSync(filePath);
-		} catch (error) {
-			await this.download(metadata, filePath);
-		}
-		
-		return filePath;
+		return LocalFileCache.get(metadata, destination, this);
 	}
 	
 	public static async convertToPdf(localPath: string, allowCache: boolean) {

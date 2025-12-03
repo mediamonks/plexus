@@ -1,10 +1,10 @@
-const process = require('node:process');
 const childProcess = require('node:child_process');
 const fs = require('node:fs');
 const path = require('node:path');
+const process = require('node:process');
 const readline = require('node:readline/promises');
-const packageJson = require('../package.json');
 const { SecretManagerServiceClient } = require('@google-cloud/secret-manager');
+const packageJson = require('../package.json');
 
 const args = require('minimist')(process.argv.slice(2));
 let { env, functions, gateway, secrets, _: names } = args;

@@ -17,14 +17,13 @@ export default abstract class DataSource {
 	) {}
 	
 	public static readonly Configuration: {
-		allowCache: boolean;
-		isFolder: boolean;
-		origin: ValueOf<typeof DataSource.ORIGIN>;
-		dataType: ValueOf<typeof DataSource.DATA_TYPE>;
-		target: ValueOf<typeof DataSource.TARGET>;
-		uri: string;
-		searchField: string;
-		namespace: string;
+		allowCache?: boolean;
+		isFolder?: boolean;
+		origin?: ValueOf<typeof DataSource.ORIGIN>;
+		dataType?: ValueOf<typeof DataSource.DATA_TYPE>;
+		target?: ValueOf<typeof DataSource.TARGET>;
+		uri?: string;
+		namespace?: string;
 	}	& typeof ApiDataSourceOrigin.Configuration;
 	
 	public static readonly DATA_TYPE = {
@@ -59,7 +58,6 @@ export default abstract class DataSource {
 			dataType: (configuration.dataType ?? dataType), // TODO for backwards compatibility
 			target: (configuration.target ?? target), // TODO for backwards compatibility
 			uri: configuration.uri ?? configuration.source, // TODO for backwards compatibility
-			searchField: configuration.searchField,
 			namespace: configuration.namespace,
 		} as typeof DataSource.Configuration;
 	}

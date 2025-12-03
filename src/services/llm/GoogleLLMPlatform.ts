@@ -5,6 +5,8 @@ import ILLMPlatform, { QueryOptions } from './ILLMPlatform';
 import Config from '../../core/Config';
 import { staticImplements } from '../../types/common';
 import History from '../../core/History';
+import GoogleCloudStorageDataSourceItem
+	from '../../entities/data-sources/origin/GoogleCloudStorageDataSourceItem';
 
 const { GOOGLE_GENAI_API_KEY } = process.env;
 
@@ -31,9 +33,14 @@ export default class GoogleLLMPlatform {
 		maxTokens,
 		structuredResponse,
 		model,
-		files
+		files = [],
 	}: QueryOptions = {}): Promise<string> {
-		const fileParts = await this.getFileParts(files);
+		const filePaths = await Promise.all(files.map(item => {
+			if (item instanceof GoogleCloudStorageDataSourceItem) return item.uri;
+			return item.getLocalFile();
+		}));
+		
+		const fileParts = await this.createFileParts(filePaths);
 		
 		const parts: Part[] = [
 			{ text: query },
@@ -144,7 +151,7 @@ export default class GoogleLLMPlatform {
 		return this._embeddingClient = new GoogleGenAI({ apiKey: GOOGLE_GENAI_API_KEY });
 	}
 	
-	private static async getFileParts(files: string[]): Promise<Part[]> {
+	private static async createFileParts(files: string[]): Promise<Part[]> {
 		return await Promise.all(files.map(async file => {
 			if (file.toLowerCase().startsWith('gs://')) return { text: file };
 			

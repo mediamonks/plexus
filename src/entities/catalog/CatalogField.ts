@@ -11,7 +11,7 @@ export default class CatalogField {
 	private readonly _id: string;
 	private readonly _catalog: Catalog;
 	private _configuration: typeof CatalogField.Configuration;
-	protected _value: Promise<JsonField | DataSourceItem<unknown, unknown>[]> | JsonField | DataSourceItem<unknown, unknown>[];
+	protected _value: Promise<JsonField | DataSourceItem<unknown, unknown>[]>;
 
 	static readonly BaseConfiguration: {
 		type: 'input' | 'output' | 'data',

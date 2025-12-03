@@ -3,14 +3,15 @@ import path from 'node:path';
 import mimeTypes from 'mime-types';
 import DataSourceItem from './DataSourceItem';
 import DataSource from '../DataSource';
+import CustomError from '../../error-handling/CustomError';
 import UnsupportedError from '../../error-handling/UnsupportedError';
 import CloudStorage from '../../../services/google-cloud/CloudStorage';
+import GoogleDrive from '../../../services/google-drive/GoogleDrive';
+import LLM from '../../../services/llm/LLM';
+import hash from '../../../utils/hash';
 import jsonl from '../../../utils/jsonl';
 import pdf from '../../../utils/pdf';
 import { JsonField, JsonObject, ValueOf } from '../../../types/common';
-import GoogleDrive from '../../../services/google-drive/GoogleDrive';
-import LLM from '../../../services/llm/LLM';
-import CustomError from '../../error-handling/CustomError';
 
 export default class GoogleCloudStorageDataSourceItem extends DataSourceItem<string, AsyncGenerator<JsonObject>> {
 	private readonly _uri: string;
@@ -23,6 +24,10 @@ export default class GoogleCloudStorageDataSourceItem extends DataSourceItem<str
 	
 	public get uri(): string {
 		return this._uri;
+	}
+	
+	public get id(): string {
+		return hash(this.uri);
 	}
 	
 	public get extension(): string {

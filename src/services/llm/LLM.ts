@@ -7,6 +7,7 @@ import UnknownError from '../../entities/error-handling/UnknownError';
 import Config from '../../core/Config';
 import History from '../../core/History';
 import EMBEDDING_MODELS from '../../../data/embedding-models.json';
+import Profiler from '../../core/Profiler';
 
 export default class LLM {
 	public static Configuration: {
@@ -27,6 +28,8 @@ export default class LLM {
 		const { model, temperature: configTemperature } = this.configuration;
 		
 		temperature ??= configTemperature;
+		
+		await Profiler.run(async () => await history.ready, 'waiting for history to be ready');
 		
 		return this.platform.query(prompt, {
 			systemInstructions: instructions,
