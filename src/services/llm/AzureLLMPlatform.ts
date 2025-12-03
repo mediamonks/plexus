@@ -1,100 +1,30 @@
 import OpenAI from 'openai';
 import { ConfidentialClientApplication } from '@azure/msal-node';
-import ILLMPlatform, { QueryOptions } from './ILLMPlatform';
+import ILLMPlatform from './ILLMPlatform';
+import OpenAILLMPlatform from './OpenAILLMPlatform';
 import CustomError from '../../entities/error-handling/CustomError';
 import Config from '../../core/Config';
 import { staticImplements } from '../../types/common';
-import History from '../../core/History';
 
 const { AZURE_TENANT_ID, AZURE_CLIENT_ID, AZURE_CLIENT_SECRET } = process.env;
 const ACCESS_TOKEN_TTL_MS = 60000;
 
 @staticImplements<ILLMPlatform>()
-export default class AzureLLMPlatform {
-	public static Configuration: {
+export default class AzureLLMPlatform extends OpenAILLMPlatform {
+	public static Configuration: typeof OpenAILLMPlatform.Configuration & {
 		baseUrl: string;
 		apiVersion: string;
-		model?: string;
 		embeddingApiVersion: string;
-		embeddingModel?: string;
 	};
 	
-	private static _client: OpenAI;
-	private static _embeddingClient: OpenAI;
 	private static _accessToken: string;
 	private static _expirationTimestamp: number;
-	private static _cachedEmbeddings: Record<string, Record<string, number[]>> = {};
 	
-	public static async query(query: string, {
-		systemInstructions,
-		history = new History(),
-		temperature,
-		maxTokens,
-		structuredResponse,
-		model,
-		files
-	}: QueryOptions = {}): Promise<string> {
-		// TODO implement support
-		if (files && files.length) throw new CustomError('Azure OpenAI file content not yet supported');
-		
-		const messages = [
-			...history.toOpenAi(),
-			{ role: 'user', content: query }
-		] as OpenAI.ChatCompletionMessageParam[];
-		
-		if (systemInstructions) messages.unshift({ role: 'system', content: systemInstructions });
-		
-		model ??= this.configuration.model;
-		
-		const client = await this.getClient(model);
-		
-		const response = await client.chat.completions.create({
-			messages,
-			model,
-			max_tokens: maxTokens,
-			temperature,
-			response_format: structuredResponse ? { type: 'json_object' } : undefined,
-		});
-
-		return response.choices[0].message.content;
-	}
-	
-	public static async generateQueryEmbeddings(text: string, model?: string): Promise<number[]> {
-		return await this.generateEmbeddings(text, model);
-	}
-	
-	public static async generateDocumentEmbeddings(text: string, model?: string): Promise<number[]> {
-		return await this.generateEmbeddings(text, model);
-	}
-	
-	public static get embeddingModel(): string {
-		return this.configuration.embeddingModel;
-	}
-	
-	private static get configuration(): typeof AzureLLMPlatform.Configuration {
+	protected static get configuration(): typeof AzureLLMPlatform.Configuration {
 		return Config.get('azure', { includeGlobal: true });
 	}
 	
-	private static async generateEmbeddings(input: string, model?: string): Promise<number[]> {
-		model ??= this.embeddingModel;
-		
-		const cachedEmbeddings = this._cachedEmbeddings[model]?.[input];
-		
-		if (cachedEmbeddings) return cachedEmbeddings;
-		
-		const client = await this.getEmbeddingClient(model);
-		
-		const response = await client.embeddings.create({ model, input });
-		
-		const vector = response.data[0].embedding;
-		
-		this._cachedEmbeddings[model] ??= {};
-		this._cachedEmbeddings[model][input] = vector;
-		
-		return vector;
-	}
-	
-	private static async getClient(model?: string): Promise<OpenAI> {
+	protected static async getClient(model?: string): Promise<OpenAI> {
 		if (this._client) return this._client;
 		
 		const token = await this.getAccessToken();
@@ -114,7 +44,7 @@ export default class AzureLLMPlatform {
 		});
 	}
 	
-	private static async getEmbeddingClient(model?: string): Promise<OpenAI> {
+	protected static async getEmbeddingClient(model?: string): Promise<OpenAI> {
 		if (this._embeddingClient) return this._embeddingClient;
 		
 		const token = await this.getAccessToken();

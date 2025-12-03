@@ -27,6 +27,10 @@ export default class GoogleDriveDataSourceItem extends DataSourceItem<string, Sp
 		return this._metadata;
 	}
 	
+	public get id(): string {
+		return this.metadata.id;
+	}
+	
 	public get mimeType(): string {
 		return this._metadata.mimeType;
 	}

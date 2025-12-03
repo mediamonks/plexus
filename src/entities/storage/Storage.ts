@@ -2,6 +2,9 @@ import StorageFile, { StorageFileType } from './StorageFile';
 import StorageDataFile from './StorageDataFile';
 import StorageTextFile from './StorageTextFile';
 import UnsupportedError from '../error-handling/UnsupportedError';
+import CloudStorage from '../../services/google-cloud/CloudStorage';
+import path from 'node:path';
+import Config from '../../core/Config';
 
 type TextFileTypes = typeof StorageFile.TYPE.DIGEST_INSTRUCTIONS | typeof StorageFile.TYPE.AGENT_INSTRUCTIONS | typeof StorageFile.TYPE.UNSTRUCTURED_DATA;
 
@@ -33,5 +36,15 @@ export default class Storage {
 		}
 		
 		return storageFile;
+	}
+	
+	public static async save(namespace: string, localPath: string): Promise<void> {
+		const uri = `gs://${Config.get('storage.bucket')}/files/${namespace}/${path.basename(localPath)}`;
+		await CloudStorage.upload(localPath, uri);
+	}
+	
+	public static async getFiles(namespace: string): Promise<string[]> {
+		const cachePath = `gs://${Config.get('storage.bucket')}/files/${namespace}`;
+		return CloudStorage.list(cachePath);
 	}
 };

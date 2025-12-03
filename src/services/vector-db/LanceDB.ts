@@ -1,7 +1,7 @@
 import { performance } from 'node:perf_hooks';
-import lancedb, { Connection } from '@lancedb/lancedb';
+import lancedb, { Connection, SchemaLike, Table } from '@lancedb/lancedb';
 import Config from '../../core/Config';
-import { JsonObject } from '../../types/common';
+import { JsonObject, JsonPrimitive } from '../../types/common';
 
 const _tables = {};
 const lastTableWrites = {};
@@ -29,7 +29,7 @@ export default class LanceDB {
 		}
 	}
 	
-	public static async createTable(name: string, records: any[], schema?: any): Promise<void> {
+	public static async createTable(name: string, records: JsonObject[], schema?: SchemaLike): Promise<void> {
 		const connection = await this.getConnection();
 		
 		lastTableWrites[name] = performance.now();
@@ -41,7 +41,7 @@ export default class LanceDB {
 		}
 	}
 	
-	public static async append(tableName: string, records: any[]): Promise<any> {
+	public static async append(tableName: string, records: JsonObject[]): Promise<void> {
 		if (!records.length) return;
 		
 		tableRecordBuffers[tableName] ??= [];
@@ -54,7 +54,7 @@ export default class LanceDB {
 		return tableWriteTimeouts[tableName];
 	}
 	
-	public static async upsert(tableName: string, records: any[]): Promise<void> {
+	public static async upsert(tableName: string, records: JsonObject[]): Promise<void> {
 		const table = await this.getTable(tableName);
 		await table.mergeInsert('id')
 			.whenMatchedUpdateAll()
@@ -62,15 +62,15 @@ export default class LanceDB {
 			.execute(records);
 	}
 	
-	public static async search(tableName: string, embeddings: number[], { limit = 3, filter, fields }: { limit?: number; filter?: any; fields?: string[] }): Promise<JsonObject[]> {
+	public static async search(tableName: string, embeddings: number[], { limit = 3, filter, fields }: { limit?: number; filter?: Record<string, JsonPrimitive>; fields?: string[] }): Promise<JsonObject[]> {
 		const table = await this.getTable(tableName);
 		
-		let vectorQuery = await table.vectorSearch(embeddings);
+		let vectorQuery = table.vectorSearch(embeddings);
 		
 		if (fields) vectorQuery = vectorQuery.select(fields);
 		
 		if (filter) vectorQuery = vectorQuery.where(
-			Object.keys(filter).map(key => `${key} = '${filter[key]}'`).join(' AND ')
+			Object.keys(filter).map(key => `${key} = '${filter[key]}'`).join(' AND ') // TODO does this work only with string values?
 		);
 		
 		return await vectorQuery
@@ -79,7 +79,7 @@ export default class LanceDB {
 			.toArray();
 	}
 	
-	public static async ensureTableExists(name: string, schema: any): Promise<void> {
+	public static async ensureTableExists(name: string, schema: SchemaLike): Promise<void> {
 		if (_tables[name]) return;
 		
 		const connection = await this.getConnection();
@@ -89,6 +89,17 @@ export default class LanceDB {
 			lastTableWrites[name] = performance.now();
 			_tables[name] = await connection.createEmptyTable(name, schema);
 		}
+	}
+	
+	public static async tableExists(tableName: string): Promise<boolean> {
+		const connection = await this.getConnection();
+		return (await connection.tableNames()).includes(tableName);
+	}
+	
+	public static async getIds(tableName: string): Promise<Set<string>> {
+		const table = await this.getTable(tableName);
+		const records = await table.query().select('_id').toArray();
+		return new Set(records.map(item => item._id));
 	}
 	
 	private static async getConnection(): Promise<Connection> {
@@ -106,7 +117,7 @@ export default class LanceDB {
 		return this._connection;
 	}
 	
-	private static async getTable(name: string): Promise<any> {
+	private static async getTable(name: string): Promise<Table> {
 		const connection = await this.getConnection();
 		
 		_tables[name] ??= connection.openTable(name);

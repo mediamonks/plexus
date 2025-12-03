@@ -1,4 +1,5 @@
 import History from '../../core/History';
+import DataSourceItem from '../../entities/data-sources/origin/DataSourceItem';
 
 export type QueryOptions = {
 	systemInstructions?: string;
@@ -7,7 +8,7 @@ export type QueryOptions = {
 	maxTokens?: number;
 	structuredResponse?: boolean;
 	model?: string;
-	files?: string[];
+	files?: DataSourceItem<unknown, unknown>[];
 };
 
 export default interface ILLMPlatform {

@@ -79,9 +79,6 @@ export default class DataSourceCatalogField extends CatalogField {
 		
 		await Promise.all(promises);
 		
-		const value = await this.dataSource.query({ input, filter, ...this.queryParameters });
-
-		// TODO do we need to assign to this._value here?
-		return this._value = value;
+		return this.dataSource.query({ input, filter, ...this.queryParameters });
 	}
-}
+};

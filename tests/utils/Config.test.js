@@ -36,7 +36,7 @@ const CustomError = require('../../src/entities/error-handling/CustomError').def
 
 describe('Config', () => {
 	beforeEach(() => {
-		// Clear the static config cache before each test
+		// Clear the static config get before each test
 		Config._staticConfig = undefined;
 		
 		// Reset RequestContext mock

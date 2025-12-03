@@ -1,9 +1,9 @@
 require('dotenv/config');
 const Router = require('./src/core/Router.ts').default;
 // const payload = require('./config/test/copydesk.json');
-const payload = require('./config/test/mantra.json');
+// const payload = require('./config/test/mantra.json');
 // const payload = require('./config/test/luis.json');
-// const payload = require('./config/test/test.json');
+const payload = require('./config/test/test.json');
 const gcs = require('./src/services/google-cloud/CloudStorage.ts').default;
 
 process.env.NODE_ENV = 'dev';
@@ -67,6 +67,8 @@ async function ingest(namespace, body) {
 	
 	await authentication();
 	
-	await invoke(payload);
+	// await invoke(payload);
+	
+	await ingest('test', payload);
 	
 }());

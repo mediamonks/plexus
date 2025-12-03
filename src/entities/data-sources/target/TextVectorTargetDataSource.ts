@@ -1,16 +1,11 @@
 import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
-import DataSource from '../DataSource';
+import VectorTargetDataSource from './VectorTargetDataSource';
 import DataSourceCatalogField from '../../catalog/DataSourceCatalogField';
 import LLM from '../../../services/llm/LLM';
 import VectorDB from '../../../services/vector-db/VectorDB';
 import CustomError from '../../error-handling/CustomError';
 
-export default class TextVectorTargetDataSource extends DataSource {
-	public async ingest(): Promise<void> {
-		await VectorDB.drop(this.id);
-		await VectorDB.create(this.id, this.generator());
-	}
-	
+export default class TextVectorTargetDataSource extends VectorTargetDataSource {
 	public async query({ input, limit }: typeof DataSourceCatalogField.QueryParameters): Promise<string[]> {
 		try {
 			const result = await VectorDB.search(this.id, input, { limit, fields: ['text'] });
@@ -22,7 +17,7 @@ export default class TextVectorTargetDataSource extends DataSource {
 		
 	}
 	
-	private async *generator(): AsyncGenerator<{ text: string, vector: number[] }> {
+	protected async *generator(): AsyncGenerator<{ text: string, _vector: number[], _id: string }> {
 		const items = await this.origin.getItems();
 		
 		for (const item of items) {
@@ -38,7 +33,7 @@ export default class TextVectorTargetDataSource extends DataSource {
 			for (const chunk of chunks) {
 				const content = chunk.pageContent;
 				if (!content) continue;
-				yield { text: content, vector: await LLM.generateDocumentEmbeddings(content) };
+				yield { text: content, _vector: await LLM.generateDocumentEmbeddings(content), _id: item.id };
 			}
 		}
 	}

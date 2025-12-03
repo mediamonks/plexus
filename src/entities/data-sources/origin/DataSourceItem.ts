@@ -15,10 +15,16 @@ export default abstract class DataSourceItem<TTextContent, TDataContent> {
 	public get allowCache(): boolean {
 		return this.dataSource.configuration.allowCache;
 	}
-
+	
+	public abstract get id(): string;
+	
+	public abstract get fileName(): string;
+	
 	public abstract toText(): Promise<TTextContent>;
 	
 	public abstract toData(): Promise<TDataContent>;
 	
 	public abstract toJSON(): JsonField;
+	
+	public abstract getLocalFile(): Promise<string>;
 }
