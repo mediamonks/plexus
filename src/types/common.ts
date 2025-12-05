@@ -18,9 +18,9 @@ export type ValueOf<T> = T[keyof T];
 
 export type SpreadSheetData = { sheets: { title: string; rows: any[] }[] };
 
-export type RequestPayload = {
+export type InvokePayload = {
 	threadId?: string;
-	config?: JsonObject;
+	config?: Configuration;
 	fields?: JsonObject;
 };
 

@@ -5,7 +5,7 @@ import UnknownError from '../error-handling/UnknownError';
 import Config from '../../core/Config';
 import Debug from '../../core/Debug';
 import RequestContext from '../../core/RequestContext';
-import { JsonField, RequestPayload, Configuration } from '../../types/common';
+import { JsonField, InvokePayload, Configuration } from '../../types/common';
 
 export default class InputCatalogField extends CatalogField {
 	static readonly Configuration: typeof CatalogField.BaseConfiguration & {
@@ -31,7 +31,7 @@ export default class InputCatalogField extends CatalogField {
 	protected async populate(): Promise<JsonField | DataSourceItem<unknown, unknown>[]> {
 		Debug.log(`Populating input field "${this.id}"`, 'Catalog');
 		
-		const payload = RequestContext.get('payload') as RequestPayload;
+		const payload = RequestContext.get('payload') as InvokePayload;
 		
 		let value = payload.fields?.[this.payloadField] as string;
 		
@@ -49,6 +49,6 @@ export default class InputCatalogField extends CatalogField {
 			value = fieldValues[value].description ?? fieldValues[value].label;
 		}
 		
-		return this._value = value;
+		return value;
 	}
 }

@@ -2,8 +2,9 @@ import { v4 as uuid } from 'uuid';
 import Config from './Config';
 import Profiler from './Profiler';
 import RequestContext from './RequestContext';
-import Firestore from '../services/google-cloud/Firestore';
 import CustomError from '../entities/error-handling/CustomError';
+import Firestore from '../services/google-cloud/Firestore';
+import { JsonObject } from '../types/common';
 
 type HistoryItem = {
 	role: string;
@@ -16,6 +17,7 @@ type OpenAIHistoryItem = {
 	name?: string;
 }
 
+// TODO is this an entity?
 export default class History {
 	public ready: Promise<void>;
 	private _history: HistoryItem[] = [];
@@ -51,7 +53,7 @@ export default class History {
 				
 				if (!thread) throw new CustomError('Invalid threadId');
 				
-				({ history } = thread);
+				history = thread.history as HistoryItem[];
 			}
 			
 			if (!history || !history.length) return;
@@ -60,8 +62,8 @@ export default class History {
 		}, 'load history');
 	}
 	
-	public async save(output: any): Promise<void> {
-		const threadUpdate = Profiler.run(() => Firestore.updateDocument('threads', this._threadId, {
+	public async save(output: JsonObject): Promise<void> {
+		const threadUpdate = Profiler.run(() => Firestore.updateDocument('threads', this.threadId, {
 			output,
 			history: this.toJSON(),
 		}), 'update thread');

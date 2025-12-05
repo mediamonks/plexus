@@ -4,6 +4,7 @@ import StorageFile from './storage/StorageFile';
 import CloudStorage from '../services/google-cloud/CloudStorage';
 import Config from '../core/Config';
 
+// TODO move to behavior folder?
 export default class Instructions {
 	constructor(private readonly _parent: IHasInstructions) {}
 	

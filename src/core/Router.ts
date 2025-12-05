@@ -6,10 +6,10 @@ import Profiler from './Profiler';
 import RequestContext from './RequestContext';
 import CustomError from '../entities/error-handling/CustomError';
 import ErrorHandler from '../entities/error-handling/ErrorHandler';
-import { JsonField, JsonObject, RequestPayload } from '../types/common';
+import { JsonField, JsonObject, InvokePayload } from '../types/common';
 import ROUTES from '../../config/routes.json';
 
-type Handler = (variables: JsonObject, payload: RequestPayload) => Promise<JsonField | undefined>;
+type Handler = (variables: JsonObject, payload: InvokePayload) => Promise<JsonField | undefined>;
 
 export default class Router {
 	public static async handle(req: Request, res: Response): Promise<void> {
@@ -130,7 +130,7 @@ export default class Router {
 		return handlerModule.default;
 	}
 	
-	private static getPayload(req: Request): RequestPayload {
+	private static getPayload(req: Request): InvokePayload {
 		return req.method === 'POST' ? req.body : req.query;
 	}
 }

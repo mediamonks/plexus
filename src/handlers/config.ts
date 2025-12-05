@@ -1,4 +1,4 @@
 import Config from '../core/Config';
-import { JsonObject } from '../types/common';
+import { Configuration } from '../types/common';
 
-export default async (): Promise<JsonObject> => Config.get() as JsonObject;
+export default async (): Promise<Configuration> => Config.get();

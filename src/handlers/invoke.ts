@@ -3,17 +3,16 @@ import CustomError from '../entities/error-handling/CustomError';
 import Config from '../core/Config';
 import History from '../core/History';
 import Profiler from '../core/Profiler';
-import RequestContext from '../core/RequestContext';
-import { JsonObject, RequestPayload } from '../types/common';
+import { JsonObject, InvokePayload } from '../types/common';
 
-export default async (_: any, payload: any): Promise<{
+export default async (_: void, payload: InvokePayload): Promise<{
 	output: JsonObject;
 	threadId: string;
 	fields: JsonObject;
 }> => {
 	const output = {};
 	
-	let { threadId } = RequestContext.get('payload') as RequestPayload;
+	let { threadId } = payload;
 	
 	History.create(threadId as string);
 	

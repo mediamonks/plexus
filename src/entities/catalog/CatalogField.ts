@@ -69,7 +69,7 @@ export default class CatalogField {
 	
 	public async toJSON(): Promise<JsonField> {
 		const value = await this.getValue();
-		if (value instanceof Array && value[0] instanceof DataSourceItem) return value.map(item => item.toJSON());
+		if (value instanceof Array && value[0] instanceof DataSourceItem) return value.map(item => item.toString());
 		return value as JsonField;
 	}
 }

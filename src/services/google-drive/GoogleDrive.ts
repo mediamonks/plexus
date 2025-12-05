@@ -237,12 +237,18 @@ export default class GoogleDrive {
 		return LocalFileCache.get(metadata, destination, this);
 	}
 	
-	public static async convertToPdf(localPath: string, allowCache: boolean) {
-		let metadata = await this.upload(localPath, this.tempFolderId);
+	public static async convertToPdf(localPath: string): Promise<string> {
+		const uploadedFileMetadata = await this.upload(localPath, this.tempFolderId);
 		
-		metadata = await this.import(metadata, allowCache);
+		const importedFileMetadata = await this.import(uploadedFileMetadata);
 		
-		return await this.exportToPdf(metadata, allowCache);
+		void this.trash(uploadedFileMetadata.id);
+		
+		const pathToPdf = await this.exportToPdf(importedFileMetadata);
+		
+		void this.trash(importedFileMetadata.id);
+		
+		return pathToPdf;
 	}
 	
 	public static async createFile(name: string, folderId: string, mimeType: string, content?: Buffer | Readable | string, mediaMimeType?: string): Promise<Metadata> {
@@ -268,6 +274,22 @@ export default class GoogleDrive {
 			},
 			media,
 			fields: this.fields,
+		}) as Metadata;
+	}
+	
+	public static async getContent(metadata: Metadata): Promise<Buffer> {
+		const fileContent = await this.execute(OPERATION.GET, {
+			fileId: metadata.id,
+			alt: 'media',
+		}, { responseType: 'stream' }) as Readable;
+		
+		return await new Promise<Buffer>((resolve, reject) => {
+			const buffer: Buffer[] = [];
+			
+			fileContent
+				.on('data', chunk => buffer.push(chunk))
+				.on('end', () => resolve(Buffer.concat(buffer)))
+				.on('error', reject);
 		});
 	}
 	
@@ -297,6 +319,12 @@ export default class GoogleDrive {
 		await this.execute(OPERATION.UPDATE, {
 			fileId: id,
 			requestBody: { trashed: true }
+		});
+	}
+	
+	private static async delete(id: string): Promise<void> {
+		await this.execute(OPERATION.DELETE, {
+			fileId: id,
 		});
 	}
 	

@@ -78,14 +78,25 @@ export default class GoogleDriveDataSourceItem extends DataSourceItem<string, Sp
 		throw new UnsupportedError('mime type for data extraction', metadata.mimeType);
 	}
 	
-	public toJSON(): JsonField {
+	public toValue(): JsonField {
 		return this.metadata as JsonField;
 	}
 	
+	public async getTextContent(): Promise<string> {
+		const buffer = await GoogleDrive.getContent(this.metadata);
+		return buffer.toString('utf8');
+	}
+	
+	public async toBase64(): Promise<string> {
+		const buffer = await GoogleDrive.getContent(this.metadata);
+		return buffer.toString('base64');
+	}
+	
+	// TODO llm conversion logic should probably live in the LLMPlatform class
 	private async _getLocalFile(): Promise<string> {
 		let metadata = this.metadata;
 		
-		if (LLM.supportedMimeTypes.includes(this.mimeType))
+		if (LLM.supportedMimeTypes.has(this.mimeType))
 			return (this.allowCache ? GoogleDrive.cache(metadata) : GoogleDrive.download(metadata));
 		
 		if (!this.mimeType.startsWith('application/vnd.google-apps.'))

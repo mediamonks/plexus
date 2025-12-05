@@ -20,11 +20,17 @@ export default abstract class DataSourceItem<TTextContent, TDataContent> {
 	
 	public abstract get fileName(): string;
 	
+	public abstract get mimeType(): string;
+	
 	public abstract toText(): Promise<TTextContent>;
 	
 	public abstract toData(): Promise<TDataContent>;
 	
-	public abstract toJSON(): JsonField;
+	public abstract toValue(): JsonField;
+	
+	public abstract getTextContent(): Promise<string>;
+	
+	public abstract toBase64(): Promise<string>;
 	
 	public abstract getLocalFile(): Promise<string>;
 }

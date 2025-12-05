@@ -59,11 +59,11 @@ export default class DataSourceCatalogField extends CatalogField {
 		
 		const promises = [];
 		
-		let input;
+		let input: string;
 		if (this.inputField) {
 			promises.push(
 				this.catalog.get(this.inputField).getValue()
-					.then(value => { input = value; })
+					.then(value => { input = String(value) })
 			);
 		}
 		

@@ -67,8 +67,8 @@ async function ingest(namespace, body) {
 	
 	await authentication();
 	
-	// await invoke(payload);
-	
-	await ingest('test', payload);
+	// await ingest('test', payload);
+
+	await invoke(payload);
 	
 }());
