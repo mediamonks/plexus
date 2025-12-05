@@ -8,14 +8,14 @@ export default class FileTargetDataSource extends DataSource {
 		const items = await this.origin.getItems();
 		await Promise.all(items.map(async item => {
 			const localPath = await item.getLocalFile();
-			return Storage.save(this.id, localPath);
+			return Storage.save(this.id, localPath, item.fileName);
 		}));
 	}
 	
 	public async query(): Promise<DataSourceItem<unknown, unknown>[]> {
-		const uris = await Storage.getFiles(this.id);
+		const files = await Storage.getFiles(this.id);
 		
-		if (uris.length) return uris.map(uri => new GoogleCloudStorageDataSourceItem(this, uri));
+		if (files.length) return files.map(file => new GoogleCloudStorageDataSourceItem(this, file.uri, file.name));
 		
 		return this.origin.getItems();
 	}

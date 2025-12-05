@@ -41,6 +41,6 @@ export default class OutputCatalogField extends CatalogField {
 		
 		if (value === undefined) throw new CustomError(`Agent "${this.agentId}" failed to output field "${this.outputField}"`);
 		
-		return this._value = value;
+		return value;
 	}
 }

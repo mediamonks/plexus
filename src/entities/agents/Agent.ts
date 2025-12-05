@@ -22,7 +22,7 @@ export default class Agent implements IHasInstructions {
 	private readonly _configuration: typeof Agent.Configuration;
 	private readonly _context: Record<string, Promise<void> | JsonField> = {};
 	private _displayName: string;
-	private readonly _files: DataSourceItem<unknown, unknown>[] = [];
+	private readonly _files: DataSourceItem<string, unknown>[] = [];
 	private readonly _id: string;
 	private _invocation: Promise<JsonObject>;
 	private _loaded: Promise<void>;
@@ -92,7 +92,7 @@ export default class Agent implements IHasInstructions {
 	private async _mapFiles(value: JsonField | DataSourceItem<unknown, unknown>[]): Promise<JsonField> {
 		if (!(value instanceof Array) || !(value[0] instanceof DataSourceItem)) return value as JsonField;
 		
-		const items = value as DataSourceItem<unknown, unknown>[];
+		const items = value as DataSourceItem<string, unknown>[];
 		
 		this.files.push(...items);
 		
@@ -164,6 +164,7 @@ export default class Agent implements IHasInstructions {
 		Debug.dump(`agent ${this.id} prompt`, this._context);
 		Debug.dump(`agent ${this.id} files`, this.files);
 		
+		// TODO pass context as-is, including files as DataSourceItems, let the LLM wrapper figure out what to do with it, so it can i.e. leave gs:// links as is
 		const response = await Status.wrap(`Running ${this.id} agent`, () =>
 			Profiler.run(() =>
 				LLM.query(JSON.stringify(this._context, undefined, 2), {
@@ -186,6 +187,8 @@ export default class Agent implements IHasInstructions {
 			throw new CustomError(`Error: ${this.displayName} agent returned invalid JSON`);
 		}
 		
+		// TODO Implement or remove pagination
+		
 		Debug.log(`Completed invocation of ${this.id}`, 'Agent');
 		
 		return output;
@@ -195,7 +198,7 @@ export default class Agent implements IHasInstructions {
 		return this._invocation ??= this._invoke();
 	}
 	
-	public get files(): DataSourceItem<unknown, unknown>[] {
+	public get files(): DataSourceItem<string, unknown>[] {
 		return this._files;
 	}
 }

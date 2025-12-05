@@ -29,9 +29,10 @@ export default class CloudStorage {
 		});
 	}
 	
-	public static async upload(filePath: string, uri: string): Promise<string> {
+	public static async upload(filePath: string, uri: string, metadata?: Record<string, string>): Promise<string> {
 		const destination = this.uri(uri).path;
 		await this.bucket(uri).upload(filePath, { destination });
+		if (metadata) await this.file(uri).setMetadata({ metadata });
 		return uri;
 	}
 	
@@ -79,6 +80,24 @@ export default class CloudStorage {
 		return uri.endsWith('/');
 	}
 	
+	public static async files(uri: string): Promise<File[]> {
+		const prefix = this.uri(uri).path;
+		
+		const [files] = await this.bucket(uri).getFiles({ prefix });
+		
+		return files.filter(file => file.name !== `${prefix}/`);
+	}
+	
+	public static async getSize(uri: string): Promise<number> {
+		const metadata = await this.file(uri).getMetadata();
+		return +metadata[0].size;
+	}
+	
+	public static async getContent(uri: string): Promise<Buffer> {
+		const [buffer] = await this.file(uri).download();
+		return buffer;
+	}
+	
 	private static get client(): Storage {
 		return this._client ??= new Storage();
 	}
@@ -92,14 +111,6 @@ export default class CloudStorage {
 		if (!components) throw new CustomError(`Invalid Google Cloud Storage URI: ${uri}`);
 		const [, bucket, path] = GS_URI_PATTERN.exec(decodeURIComponent(uri));
 		return { bucket, path };
-	}
-	
-	private static async files(uri: string): Promise<File[]> {
-		const prefix = this.uri(uri).path;
-		
-		const [files] = await this.bucket(uri).getFiles({ prefix });
-		
-		return files.filter(file => file.name !== `${prefix}/`);
 	}
 	
 	private static file(uri: string): File {

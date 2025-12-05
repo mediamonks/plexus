@@ -1,17 +1,24 @@
-import fs from 'node:fs';
+import fs from 'node:fs/promises';
 import { GoogleGenAI, Content, Part } from '@google/genai';
-import mimeTypes from 'mime-types';
 import ILLMPlatform, { QueryOptions } from './ILLMPlatform';
 import Config from '../../core/Config';
 import { staticImplements } from '../../types/common';
-import History from '../../core/History';
-import GoogleCloudStorageDataSourceItem
-	from '../../entities/data-sources/origin/GoogleCloudStorageDataSourceItem';
+import DataSourceItem from '../../entities/data-sources/origin/DataSourceItem';
+import GoogleCloudStorageDataSourceItem from '../../entities/data-sources/origin/GoogleCloudStorageDataSourceItem';
+import Profiler from '../../core/Profiler';
 
 const { GOOGLE_GENAI_API_KEY } = process.env;
 
 @staticImplements<ILLMPlatform>()
 export default class GoogleLLMPlatform {
+	public static readonly supportedMimeTypes: Set<string> = new Set([
+		'application/json',
+		'application/pdf',
+		'image/jpeg',
+		'image/png',
+		'text/plain',
+	]);
+	
 	public static Configuration: {
 		projectId: string;
 		location: string;
@@ -27,20 +34,15 @@ export default class GoogleLLMPlatform {
 	private static _cachedEmbeddings: Record<string, Record<string, Record<string, number[]>>> = {};
 	
 	public static async query(query: string, {
-		systemInstructions,
-		history = new History(),
+		instructions,
+		history,
 		temperature,
 		maxTokens,
 		structuredResponse,
 		model,
 		files = [],
 	}: QueryOptions = {}): Promise<string> {
-		const filePaths = await Promise.all(files.map(item => {
-			if (item instanceof GoogleCloudStorageDataSourceItem) return item.uri;
-			return item.getLocalFile();
-		}));
-		
-		const fileParts = await this.createFileParts(filePaths);
+		const fileParts = await this.createFileParts(files);
 		
 		const parts: Part[] = [
 			{ text: query },
@@ -56,18 +58,18 @@ export default class GoogleLLMPlatform {
 		
 		await this.quotaDelay();
 		
-		const result = await this.client.models.generateContent({
+		const response = await Profiler.run(async () =>  this.client.models.generateContent({
 			model,
 			contents,
 			config: {
-				systemInstruction: systemInstructions,
+				systemInstruction: instructions,
 				temperature,
 				maxOutputTokens: maxTokens,
 				responseMimeType: structuredResponse && 'application/json',
 			},
-		});
+		}), 'GoogleLLMPlatform.query');
 		
-		return result.candidates[0].content.parts[0].text;
+		return response.candidates[0].content.parts[0].text;
 	}
 	
 	public static async generateQueryEmbeddings(text: string, model?: string): Promise<number[]> {
@@ -151,14 +153,21 @@ export default class GoogleLLMPlatform {
 		return this._embeddingClient = new GoogleGenAI({ apiKey: GOOGLE_GENAI_API_KEY });
 	}
 	
-	private static async createFileParts(files: string[]): Promise<Part[]> {
-		return await Promise.all(files.map(async file => {
-			if (file.toLowerCase().startsWith('gs://')) return { text: file };
+	private static async createFileParts(files: DataSourceItem<unknown, unknown>[]): Promise<Part[]> {
+		return await Promise.all(files.map(async item => {
+			if (item instanceof GoogleCloudStorageDataSourceItem && (await item.size) <= 52428800 * 1024) return {
+				fileData: {
+					fileUri: item.uri,
+					mimeType: item.mimeType,
+				}
+			};
+			
+			const localFile = await item.getLocalFile();
 			
 			return {
 				inlineData: {
-					mimeType: mimeTypes.lookup(file) as string,
-					data: await fs.promises.readFile(file, { encoding: 'base64' }),
+					mimeType: item.mimeType,
+					data: await fs.readFile(localFile, { encoding: 'base64' }),
 				},
 			};
 		}));

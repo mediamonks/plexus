@@ -11,16 +11,18 @@ import LLM from '../../../services/llm/LLM';
 import hash from '../../../utils/hash';
 import jsonl from '../../../utils/jsonl';
 import pdf from '../../../utils/pdf';
-import { JsonField, JsonObject, ValueOf } from '../../../types/common';
+import { JsonObject, ValueOf } from '../../../types/common';
 
 export default class GoogleCloudStorageDataSourceItem extends DataSourceItem<string, AsyncGenerator<JsonObject>> {
-	private readonly _uri: string;
-	
-	public constructor(dataSource: DataSource, uri: string) {
+	public constructor(
+		dataSource: DataSource,
+		private readonly _uri: string,
+		private readonly _name?: string,
+	)	{
 		super(dataSource);
-
-		this._uri = uri;
 	}
+	
+	private _size?: Promise<number>;
 	
 	public get uri(): string {
 		return this._uri;
@@ -35,21 +37,26 @@ export default class GoogleCloudStorageDataSourceItem extends DataSourceItem<str
 	}
 	
 	public get fileName(): string {
-		return path.basename(this.uri);
+		return this._name ?? path.basename(this.uri);
 	}
 	
-	private get mimeType(): string {
+	public get mimeType(): string {
 		const mimeType = mimeTypes.lookup(this.uri);
 		if (!mimeType) throw new CustomError(`Failed detecting mime type for file "${this.uri}"`);
 		return mimeType;
 	}
 	
+	// TODO code smell?
+	public get size(): Promise<number> {
+		return this._size ??= CloudStorage.getSize(this.uri);
+	}
+	
 	public async getLocalFile(): Promise<string> {
 		const localPath = this.allowCache ? await CloudStorage.cache(this.uri) : await CloudStorage.download(this.uri);
 		
-		if (LLM.supportedMimeTypes.includes(this.mimeType)) return localPath;
+		if (LLM.supportedMimeTypes.has(this.mimeType)) return localPath;
 		
-		return await GoogleDrive.convertToPdf(localPath, this.allowCache);
+		return await GoogleDrive.convertToPdf(localPath);
 	}
 	
 	public async toText(): Promise<string> {
@@ -70,8 +77,18 @@ export default class GoogleCloudStorageDataSourceItem extends DataSourceItem<str
 		return jsonl.read(file);
 	}
 	
-	public toJSON(): JsonField {
+	public toValue(): string {
 		return this.uri;
+	}
+	
+	public async getTextContent(): Promise<string> {
+		const content = await CloudStorage.getContent(this.uri);
+		return content.toString('utf8');
+	}
+	
+	public async toBase64(): Promise<string> {
+		const content = await CloudStorage.getContent(this.uri);
+		return content.toString('base64');
 	}
 	
 	private detectDataType(): ValueOf<typeof DataSource.DATA_TYPE> {

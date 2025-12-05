@@ -1,6 +1,6 @@
 import RequestContext from './RequestContext';
 import CustomError from '../entities/error-handling/CustomError';
-import { Configuration, RequestPayload, ValueOf } from '../types/common';
+import { Configuration, InvokePayload, ValueOf } from '../types/common';
 import global from '../../config/global.json';
 
 const MODULES = [
@@ -77,7 +77,7 @@ export default class Config {
 	}
 	
 	private static get requestConfig(): Configuration {
-		return (RequestContext.store?.payload as RequestPayload)?.config ?? {} as Configuration;
+		return (RequestContext.store?.payload as InvokePayload)?.config ?? {} as Configuration;
 	}
 	
 	private static get staticGlobalConfig(): Configuration {

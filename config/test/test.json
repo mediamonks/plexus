@@ -20,9 +20,10 @@
 				]
 			},
 			"summary": {
-				"instructions": "Please summarize the provided documents.",
+				"instructions": "Please summarize the provided documents. If user input is listed under `input`, reply to that instead.",
 				"context": [
-					"documents"
+					"documents",
+					"input"
 				]
 			}
 		},
@@ -40,7 +41,11 @@
 			},
 			"documents": {
 				"type": "data",
-				"dataSource": "documents"
+				"dataSource": "documents",
+				"example": [
+					"someFile.pdf",
+					"someOtherFile.pdf"
+				]
 			},
 			"names": {
 				"type": "output",
@@ -66,6 +71,11 @@
 				"agent": "summary",
 				"field": "summary",
 				"example": "This is the summary."
+			},
+			"input": {
+				"type": "input",
+				"field": "input",
+				"example": "Please explain your findings."
 			}
 		},
 		"data-sources": {
@@ -84,7 +94,11 @@
 			}
 		},
 		"output": [
-			"output"
+			"summary"
 		]
-	}
+	},
+	"fields": {
+		"input": "What about the CopyDesk document?"
+	},
+	"xthreadId": "8ff89adb-9cde-4a76-95fe-939c560d784a"
 }

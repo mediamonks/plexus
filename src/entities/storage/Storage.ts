@@ -8,6 +8,7 @@ import Config from '../../core/Config';
 
 type TextFileTypes = typeof StorageFile.TYPE.DIGEST_INSTRUCTIONS | typeof StorageFile.TYPE.AGENT_INSTRUCTIONS | typeof StorageFile.TYPE.UNSTRUCTURED_DATA;
 
+// TODO is this a service?
 export default class Storage {
 	private static readonly _storageFiles = {};
 	
@@ -38,13 +39,20 @@ export default class Storage {
 		return storageFile;
 	}
 	
-	public static async save(namespace: string, localPath: string): Promise<void> {
+	public static async save(namespace: string, localPath: string, fileName: string): Promise<void> {
 		const uri = `gs://${Config.get('storage.bucket')}/files/${namespace}/${path.basename(localPath)}`;
-		await CloudStorage.upload(localPath, uri);
+		await CloudStorage.upload(localPath, uri, { originalName: fileName });
 	}
 	
-	public static async getFiles(namespace: string): Promise<string[]> {
+	public static async getFiles(namespace: string): Promise<{ uri: string; name: string }[]> {
 		const cachePath = `gs://${Config.get('storage.bucket')}/files/${namespace}`;
-		return CloudStorage.list(cachePath);
+		const files = await CloudStorage.files(cachePath);
+		return Promise.all(files.map(async file => {
+			const [{ metadata }] = await file.getMetadata();
+			return {
+				uri: file.cloudStorageURI.toString(),
+				name: metadata.originalName as string,
+			};
+		}));
 	}
 };

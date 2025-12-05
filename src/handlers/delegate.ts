@@ -1,12 +1,17 @@
 import CustomError from '../entities/error-handling/CustomError';
 
-export default async ({}, { fn, args = [] }: { fn: string; args?: any[] }): Promise<void> => {
+type Module = {
+	default?: (...args: unknown[]) => Promise<void>;
+	[key: string]: (...args: unknown[]) => Promise<void>;
+}
+
+export default async (_: void, { fn, args = [] }: { fn: string; args?: any[] }): Promise<void> => {
 	if (!fn.match(/^[\w/]+(\.\w+)?$/)) {
 		throw new CustomError(`Invalid delegate function format: "${fn}". Must be either [module name] or [module name].[function name]. Module name may contain forward slashes for pathing.`);
 	}
 	
 	const [moduleName, functionName] = fn.split('.');
-	let module;
+	let module: Module;
 	try {
 		module = await import(`../modules/${moduleName}`);
 	} catch (error) {

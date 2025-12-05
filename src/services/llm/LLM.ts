@@ -1,13 +1,22 @@
-import UnsupportedError from '../../entities/error-handling/UnsupportedError';
 import ILLMPlatform from './ILLMPlatform';
 import AzureLLMPlatform from './AzureLLMPlatform';
-import OpenAILLMPlatform from './OpenAILLMPlatform';
 import GoogleLLMPlatform from './GoogleLLMPlatform';
-import UnknownError from '../../entities/error-handling/UnknownError';
+import OpenAILLMPlatform from './OpenAILLMPlatform';
 import Config from '../../core/Config';
 import History from '../../core/History';
-import EMBEDDING_MODELS from '../../../data/embedding-models.json';
 import Profiler from '../../core/Profiler';
+import DataSourceItem from '../../entities/data-sources/origin/DataSourceItem';
+import UnknownError from '../../entities/error-handling/UnknownError';
+import UnsupportedError from '../../entities/error-handling/UnsupportedError';
+import EMBEDDING_MODELS from '../../../data/embedding-models.json';
+
+type QueryOptions = {
+	instructions?: string;
+	history?: History;
+	temperature?: number;
+	structuredResponse?: boolean;
+	files?: DataSourceItem<string, unknown>[];
+};
 
 export default class LLM {
 	public static Configuration: {
@@ -18,13 +27,13 @@ export default class LLM {
 		temperature?: number;
 	};
 	
-	public static async query(prompt: string, { instructions, temperature, history, structuredResponse, files }: {
-		instructions?: string;
-		temperature?: number;
-		history?: History;
-		structuredResponse?: boolean;
-		files?: any[];
-	}): Promise<string> {
+	public static async query(prompt: string, {
+		instructions,
+		history = new History(),
+		temperature,
+		structuredResponse,
+		files
+	}: QueryOptions): Promise<string> {
 		const { model, temperature: configTemperature } = this.configuration;
 		
 		temperature ??= configTemperature;
@@ -32,7 +41,7 @@ export default class LLM {
 		await Profiler.run(async () => await history.ready, 'waiting for history to be ready');
 		
 		return this.platform.query(prompt, {
-			systemInstructions: instructions,
+			instructions,
 			temperature,
 			history,
 			structuredResponse,
@@ -59,15 +68,8 @@ export default class LLM {
 		return EMBEDDING_MODELS[this.embeddingModel].dimensions;
 	}
 	
-	public static get supportedMimeTypes(): string[] {
-		// TODO make platform (or model?) specific
-		return [
-			'application/json',
-			'application/pdf',
-			'image/jpeg',
-			'image/png',
-			'text/plain',
-		];
+	public static get supportedMimeTypes(): Set<string> {
+		return this.getPlatformClass(this.configuration.platform).supportedMimeTypes;
 	}
 	
 	private static get configuration(): typeof LLM.Configuration {
