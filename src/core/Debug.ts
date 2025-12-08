@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import Config from './Config';
+import Console from './Console';
 import RequestContext from './RequestContext';
 import { JsonField } from '../types/common';
 
@@ -29,7 +30,7 @@ export default class Debug {
 		switch (typeof data) {
 			case 'string':
 				data = data.replace(/\n/g, '\\n');
-				if (data.length <= 100) return [data];
+				if (data.length <= 100) return [data as string];
 				return [data.substring(0, 99) + '…', data.length];
 			case 'number':
 			case 'boolean':
@@ -42,9 +43,7 @@ export default class Debug {
 	public static log(message: string, topic?: string): void {
 		this._log.push({ ts: Date.now(), type: 'message', topic, message });
 		
-		if (process.env.NODE_ENV !== 'dev') return;
-		
-		console.debug('[DEBUG]', topic && `[${topic}]`, message);
+		Console.output(Console.OUTPUT_TYPE.STATUS, topic && `[${topic}]`, message);
 	}
 	
 	public static dump(label: string, data: any): void {
@@ -52,9 +51,7 @@ export default class Debug {
 		
 		void this.writeDumpFile(label, data);
 		
-		if (process.env.NODE_ENV !== 'dev') return;
-		
-		console.debug('[DUMP]',`[${label}]`, ...this._formatData(data));
+		Console.output(Console.OUTPUT_TYPE.DUMP, `[${label}]`, ...this._formatData(data));
 	}
 	
 	public static get(): DebugLogEntry[] {

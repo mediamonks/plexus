@@ -42,7 +42,7 @@ export default class GoogleLLMPlatform {
 		model,
 		files = [],
 	}: QueryOptions = {}): Promise<string> {
-		const fileParts = await this.createFileParts(files);
+		const fileParts = await Profiler.run(() => this.createFileParts(files), 'GoogleLLMPlatform.createFileParts');
 		
 		const parts: Part[] = [
 			{ text: query },
@@ -56,7 +56,7 @@ export default class GoogleLLMPlatform {
 		
 		model ??= this.configuration.model;
 		
-		await this.quotaDelay();
+		await Profiler.run(() => this.quotaDelay(), 'GoogleLLMPlatform.quotaDelay');
 		
 		const response = await Profiler.run(async () =>  this.client.models.generateContent({
 			model,

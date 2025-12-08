@@ -15,7 +15,7 @@ import RequestContext from '../../core/RequestContext';
 import { JsonObject } from '../../types/common';
 
 export default class DataSources {
-	static readonly Configuration: Record<string, typeof DataSource.Configuration>;
+	static readonly Configuration: Record<string, typeof DataSource.ShorthandConfiguration>;
 
 	private static readonly _dataSources: Record<string, DataSource> = {};
 	
@@ -66,8 +66,8 @@ export default class DataSources {
 		}));
 	}
 	
-	private static create(id: string, configuration: JsonObject): DataSource {
-		Debug.log(`Creating data source "${id}"`, 'DataSources');
+	private static create(id: string, configuration: typeof DataSource.ShorthandConfiguration): DataSource {
+		Debug.log(`Instantiating data source "${id}"`, 'DataSources');
 		
 		let { target, dataType } = DataSource.parseConfiguration(configuration);
 		

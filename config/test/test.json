@@ -1,104 +1,101 @@
 {
-	"config": {
-		"agents": {
-			"hello": {
-				"instructions": "gs://monks-plexustest/hello.txt",
-				"context": [
-					"names"
-				]
-			},
-			"names": {
-				"instructions": "gs://monks-plexustest/names.txt",
-				"context": [
-					"documents"
-				]
-			},
-			"test": {
-				"instructions": "gs://monks-plexustest/hello.txt",
-				"context": [
-					"gcs-export"
-				]
-			},
-			"summary": {
-				"instructions": "Please summarize the provided documents. If user input is listed under `input`, reply to that instead.",
-				"context": [
-					"documents",
-					"input"
-				]
-			}
+	"profiling": true,
+	"dataDumps": true,
+	"debug": true,
+	"agents": {
+		"hello": {
+			"instructions": "gs://monks-plexustest/hello.txt",
+			"context": [
+				"names"
+			]
 		},
-		"catalog": {
-			"name": {
-				"type": "input",
-				"field": "name",
-				"required": true
-			},
-			"helloString": {
-				"type": "output",
-				"agent": "hello",
-				"field": "helloString",
-				"example": "the output string"
-			},
-			"documents": {
-				"type": "data",
-				"dataSource": "documents",
-				"example": [
-					"someFile.pdf",
-					"someOtherFile.pdf"
-				]
-			},
-			"names": {
-				"type": "output",
-				"agent": "names",
-				"field": "names",
-				"example": [
-					"John",
-					"Pete"
-				]
-			},
-			"gcs-export": {
-				"type": "data",
-				"source": "gcs-export"
-			},
-			"output": {
-				"type": "output",
-				"agent": "test",
-				"field": "output",
-				"example": "the output string"
-			},
-			"summary": {
-				"type": "output",
-				"agent": "summary",
-				"field": "summary",
-				"example": "This is the summary."
-			},
-			"input": {
-				"type": "input",
-				"field": "input",
-				"example": "Please explain your findings."
-			}
+		"names": {
+			"instructions": "gs://monks-plexustest/names.txt",
+			"context": [
+				"documents"
+			]
 		},
-		"data-sources": {
-			"documents": {
-				"namespace": "test",
-				"uri": "https://drive.google.com/drive/folders/1o8kMT0Fra7KpZHkB9Ud7CkjbzlEaJtFG",
-				"platform": "drive",
-				"target": "file",
-				"folder": true
-			},
-			"gcs-export": {
-				"namespace": "test",
-				"uri": "gs://monks-plexustest/gcs-export",
-				"target": "file",
-				"folder": true
-			}
+		"test": {
+			"instructions": "gs://monks-plexustest/hello.txt",
+			"context": [
+				"gcs-export"
+			]
 		},
-		"output": [
-			"summary"
-		]
+		"summary": {
+			"instructions": "Please summarize the provided documents. If user input is listed under `input`, reply to that instead.",
+			"context": [
+				"documents",
+				"input"
+			]
+		}
 	},
-	"fields": {
-		"input": "What about the CopyDesk document?"
+	"catalog": {
+		"name": {
+			"type": "input",
+			"field": "name",
+			"required": true
+		},
+		"helloString": {
+			"type": "output",
+			"agent": "hello",
+			"field": "helloString",
+			"example": "the output string"
+		},
+		"documents": {
+			"type": "data",
+			"dataSource": "documents",
+			"example": [
+				"someFile.pdf",
+				"someOtherFile.pdf"
+			]
+		},
+		"names": {
+			"type": "output",
+			"agent": "names",
+			"field": "names",
+			"example": [
+				"John",
+				"Pete"
+			]
+		},
+		"gcs-export": {
+			"type": "data",
+			"source": "gcs-export"
+		},
+		"output": {
+			"type": "output",
+			"agent": "test",
+			"field": "output",
+			"example": "the output string"
+		},
+		"summary": {
+			"type": "output",
+			"agent": "summary",
+			"field": "summary",
+			"example": "This is the summary."
+		},
+		"input": {
+			"type": "input",
+			"field": "input",
+			"example": "Please explain your findings."
+		}
 	},
-	"xthreadId": "8ff89adb-9cde-4a76-95fe-939c560d784a"
+	"data-sources": {
+		"documents": {
+			"namespace": "test",
+			"uri": "https://drive.google.com/drive/folders/1o8kMT0Fra7KpZHkB9Ud7CkjbzlEaJtFG",
+			"platform": "drive",
+			"target": "file",
+			"folder": true
+		},
+		"gcs-export": {
+			"namespace": "test",
+			"uri": "gs://monks-plexustest/gcs-export",
+			"target": "file",
+			"folder": true
+		}
+	},
+	"output": [
+		"summary"
+	]
 }

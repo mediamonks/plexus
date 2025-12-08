@@ -6,6 +6,8 @@ import LLM from '../../../services/llm/LLM';
 import VectorDB from '../../../services/vector-db/VectorDB';
 
 export default class DataVectorTargetDataSource extends VectorTargetDataSource {
+	declare protected readonly _configuration: typeof DataVectorTargetDataSource.Configuration;
+	
 	public static Configuration: typeof VectorTargetDataSource.Configuration & {
 		searchField?: string;
 	}

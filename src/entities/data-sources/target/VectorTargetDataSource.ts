@@ -4,6 +4,8 @@ import VectorDB from '../../../services/vector-db/VectorDB';
 import Firestore from '../../../services/google-cloud/Firestore';
 
 export default abstract class VectorTargetDataSource extends DataSource {
+	declare protected readonly _configuration: typeof VectorTargetDataSource.Configuration;
+	
 	public static Configuration: typeof DataSource.Configuration & {
 		incremental?: boolean;
 		externalIngestionTracking?: boolean;
@@ -33,7 +35,7 @@ export default abstract class VectorTargetDataSource extends DataSource {
 		let ingestedIds: Set<string>;
 		if (this.configuration.externalIngestionTracking) {
 			const doc = await Firestore.getDocument('vectordb', this.id);
-			ingestedIds = new Set((doc?.ingested as string[]) ?? []);
+			ingestedIds = new Set((doc?.['ingested'] as string[]) ?? []);
 		} else {
 			ingestedIds = await VectorDB.getIds(this.id);
 		}
