@@ -13,7 +13,7 @@ import { JsonField, JsonObject, ValueOf } from '../../types/common';
 export default abstract class DataSource {
 	public constructor(
 		private readonly _id: string,
-		protected readonly _configuration: JsonObject,
+		protected readonly _configuration: typeof DataSource.Configuration,
 	) {}
 	
 	public static readonly Configuration: {
@@ -25,6 +25,14 @@ export default abstract class DataSource {
 		uri?: string;
 		namespace?: string;
 	}	& typeof ApiDataSourceOrigin.Configuration;
+	
+	public static readonly ShorthandConfiguration: typeof DataSource.Configuration & {
+		type?: string; // TODO for backwards compatibility
+		cache?: boolean; // TODO for backwards compatibility
+		folder?: boolean; // TODO for backwards compatibility
+		platform?: string; // TODO for backwards compatibility
+		source?: string; // TODO for backwards compatibility
+	};
 	
 	public static readonly DATA_TYPE = {
 		UNSTRUCTURED: 'text',
@@ -47,7 +55,7 @@ export default abstract class DataSource {
 		RAW: 'raw',
 	} as const;
 	
-	public static parseConfiguration(configuration: JsonObject): typeof DataSource.Configuration {
+	public static parseConfiguration(configuration: typeof this.ShorthandConfiguration): typeof DataSource.Configuration {
 		const { type } = configuration;
 		const [dataType, target] = typeof type === 'string' ? type.split(':') : [];
 		

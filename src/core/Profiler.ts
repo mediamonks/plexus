@@ -1,4 +1,5 @@
 import { performance } from 'node:perf_hooks';
+import Console from './Console';
 import RequestContext from './RequestContext';
 
 export type ProfilerLogEntry = Record<string, number>;
@@ -15,7 +16,8 @@ export default class Profiler {
 	private static log(label: string, start: number): void {
 		const ms = performance.now() - start;
 		this._log.push({ [label]: ms });
-		if (process.env.NODE_ENV === 'dev') console.debug('[PERF]', `[${label}]`, ms);
+		
+		Console.output(Console.OUTPUT_TYPE.PERF, `[${label}]`, ms);
 	}
 
 	public static async run<TReturnValue>(fn: () => TReturnValue, label?: string): Promise<TReturnValue>;

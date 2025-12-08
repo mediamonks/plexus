@@ -6,6 +6,8 @@ import IHasInstructions from '../../IHasInstructions';
 import Instructions from '../../Instructions';
 
 export default class DigestTargetDataSource extends DataSource implements IHasInstructions {
+	declare protected readonly _configuration: typeof DigestTargetDataSource.Configuration;
+
 	public static Configuration: typeof DataSource.Configuration & {
 		instructions: string;
 	}

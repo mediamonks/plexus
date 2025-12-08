@@ -8,7 +8,7 @@ import Profiler from '../../core/Profiler';
 import CustomError from '../../entities/error-handling/CustomError';
 import { staticImplements } from '../../types/common';
 
-const GS_URI_PATTERN = /gs:\/\/([^/]+)\/(.*)/;
+const GS_URI_PATTERN = /gs:\/\/([^/]+)\/?(.*)/;
 
 @staticImplements<IHasLocalFileCache<string>>()
 export default class CloudStorage {
@@ -51,7 +51,7 @@ export default class CloudStorage {
 			await this.file(uri).download({ destination });
 			
 			return destination;
-		}, `download gcs file "${uri}"`);
+		}, `gcs.download file "${uri}"`);
 	}
 	
 	public static async downloadAll(uri: string, destination?: string): Promise<void> {
@@ -63,9 +63,11 @@ export default class CloudStorage {
 	}
 	
 	public static async cache(uri: string, destination?: string): Promise<string> {
-		destination ??= path.join(this.downloadPath, this.uri(uri).bucket, this.uri(uri).path);
-		
-		return LocalFileCache.get(uri, destination, this);
+		return Profiler.run(() => {
+			destination ??= path.join(this.downloadPath, this.uri(uri).bucket, this.uri(uri).path);
+			
+			return LocalFileCache.get(uri, destination, this);
+		}, `gcs.cache "${uri}"`);
 	}
 	
 	public static async cacheAll(uri: string, destination?: string): Promise<string[]> {
@@ -81,11 +83,13 @@ export default class CloudStorage {
 	}
 	
 	public static async files(uri: string): Promise<File[]> {
-		const prefix = this.uri(uri).path;
-		
-		const [files] = await this.bucket(uri).getFiles({ prefix });
-		
-		return files.filter(file => file.name !== `${prefix}/`);
+		return Profiler.run(async () => {
+			const prefix = this.uri(uri).path;
+			
+			const [files] = await this.bucket(uri).getFiles({ prefix });
+			
+			return files.filter(file => file.name !== `${prefix}/`);
+		}, `gcs.files "${uri}"`);
 	}
 	
 	public static async getSize(uri: string): Promise<number> {
@@ -94,8 +98,10 @@ export default class CloudStorage {
 	}
 	
 	public static async getContent(uri: string): Promise<Buffer> {
-		const [buffer] = await this.file(uri).download();
-		return buffer;
+		return Profiler.run(async () => {
+			const [buffer] = await this.file(uri).download();
+			return buffer;
+		}, `gcs.getContent "${uri}"`);
 	}
 	
 	private static get client(): Storage {

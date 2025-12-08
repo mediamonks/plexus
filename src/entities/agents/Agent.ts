@@ -127,7 +127,7 @@ export default class Agent implements IHasInstructions {
 			} catch (error) {
 				throw new CustomError(`Missing instructions for agent "${this._id}"`);
 			}
-		}, `load base instructions for agent "${this.id}`);
+		}, `load base instructions for agent "${this.id}"`);
 	}
 	
 	public prepare(catalog: Catalog): void {

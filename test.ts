@@ -1,12 +1,12 @@
 require('dotenv/config');
 const Router = require('./src/core/Router.ts').default;
+const gcs = require('./src/services/google-cloud/CloudStorage.ts').default;
 // const payload = require('./config/test/copydesk.json');
 // const payload = require('./config/test/mantra.json');
 // const payload = require('./config/test/luis.json');
-const payload = require('./config/test/test.json');
-const gcs = require('./src/services/google-cloud/CloudStorage.ts').default;
+const config = require('./config/test/test.json');
 
-process.env.NODE_ENV = 'dev';
+process.env.PLEXUS_OUTPUT = 'debug';
 
 async function authentication() {
 	console.log('Warming up GCS authentication...');
@@ -69,6 +69,6 @@ async function ingest(namespace, body) {
 	
 	// await ingest('test', payload);
 
-	await invoke(payload);
+	await invoke({ config });
 	
 }());

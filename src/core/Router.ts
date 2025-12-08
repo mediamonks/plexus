@@ -8,6 +8,7 @@ import CustomError from '../entities/error-handling/CustomError';
 import ErrorHandler from '../entities/error-handling/ErrorHandler';
 import { JsonField, JsonObject, InvokePayload } from '../types/common';
 import ROUTES from '../../config/routes.json';
+import Config from './Config';
 
 type Handler = (variables: JsonObject, payload: InvokePayload) => Promise<JsonField | undefined>;
 
@@ -59,8 +60,8 @@ export default class Router {
 				res.send({
 					result,
 					error: error?.toString(),
-					performance: Profiler.getReport(),
-					debug: Debug.get(),
+					performance: Config.get('profiling') && Profiler.getReport(),
+					debug: Config.get('debug') && Debug.get(),
 				});
 			});
 		} catch (error) {
