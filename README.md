@@ -309,10 +309,10 @@ Top-level configuration options that apply across the entire platform:
 	- **`url`** (string): URL
 	- **`headers`** (object): Additional HTTP headers, e.g. for authentication
 
-The following top-level configuration options are only relevant when consuming Plexus as a CLI:
+The following top-level configuration options are only relevant when using Plexus as a CLI:
 - **`tempPath`** (string): Path for temporary files
 
-The following top-level configuration options are only relevant when consuming Plexus as an SDK:
+The following top-level configuration options are only relevant when using Plexus as an SDK:
 - **`projectId`** (string): Google Cloud Project ID
 - **`location`** (string): Default Google Cloud region
 
