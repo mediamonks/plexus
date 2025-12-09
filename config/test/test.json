@@ -1,6 +1,6 @@
 {
 	"profiling": true,
-	"dataDumps": true,
+	"dataDumps": false,
 	"debug": true,
 	"agents": {
 		"hello": {

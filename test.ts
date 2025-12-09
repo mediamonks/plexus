@@ -71,4 +71,6 @@ async function ingest(namespace, body) {
 
 	await invoke({ config });
 	
+	await invoke({ config: { ...config, apiKey: 'AIzaSyAvGUufhxLxppfNE3YkDPNFKZSLfZ8VULE' } });
+	
 }());

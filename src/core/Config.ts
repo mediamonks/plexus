@@ -43,6 +43,7 @@ export default class Config {
 			if (module) {
 				result = result[module];
 				
+				// TODO this option should be removed and specific global settings should be merged on a per-module basis
 				if (includeGlobal) {
 					const globalConfig = includeRequest ? this.merge(this.staticGlobalConfig, this.requestGlobalConfig) : this.staticGlobalConfig;
 					
