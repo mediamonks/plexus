@@ -5,6 +5,7 @@ Plexus is a flexible AI platform for orchestrating multi-agent LLM workflows. It
 ## Overview
 
 Plexus employs a multi-agent architecture where different AI agents can be configured to handle specific aspects of any LLM-based workflow. The platform is designed to be completely configurable, allowing you to define custom agents, data sources, and processing pipelines for your specific use case.
+One of its key features is being able to ingest data from online resources - like Google Drive, Google Cloud Storage, or APIs - process it, and store it in a vector database or other processed state, which can then be used to power agents.
 
 ## How it Works
 
@@ -15,7 +16,6 @@ The Catalog is a definition of all data fields that exist in your system. These 
 Catalog fields come in 3 types: input, output and data. Input fields are automatically populated by values passed in the request payload. Output fields are fields that are populated by agents. And data fields are populated by the content of data sources.
 
 Agents consists of instructions (the system prompt), and a set of context fields. An agent's input consists of these instructions, and a JSON object containing the runtime values for all context fields, as populated by the Catalog.
-
 
 When a workflow is invoked, the Catalog will first start to populate the fields defined by the workflow's `output` configuration. For output fields, this means an Agent will need to be invoked. This Agent will in turn require certain fields for its context, which causes the Catalog to start populating those fields, and so on.
 This means the workflow is essentially built backwards, at runtime.
@@ -70,11 +70,18 @@ The following table shows which combinations of file type and target or data typ
 
 **: `drive` origin only
 
-## API Reference
+## Usage Modes
+Plexus can be used in three different ways: as a service, as a CLI, or as an SDK.
 
-Plexus provides a REST API with the following endpoints:
+### Plexus as a Service
 
-### POST `/invoke`
+#### API Reference
+
+Plexus provides a REST API at `https://plexus-gateway-28etw3xg.ew.gateway.dev/api`.
+Each request should be accompanied by an `X-Api-Key` header. Contact [Richard Heuser](mailto:richard.heuser@monks.com) for an API key. 
+It has the following endpoints:
+
+##### POST `/invoke`
 
 Invokes an agent workflow.
 
@@ -123,7 +130,7 @@ Invokes an agent workflow.
 - **`threadId`** (string): Unique identifier for the conversation thread
 - **`fields`** (object): Field values as provided in the request payload
 
-### GET `/fields/{field}`
+##### GET `/fields/{field}`
 
 Retrieves available options for a specific input field.
 
@@ -155,7 +162,7 @@ Retrieves available options for a specific input field.
 - **`label`** (string): Display label for the option
 - **`description`** (string): Description of the option
 
-### GET `/thread/{threadId}`
+##### GET `/thread/{threadId}`
 
 Retrieves a conversation thread with its history and last interaction details.
 
@@ -187,7 +194,7 @@ Retrieves a conversation thread with its history and last interaction details.
 - **`history`** (array): The conversation history
 - **`output`** (object): Generated output from last interaction
 
-### POST `/ingest/{namespace}`
+##### POST `/ingest/{namespace}`
 
 Ingests all static data sources for a given namespace.
 
@@ -206,7 +213,7 @@ Ingests all static data sources for a given namespace.
 **Payload Fields:**
 - **`config`** (object, optional): Runtime configuration overrides
 
-### GET `/config`
+##### GET `/config`
 
 Retrieves the default configuration for the service.
 
@@ -229,6 +236,16 @@ Retrieves the default configuration for the service.
 **Response Fields:**
 - Returns the complete default configuration object as defined in the service
 
+### Plexus CLI
+
+In order to use Plexus as a CLI, follow these steps:
+- Install node.js v20 and npm
+- Clone the [repository](https://bitbucket.org/mediamonks/s-4-capital-mediamonks-met-applied-250351484-plexus/src/master/)
+- Install dependencies: `npm i`
+- Build: `npm run build`
+- Create a `.json` configuration file in the `config/` folder. See the [Configuration](#configuration) section for more information.
+- Run your configuration: `./plexus <command> <config-file-name> <arguments> <options>`
+
 ## Configuration
 
 Plexus uses a flexible, hierarchical configuration system that supports multiple deployment patterns:
@@ -237,8 +254,6 @@ Plexus uses a flexible, hierarchical configuration system that supports multiple
 - **Runtime Configuration**: Dynamic overrides passed as request parameters
 - **Flexible Structure**: Configuration can be provided as one large object or divided across multiple files
 - **Merge Strategy**: Static and runtime configurations are automatically merged to determine the final runtime configuration
-
-**Note**: Plexus is currently available as a service. While it will be made available as a library in the future, implementation-specific configuration currently can only be passed in the request payload.
 
 ### Configuration Structure
 
@@ -254,6 +269,9 @@ The configuration object has the following top-level structure. All fields are o
   "tempPath": "./temp/",
 	"instructionsPath": "gs://my-bucket/instructions",
   "output": ["field1", "field2"],
+	"profiling": true,
+	"dataDumps": false,
+	"debug": true,
   "postback": {
     "url": "https://your-callback-url.com",
     "headers": {
@@ -261,15 +279,16 @@ The configuration object has the following top-level structure. All fields are o
     }
   },
   "agents": { /* agent configurations */ },
-  "azure": { /* Azure OpenAI settings */ },
-  "catalog": { /* field definitions */ },
-  "data-sources": { /* data source configurations */ },
-  "drive": { /* Google Drive settings */ },
-  "firestore": { /* Firestore settings */ },
-  "genai": { /* Google GenAI settings */ },
-  "input-fields": { /* input field options */ },
-  "lancedb": { /* vector database settings */ },
-  "openai": { /* OpenAI settings */ },
+	"catalog": { /* field definitions */ },
+	"data-sources": { /* data source configurations */ },
+	"input-fields": { /* input field options */ },
+	"llm": { /* LLM settings */ },
+	"azure": { /* Azure OpenAI settings */ },
+	"genai": { /* Google GenAI settings */ },
+	"openai": { /* OpenAI settings */ },
+	"drive": { /* Google Drive settings */ },
+	"firestore": { /* Firestore settings */ },
+	"lancedb": { /* vector database settings */ },
   "storage": { /* internal file storage settings */ }
 }
 ```
@@ -281,16 +300,21 @@ Top-level configuration options that apply across the entire platform:
 - **`platform`** (string): Primary AI platform ("google", "azure", "openai")
 - **`embeddingPlatform`** (string): AI platform for text embeddings ("google", "azure", "openai")
 - **`waitForThreadUpdate`** (boolean): Whether to wait for the conversation thread to be updated before returning a response. Enabling this will increase response time, but will guarantee conversation consistency in scenarios where the `invoke` endpoint is called in quick succession.
-- **`instructionsPath`** (string): Root GOOGLE_CLOUD_STORAGE path for agent and digest instruction files
+- **`instructionsPath`** (string): Root Google Cloud Storage path for agent and digest instruction files
 - **`output`** (array): List of output fields to return
+- **`profiling`** (boolean): Whether to output performance metrics
+- **`debug`** (boolean): Whether to output debug information
+- **`dataDumps`** (boolean): Whether to output data dumps for debugging
 - **`postback`** (object): The webhook for receiving status messages during invocation. It will receive POST requests with a payload of the following format: `{ "status": "Some operation", "isRunning": true }`.
-  - **`url`** (string): URL
-  - **`headers`** (object): Additional HTTP headers, e.g. for authentication
+	- **`url`** (string): URL
+	- **`headers`** (object): Additional HTTP headers, e.g. for authentication
 
-The following top-level configuration options are internal and not relevant when consuming Plexus as a service:
+The following top-level configuration options are only relevant when consuming Plexus as a CLI:
+- **`tempPath`** (string): Path for temporary files
+
+The following top-level configuration options are only relevant when consuming Plexus as an SDK:
 - **`projectId`** (string): Google Cloud Project ID
 - **`location`** (string): Default Google Cloud region
-- **`tempPath`** (string): Path for temporary files
 
 ## Entities
 
@@ -342,13 +366,15 @@ Defines all fields that exist in the workflow and maps them to input parameters,
     },
     "someDataField": {
       "type": "data",
-      "dataSource": "data-source-id",
+      "source": "data-source-id",
       "example": [
         { "name": "John", "age": 30 }
       ],
       "query": {
+				"input": "someInputField",
         "filter": { "age": "targetAge" },
         "limit": 5,
+				"fields": ["name", "age"],
         "sort": "name"
       }
     }
@@ -379,9 +405,9 @@ These take their value from the output object of an agent.
 These take their value from a data source.
 - **`source`** (string): Data source identifier, points to a data source defined in the `data-sources` section
 - **`query`** (object, optional): Properties that determine if and how the data from the data source should be queried. If not specified, the source data will always be used in its entirety (after `target`-based processing applies).
+	- **`input`** (string, optional): Performs a text search against an unstructured data source, using the value of the given catalog field as input.
+	- **`filter`** (object, optional): Filter criteria for queries against a structured data source, should consist of key-value pairs, where the key is the field name in the source data set, and the value is the name of a catalog field, which value will be used as the filter value.
   - **`limit`** (number, optional): Maximum number of results for any type of query.
-  - **`input`** (string, optional): Performs a text search against an unstructured data source, using the value of the given catalog field as input.
-  - **`filter`** (object, optional): Filter criteria for queries against a structured data source, should consist of key-value pairs, where the key is the field name in the source data set, and the value is the name of a catalog field, which value will be used as the filter value.
   - **`fields`** (array, optional): Specific fields to retrieve when querying a structured data source.
   - **`sort`** (string, optional): Which field to sort by when querying a structured data source.
 
@@ -394,7 +420,7 @@ Defines available data sources and their properties:
   "data-sources": {
     "source-id": {
       "namespace": "my-namespace",
-      "platform": "drive",
+      "origin": "drive",
       "uri": "https://drive.google.com/drive/folders/someGoogleDriveFolderId",
       "dataType": "text",
       "target": "vector",
@@ -405,24 +431,25 @@ Defines available data sources and their properties:
 ```
 
 **Data Source Properties:**
-- **`uri`** (string): The URI pointing to the data source, can be a Google Drive URL, or a GOOGLE_CLOUD_STORAGE path. A URI can contain catalog field values, of the form `{fielName}`, which makes the data source dynamic.
+- **`uri`** (string): The URI pointing to the data source, can be a Google Drive URL, a Google Cloud Storage path, or an API endpoint. A URI can contain catalog field values, of the form `{fieldName}`, which will make the data source dynamic.
 - **`target`** (string): Target for the data source: "raw" for raw text or data, "vector" for vector embeddings, "file" for unprocessed files (to feed as-is into an LLM, currently supported for Google GenAI only), "digest" for AI-generated summaries ("text" only).
+- **`origin`** (string, optional): Data origin platform ("gcs", "drive", "api"), will be derived from the URI if not specified.
 - **`dataType`** (string, optional): Type of data in the source: "text" for unstructured data, "data" for structured data. Required for `target` types: "raw" and "vector". Ignored for `digest` and `file`.
 - **`namespace`** (string, optional): Logical grouping namespace, only used for batch ingestion.
-- **`origin`** (string, optional): Data origin platform ("gcs", "drive", "api"), will be derived from the URI if not specified.
-- **`get`** (boolean, optional): Whether to get the data source, defaults to true. Set this to `false` for data sources of which the content can change between invocations.
-- **`folder`** (boolean, optional): Whether the `gcs` or `drive` origin data source is a folder. Detected if not specified.
+- **`isFolder`** (boolean, optional): Whether the `gcs` or `drive` origin data source is a folder. Will be detected if not specified, at a slight performance hit. 
+- **`allowCache`** (boolean, optional): Whether to allow caching of the data source, defaults to true. Set this to `false` for data sources of which the content can change between invocations.
 - **`instructions`** (string, optional): Processing instructions for a `digest`-type data source.
 - **`searchField`** (string, optional): Name of the field against which to perform vector searches for a `data`-type, `vector`-target data source.
 
 ### `input-fields`
 
-Defines available options for input fields in your application:
+Defines available options for input fields. If these are defined for an input field, the input value will be mapped to the `id` of the selected option and the corresponding `label` will be used as the value for inference.
+This also restricts allowed input values to the defined options.
 
 ```json
 {
   "input-fields": {
-    "fieldType": {
+    "fieldName": {
       "option1": {
         "id": "option1",
         "label": "Option 1"
@@ -440,8 +467,6 @@ Defines available options for input fields in your application:
 - **`id`** (string): Unique identifier
 - **`label`** (string): Display label
 
-Field types and options can be customized to match your specific domain and use case requirements.
-
 ## LLM
 
 Configuration of the LLM and the various LLM services. 
@@ -454,8 +479,9 @@ Configuration for the LLM. Can also be set at the global level.
 {
   "llm": {
 		"platform": "google",
-		"embeddingPlatform": "google",
 		"model": "gemini-2.5-flash-lite",
+		"embeddingPlatform": "google",
+		"embeddingModel": "gemini-embedding-001",
     "temperature": 0.7
   }
 }
@@ -474,20 +500,20 @@ Configuration for Azure OpenAI services:
 ```json
 {
   "azure": {
-    "baseUrl": "https://your-resource.openai.azure.com/",
-    "apiVersion": "2025-01-01-preview",
 		"model": "gpt-4o-mini",
-		"embeddingApiVersion": "2023-05-15",
-    "embeddingModel": "text-embedding-ada-002"
+		"embeddingModel": "text-embedding-ada-002",
+		"baseUrl": "https://your-resource.openai.azure.com/",
+		"apiVersion": "2025-01-01-preview",
+		"embeddingApiVersion": "2023-05-15"
   }
 }
 ```
 
+- **`model`** (string, optional): Name of the deployed model, can also be set at the `llm` level
+- **`embeddingModel`** (string, optional): Model name for text embeddings, can also be set at the `llm` level
 - **`baseUrl`** (string): Azure OpenAI endpoint URL
 - **`apiVersion`** (string): API version for chat completions
-- **`model`** (string, optional): Name of the deployed model, can also be set at the `llm` level
 - **`embeddingApiVersion`** (string): API version for embeddings
-- **`embeddingModel`** (string, optional): Model name for text embeddings, can also be set at the `llm` level
 
 ### `genai`
 
@@ -496,29 +522,26 @@ Google Generative AI (Gemini) configuration:
 ```json
 {
   "genai": {
-    "model": "gemini-2.5-flash-lite",
-    "embeddingModel": "gemini-embedding-001",
-    "embeddingLocation": "europe-west1",
-    "quotaDelayMs": 500,
-    "safetySettings": [
-      {
-        "category": "HARM_CATEGORY_HATE_SPEECH",
-        "threshold": "BLOCK_MEDIUM_AND_ABOVE"
-      }
-    ]
+		"model": "gemini-2.5-flash-lite",
+		"embeddingModel": "gemini-embedding-001",
+		"quotaDelayMs": 500,
+		"useVertexAi": true,
+		"projectId": "your-project-id",
+		"location": "your-location",
+		"embeddingLocation": "europe-west1",
+		"apiKey": "your-api-key"
   }
 }
 ```
 
-- **`projectId`** (string, optional): GCP project to use, defaults to the project associated with the API key, can also be set at the global level
-- **`location`** (string, optional): GCP location to use, defaults to the location associated with the API key, can also be set at the global level
 - **`model`** (string, optional): Primary model name, can also be set at the `llm` level
 - **`embeddingModel`** (string, optional): Embedding model name, can also be set at the `llm` level
-- **`embeddingLocation`** (string, optional): Region for embedding API, defaults to `genai.location`
 - **`quotaDelayMs`** (number, optional): Delay between API calls for quota management
-- **`safetySettings`** (array, optional): Contents safety configuration
-	- **`category`** (string): Safety category
-	- **`threshold`** (string): Blocking threshold
+- **`useVertexAi`** (boolean, optional): Whether to use Vertex AI instead of the GenAI API
+- **`projectId`** (string, optional): GCP project to use, defaults to the project associated with the API key, can also be set at the global level, only applies when `useVertexAi` is true
+- **`location`** (string, optional): GCP location to use, defaults to the location associated with the API key, can also be set at the global level, only applies when `useVertexAi` is true
+- **`embeddingLocation`** (string, optional): Region for embedding API, defaults to `genai.location`, only applies when `useVertexAi` is true
+- **`apiKey`** (number, optional): Your custom Google AI Studio API key, Plexus will use its own if not provided, only applies when `useVertexAi` is false
 
 ### `openai`
 
@@ -527,14 +550,12 @@ OpenAI API configuration:
 ```json
 {
   "openai": {
-		"apiVersion": "2024-11-20",
 		"model": "gpt-4o-mini",
     "embeddingModel": "text-embedding-3-small"
   }
 }
 ```
 
-- **`apiVersion`** (string): API version
 - **`model`** (string, optional): Primary model name, can also be set at the `llm` level
 - **`embeddingModel`** (string, optional): Embedding model name, can also be set at the `llm` level
 

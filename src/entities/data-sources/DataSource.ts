@@ -17,13 +17,13 @@ export default abstract class DataSource {
 	) {}
 	
 	public static readonly Configuration: {
-		allowCache?: boolean;
-		isFolder?: boolean;
+		uri?: string;
+		target?: ValueOf<typeof DataSource.TARGET>;
 		origin?: ValueOf<typeof DataSource.ORIGIN>;
 		dataType?: ValueOf<typeof DataSource.DATA_TYPE>;
-		target?: ValueOf<typeof DataSource.TARGET>;
-		uri?: string;
 		namespace?: string;
+		isFolder?: boolean;
+		allowCache?: boolean;
 	}	& typeof ApiDataSourceOrigin.Configuration;
 	
 	public static readonly ShorthandConfiguration: typeof DataSource.Configuration & {

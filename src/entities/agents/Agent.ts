@@ -35,7 +35,7 @@ export default class Agent implements IHasInstructions {
 		readonly required?: readonly string[];
 		readonly useHistory?: boolean;
 		readonly temperature?: number | string;
-		readonly paginationRule?: string;
+		readonly paginationRule?: string; // TODO not fully implemented
 	};
 	
 	public constructor(id: string, configuration: typeof Agent.Configuration) {

@@ -19,7 +19,6 @@ export default class OpenAILLMPlatform {
 	public static Configuration: {
 		model: string;
 		embeddingModel: string;
-		baseURL?: string;
 	};
 	
 	protected static _client: OpenAI;

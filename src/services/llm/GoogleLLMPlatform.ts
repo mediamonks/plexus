@@ -26,6 +26,8 @@ export default class GoogleLLMPlatform {
 		embeddingLocation: string;
 		embeddingModel: string;
 		quotaDelayMs: number;
+		apiKey: string;
+		useVertexAi: boolean;
 	};
 	
 	private static _client: GoogleGenAI;
@@ -117,10 +119,12 @@ export default class GoogleLLMPlatform {
 		
 		const {
 			projectId: project,
-			location
+			location,
+			apiKey,
+			useVertexAi,
 		} = this.configuration;
 		
-		if (project && location) {
+		if (useVertexAi) {
 			return this._client = new GoogleGenAI({
 				vertexai: true,
 				project,
@@ -128,7 +132,7 @@ export default class GoogleLLMPlatform {
 			});
 		}
 		
-		return this._client = new GoogleGenAI({ apiKey: GOOGLE_GENAI_API_KEY });
+		return this._client = new GoogleGenAI({ apiKey: apiKey ?? GOOGLE_GENAI_API_KEY });
 	}
 	
 	private static get embeddingClient(): GoogleGenAI {
@@ -138,11 +142,13 @@ export default class GoogleLLMPlatform {
 			projectId: project,
 			location,
 			embeddingLocation,
+			apiKey,
+			useVertexAi,
 		} = this.configuration;
 		
 		if (embeddingLocation === location) return this._embeddingClient = this.client;
 		
-		if (project && embeddingLocation) {
+		if (useVertexAi) {
 			return this._embeddingClient = new GoogleGenAI({
 				vertexai: true,
 				project,
@@ -150,7 +156,7 @@ export default class GoogleLLMPlatform {
 			});
 		}
 		
-		return this._embeddingClient = new GoogleGenAI({ apiKey: GOOGLE_GENAI_API_KEY });
+		return this._embeddingClient = new GoogleGenAI({ apiKey: apiKey ?? GOOGLE_GENAI_API_KEY });
 	}
 	
 	private static async createFileParts(files: DataSourceItem<unknown, unknown>[]): Promise<Part[]> {
