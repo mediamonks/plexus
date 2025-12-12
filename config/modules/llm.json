@@ -1,4 +1,4 @@
 {
-	"platform": "google",
+	"platform": "huggingface",
 	"embeddingPlatform": "google"
 }

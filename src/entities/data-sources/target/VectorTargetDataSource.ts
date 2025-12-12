@@ -6,7 +6,7 @@ import Firestore from '../../../services/google-cloud/Firestore';
 export default abstract class VectorTargetDataSource extends DataSource {
 	declare protected readonly _configuration: typeof VectorTargetDataSource.Configuration;
 	
-	public static Configuration: typeof DataSource.Configuration & {
+	public static readonly Configuration: typeof DataSource.Configuration & {
 		incremental?: boolean;
 		externalIngestionTracking?: boolean;
 	}

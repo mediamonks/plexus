@@ -19,7 +19,7 @@ export default class GoogleLLMPlatform {
 		'text/plain',
 	]);
 	
-	public static Configuration: {
+	public static readonly Configuration: {
 		projectId: string;
 		location: string;
 		model: string;
@@ -52,7 +52,7 @@ export default class GoogleLLMPlatform {
 		];
 		
 		const contents: Content[] = [
-			...history.toVertexAi(),
+			...history.toGemini(),
 			{ role: 'user', parts },
 		];
 		
@@ -168,12 +168,10 @@ export default class GoogleLLMPlatform {
 				}
 			};
 			
-			const localFile = await item.getLocalFile();
-			
 			return {
 				inlineData: {
 					mimeType: item.mimeType,
-					data: await fs.readFile(localFile, { encoding: 'base64' }),
+					data: await item.toBase64(),
 				},
 			};
 		}));
