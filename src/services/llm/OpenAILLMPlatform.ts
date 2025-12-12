@@ -5,18 +5,21 @@ import Config from '../../core/Config';
 import { staticImplements } from '../../types/common';
 import UnsupportedError from '../../entities/error-handling/UnsupportedError';
 import Profiler from '../../core/Profiler';
+import History from '../../core/History';
 
 @staticImplements<ILLMPlatform>()
 export default class OpenAILLMPlatform {
 	public static readonly supportedMimeTypes: Set<string> = new Set([
 		'application/json',
 		'application/pdf',
+		'image/gif',
 		'image/jpeg',
 		'image/png',
+		'image/webp',
 		'text/plain',
 	]);
 	
-	public static Configuration: {
+	public static readonly Configuration: {
 		model: string;
 		embeddingModel: string;
 	};
@@ -34,18 +37,9 @@ export default class OpenAILLMPlatform {
 		model,
 		files
 	}: QueryOptions = {}): Promise<string> {
-		const fileParts = await this.createFileParts(files);
-		
-		const content = [{ type: 'text', text: query }, ...fileParts];
-		
-		const messages = [
-			...history.toOpenAi(),
-			{ role: 'user', content }
-		] as OpenAI.ChatCompletionMessageParam[];
-		
-		if (instructions) messages.unshift({ role: 'system', content: instructions });
-		
 		model ??= this.configuration.model;
+		
+		const messages = await this.createMessages(instructions, history, query, files);
 		
 		const client = await this.getClient(model);
 		
@@ -105,34 +99,46 @@ export default class OpenAILLMPlatform {
 		return vector;
 	}
 	
+	protected static async createMessages(instructions: string, history: History, query: string, files: DataSourceItem<string, unknown>[]): Promise<OpenAI.ChatCompletionMessageParam[]> {
+		const fileParts = await this.createFileParts(files);
+		
+		const content = [{ type: 'text', text: query }, ...fileParts];
+		
+		const messages = [
+			...history.toOpenAi(),
+			{ role: 'user', content }
+		] as OpenAI.ChatCompletionMessageParam[];
+		
+		if (instructions) messages.unshift({ role: 'system', content: instructions });
+		
+		return messages;
+	}
+	
 	protected static async createFileParts(files: DataSourceItem<string, unknown>[]): Promise<OpenAI.ChatCompletionContentPart[]> {
-		const SUPPORTED_IMAGE_TYPES = new Set(['image/png', 'image/jpeg', 'image/gif', 'image/webp']);
+		const supportedImageTypes = new Set([...this.supportedMimeTypes].filter(type => type.startsWith('image/')));
 		
 		return Promise.all(files.map(async item => {
-			if (item.mimeType === 'text/plain') return {
-				type: 'text' as const,
-				text: await item.toText(),
-			};
-			
 			if (item.mimeType === 'application/json') return {
 				type: 'text' as const,
 				text: await item.getTextContent(),
 			};
 			
-			const base64 = await item.toBase64();
-			const dataUri = `data:${item.mimeType};base64,${base64}`;
-			
-			if (SUPPORTED_IMAGE_TYPES.has(item.mimeType)) return {
-				type: 'image_url' as const,
-				image_url: { url: dataUri },
-			};
-			
 			if (item.mimeType === 'application/pdf') return {
 				type: 'file' as const,
 				file: {
-					file_data: `data:${item.mimeType};base64,${base64}`,
+					file_data: await item.toDataUri(),
 					filename: item.fileName,
 				}
+			};
+			
+			if (supportedImageTypes.has(item.mimeType)) return {
+				type: 'image_url' as const,
+				image_url: { url: await item.toDataUri() },
+			};
+			
+			if (item.mimeType === 'text/plain') return {
+				type: 'text' as const,
+				text: await item.toText(),
 			};
 			
 			throw new UnsupportedError('mime type', item.mimeType, Array.from(this.supportedMimeTypes));

@@ -11,7 +11,7 @@ const ACCESS_TOKEN_TTL_MS = 60000;
 
 @staticImplements<ILLMPlatform>()
 export default class AzureLLMPlatform extends OpenAILLMPlatform {
-	public static Configuration: typeof OpenAILLMPlatform.Configuration & {
+	public static readonly Configuration: typeof OpenAILLMPlatform.Configuration & {
 		baseUrl: string;
 		apiVersion: string;
 		embeddingApiVersion: string;

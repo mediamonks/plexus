@@ -4,7 +4,7 @@ import CustomError from '../../error-handling/CustomError';
 import { JsonField, JsonObject } from '../../../types/common';
 
 export default class ApiDataSourceOrigin extends DataSourceOrigin {
-	public static Configuration: {
+	public static readonly Configuration: {
 		headers?: Record<string, string>;
 		payload?: JsonObject;
 		method?: 'GET' | 'POST';

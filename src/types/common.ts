@@ -4,6 +4,7 @@ import DataSources from '../entities/data-sources/DataSources';
 import AzureLLMPlatform from '../services/llm/AzureLLMPlatform';
 import GoogleLLMPlatform from '../services/llm/GoogleLLMPlatform';
 import LLM from '../services/llm/LLM';
+import HuggingFaceLLMPlatform from '../services/llm/HuggingFaceLLMPlatform';
 
 export function staticImplements<TInterface>() {
 	return <TConstructor extends TInterface>(constructor: TConstructor) => constructor;
@@ -78,6 +79,7 @@ export type Configuration = {
 		ignoreUndefinedProperties?: boolean;
 	};
 	genai?: typeof GoogleLLMPlatform.Configuration;
+	huggingface?: typeof HuggingFaceLLMPlatform.Configuration;
 	'input-fields'?: Record<string, { id: string; label: string; description: string; }>;
 	lancedb?: {
 		databaseUri: string;

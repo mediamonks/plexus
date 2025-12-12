@@ -16,6 +16,10 @@ export default abstract class DataSourceItem<TTextContent, TDataContent> {
 		return this.dataSource.configuration.allowCache;
 	}
 	
+	public async toDataUri(): Promise<string> {
+		return `data:${this.mimeType};base64,${await this.toBase64()}`;
+	}
+	
 	public abstract get id(): string;
 	
 	public abstract get fileName(): string;

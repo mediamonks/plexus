@@ -239,7 +239,7 @@ Retrieves the default configuration for the service.
 ### Plexus CLI
 
 In order to use Plexus as a CLI, follow these steps:
-- Install node.js v20 and npm
+- Install node.js v20 or higher and npm
 - Clone the [repository](https://bitbucket.org/mediamonks/s-4-capital-mediamonks-met-applied-250351484-plexus/src/master/)
 - Install dependencies: `npm i`
 - Build: `npm run build`

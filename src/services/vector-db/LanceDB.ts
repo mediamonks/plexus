@@ -9,7 +9,7 @@ const tableRecordBuffers = {};
 const tableWriteTimeouts = {};
 
 export default class LanceDB {
-	public static Configuration: {
+	public static readonly Configuration: {
 		databaseUri?: string;
 		rateLimitDelayMs?: number;
 	};

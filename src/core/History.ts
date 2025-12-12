@@ -7,12 +7,12 @@ import Firestore from '../services/google-cloud/Firestore';
 import { JsonObject } from '../types/common';
 
 type HistoryItem = {
-	role: string;
+	role: 'user' | 'model';
 	parts: { text: string }[];
 };
 
 type OpenAIHistoryItem = {
-	role: string;
+	role: 'system' | 'user' | 'assistant';
 	content: string;
 	name?: string;
 }
@@ -71,25 +71,25 @@ export default class History {
 		if (Config.get('waitForThreadUpdate')) await threadUpdate;
 	}
 	
-	public toVertexAi(): HistoryItem[] {
+	public toGemini(): HistoryItem[] {
 		return this._history;
 	}
 	
 	public toOpenAi(): OpenAIHistoryItem[] {
 		return this._history.map(item => ({
-			role: item.role,
+			role: item.role === 'model' ? 'assistant' : 'user',
 			content: item.parts[0].text
 		}));
 	}
 	
 	public fromOpenAi(history: OpenAIHistoryItem[]): void {
 		this._history = history.map(item => ({
-			role: item.role,
+			role: item.role === 'assistant' ? 'model' : 'user',
 			parts: [{ text: item.content }]
 		}));
 	}
 	
-	public add(role: string, text: string): void {
+	public add(role: 'model' | 'user', text: string): void {
 		this._history.push({
 			role,
 			parts: [{ text }]
