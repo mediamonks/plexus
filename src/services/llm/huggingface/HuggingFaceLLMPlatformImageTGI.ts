@@ -8,7 +8,9 @@ export default class HuggingFaceLLMPlatformImageTGI implements IHuggingFaceLLMPl
 	public readonly cacheBindPath = '/data';
 	public readonly healthEndpoint = 'health';
 	
-	public getContainerConfig(model: string): ContainerConfig {
+	public getContainerConfig(): ContainerConfig {
+		const { model } = HuggingFaceLLMPlatform.configuration;
+		const contextSize = HuggingFaceLLMPlatform.contextSize;
 		const quantization = model.toLowerCase().includes('-awq') ? 'awq'
 			: model.toLowerCase().includes('-gptq') ? 'gptq'
 			: 'bitsandbytes-nf4';
@@ -17,9 +19,9 @@ export default class HuggingFaceLLMPlatformImageTGI implements IHuggingFaceLLMPl
 			env: [
 				`MODEL_ID=${model}`,
 				`QUANTIZE=${quantization}`,
-				'MAX_INPUT_LENGTH=8000',
-				'MAX_TOTAL_TOKENS=8192',
-				'MAX_BATCH_PREFILL_TOKENS=8000',
+				`MAX_INPUT_LENGTH=${contextSize - 1000}`,
+				`MAX_TOTAL_TOKENS=${contextSize}`,
+				`MAX_BATCH_PREFILL_TOKENS=${contextSize - 1000}`,
 				'MAX_BATCH_SIZE=1'
 			],
 		};

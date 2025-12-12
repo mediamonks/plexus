@@ -7,7 +7,9 @@ export default class HuggingFaceLLMPlatformImageLlamaCpp implements IHuggingFace
 	public readonly cacheBindPath = '/root/.cache/llama.cpp';
 	public readonly healthEndpoint = 'health';
 	
-	public getContainerConfig(model: string): ContainerConfig {
+	public getContainerConfig(): ContainerConfig {
+		const { model } = HuggingFaceLLMPlatform.configuration;
+		const contextSize = HuggingFaceLLMPlatform.contextSize;
 		const [hfRepo, hfFile] = model.includes('/') && model.endsWith('.gguf')
 			? [model.substring(0, model.lastIndexOf('/')), model.split('/').pop()!]
 			: [model, undefined];
@@ -17,7 +19,7 @@ export default class HuggingFaceLLMPlatformImageLlamaCpp implements IHuggingFace
 			cmd: [
 				'--hf-repo', hfRepo,
 				...(hfFile ? ['--hf-file', hfFile] : []),
-				'--ctx-size', '32768',
+				'--ctx-size', String(contextSize),
 				'--n-gpu-layers', '99',
 				'--host', '0.0.0.0',
 				'--port', '80',

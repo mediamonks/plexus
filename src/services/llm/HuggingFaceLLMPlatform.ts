@@ -44,6 +44,7 @@ export default class HuggingFaceLLMPlatform {
 	public static readonly Configuration: {
 		model: string;
 		image: 'tgi' | 'llamacpp';
+		contextSize?: number;
 	};
 	
 	private static _container: Docker.Container;
@@ -92,8 +93,12 @@ export default class HuggingFaceLLMPlatform {
 		await this._container.stop();
 	}
 	
-	protected static get configuration(): typeof HuggingFaceLLMPlatform.Configuration {
+	public static get configuration(): typeof HuggingFaceLLMPlatform.Configuration {
 		return Config.get('huggingface');
+	}
+	
+	public static get contextSize(): number {
+		return this.configuration.contextSize ?? 32768;
 	}
 	
 	private static get endpointUrl(): string {
@@ -194,20 +199,18 @@ export default class HuggingFaceLLMPlatform {
 	}
 	
 	private static containerConfigMatches(containerEnv: string[], containerImage: string): boolean {
-		const { model } = this.configuration;
-		const expectedEnv = this.image.getContainerConfig(model).env;
+		const expectedEnv = this.image.getContainerConfig().env;
 		const envMatches = expectedEnv.every(expected => containerEnv.includes(expected));
 		const imageMatches = containerImage === this.image.imageName;
 		return envMatches && imageMatches;
 	}
 	
 	private static async createContainer(): Promise<Docker.Container> {
-		const { model } = this.configuration;
 		Debug.log(`Creating ${this.containerName} Docker Container`, 'HuggingFaceLLMPlatform');
 		
 		const localCacheDir = path.resolve(Config.get('tempPath'), 'hf-data');
 		const dockerImage = await this.getDockerImage();
-		const { env, cmd } = this.image.getContainerConfig(model);
+		const { env, cmd } = this.image.getContainerConfig();
 		
 		return docker.createContainer({
 			Image: dockerImage,

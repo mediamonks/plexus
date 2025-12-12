@@ -31,6 +31,4 @@
 
 ## Chris
 - **Multimodal input/output** - base64
-- **Local model support** - HuggingFace auto-download? Test with DeepSeek
-- **Local execution** - Add CLI
 - **UI**

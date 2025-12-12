@@ -6,13 +6,11 @@ export interface ContainerConfig {
 	cmd?: string[];
 }
 
-export type UserContent = string | OpenAI.Chat.Completions.ChatCompletionContentPart[];
-
 export default interface IHuggingFaceLLMPlatformImage {
 	readonly imageName: string;
 	readonly healthEndpoint: string;
 	readonly cacheBindPath: string;
 	
-	getContainerConfig(model: string): ContainerConfig;
-	createUserContent(query: string, files: DataSourceItem<string, unknown>[]): Promise<UserContent>;
+	getContainerConfig(): ContainerConfig;
+	createUserContent(query: string, files: DataSourceItem<string, unknown>[]): Promise<string | OpenAI.Chat.Completions.ChatCompletionContentPart[]>;
 }
