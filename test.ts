@@ -1,3 +1,5 @@
+import fs from 'node:fs/promises';
+
 require('dotenv/config');
 const Router = require('./src/core/Router.ts').default;
 const gcs = require('./src/services/google-cloud/CloudStorage.ts').default;
@@ -65,10 +67,12 @@ async function ingest(namespace, body) {
 
 (async function () {
 	
-	await authentication();
+	// await authentication();
 	
 	// await ingest('test', payload);
-
-	await invoke({ config });
+	
+	const base64 = (await fs.readFile('/mnt/c/Users/Richard Heuser/Downloads/portrait-of-three-funny-tabby-cats-surprised-hd-png-735811696682339uxgl8qojiu.png')).toString('base64');
+	
+	await invoke({ config, fields: { image: base64 } });
 	
 }());

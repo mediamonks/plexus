@@ -286,6 +286,7 @@ The configuration object has the following top-level structure. All fields are o
 	"azure": { /* Azure OpenAI settings */ },
 	"genai": { /* Google GenAI settings */ },
 	"openai": { /* OpenAI settings */ },
+	"local-llm": { /* Local LLM settings */ },
 	"drive": { /* Google Drive settings */ },
 	"firestore": { /* Firestore settings */ },
 	"lancedb": { /* vector database settings */ },
@@ -297,7 +298,7 @@ The configuration object has the following top-level structure. All fields are o
 
 Top-level configuration options that apply across the entire platform:
 
-- **`platform`** (string): Primary AI platform ("google", "azure", "openai")
+- **`platform`** (string): Primary AI platform ("google", "azure", "openai", "local")
 - **`embeddingPlatform`** (string): AI platform for text embeddings ("google", "azure", "openai")
 - **`waitForThreadUpdate`** (boolean): Whether to wait for the conversation thread to be updated before returning a response. Enabling this will increase response time, but will guarantee conversation consistency in scenarios where the `invoke` endpoint is called in quick succession.
 - **`instructionsPath`** (string): Root Google Cloud Storage path for agent and digest instruction files
@@ -395,6 +396,8 @@ Defines all fields that exist in the workflow and maps them to input parameters,
 These take their value directly from the request payload.
 - **`field`** (string): Name of the field in the request payload
 - **`required`** (boolean, optional): Whether the field is required. If `true`, the workflow will return an error if the field is missing from the request payload.
+- **`fileName`** (string, optional): If specified, the input value will be interpreted as the base64 contents of a file.
+- **`mimeType`** (string, optional): Required if `fileName` is set. Specifies the mimeType of the file contents.
 
 **Output Fields:**
 These take their value from the output object of an agent.
@@ -488,9 +491,9 @@ Configuration for the LLM. Can also be set at the global level.
 ```
 
 - **`platform`** (string): Primary AI platform ("google", "azure", "openai")
-- **`model`** (string, optional): Primary model name, can also be set at the platform level
+- **`model`** (string): Primary model name, can also be set at the platform level
 - **`embeddingPlatform`** (string): AI platform for text embeddings ("google", "azure", "openai")
-- **`embeddingModel`** (string, optional): Embedding model name, can also be set at the platform level
+- **`embeddingModel`** (string): Embedding model name, can also be set at the platform level
 - **`temperature`** (number, optional): Default AI model temperature setting (0.0-1.0), defaults to 0
 
 ### `azure`
@@ -509,8 +512,8 @@ Configuration for Azure OpenAI services:
 }
 ```
 
-- **`model`** (string, optional): Name of the deployed model, can also be set at the `llm` level
-- **`embeddingModel`** (string, optional): Model name for text embeddings, can also be set at the `llm` level
+- **`model`** (string): Name of the deployed model, can also be set at the `llm` level
+- **`embeddingModel`** (string): Model name for text embeddings, can also be set at the `llm` level
 - **`baseUrl`** (string): Azure OpenAI endpoint URL
 - **`apiVersion`** (string): API version for chat completions
 - **`embeddingApiVersion`** (string): API version for embeddings
@@ -534,8 +537,8 @@ Google Generative AI (Gemini) configuration:
 }
 ```
 
-- **`model`** (string, optional): Primary model name, can also be set at the `llm` level
-- **`embeddingModel`** (string, optional): Embedding model name, can also be set at the `llm` level
+- **`model`** (string): Primary model name, can also be set at the `llm` level
+- **`embeddingModel`** (string): Embedding model name, can also be set at the `llm` level
 - **`quotaDelayMs`** (number, optional): Delay between API calls for quota management
 - **`useVertexAi`** (boolean, optional): Whether to use Vertex AI instead of the GenAI API
 - **`projectId`** (string, optional): GCP project to use, defaults to the project associated with the API key, can also be set at the global level, only applies when `useVertexAi` is true
@@ -556,8 +559,27 @@ OpenAI API configuration:
 }
 ```
 
-- **`model`** (string, optional): Primary model name, can also be set at the `llm` level
-- **`embeddingModel`** (string, optional): Embedding model name, can also be set at the `llm` level
+- **`model`** (string): Primary model name, can also be set at the `llm` level
+- **`embeddingModel`** (string): Embedding model name, can also be set at the `llm` level
+
+### `local-llm`
+
+Local LLM configuration. Will download a model from huggingface.com and run it in a local Docker container.
+Requires Docker to be installed. Does not yet support generating embeddings.
+
+```json
+{
+  "local-llm": {
+		"model": "ggml-org/Qwen2-VL-2B-Instruct-GGUF",
+		"image": "llamacpp",
+		"contextSize": 65536
+  }
+}
+```
+
+- **`model`** (string): Primary model ID on huggingface.com, can also be set at the `llm` level
+- **`image`** (tgi|llamacpp): Which Docker image to use, either TGI (ghcr.io/huggingface/text-generation-inference:2.4.0) or Llama.cpp (ghcr.io/ggml-org/llama.cpp:server-cuda)
+- **`contextSize`** (number, optional): Context size for the model, defaults to 32768
 
 ## Internal
 

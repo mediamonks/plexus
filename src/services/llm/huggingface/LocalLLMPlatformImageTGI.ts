@@ -1,16 +1,16 @@
 import OpenAI from 'openai';
-import IHuggingFaceLLMPlatformImage, { ContainerConfig } from './IHuggingFaceLLMPlatformImage';
-import HuggingFaceLLMPlatform from '../HuggingFaceLLMPlatform';
+import ILocalLLMPlatformImage, { ContainerConfig } from './ILocalLLMPlatformImage';
+import LocalLLMPlatform from '../LocalLLMPlatform';
 import DataSourceItem from '../../../entities/data-sources/origin/DataSourceItem';
 
-export default class HuggingFaceLLMPlatformImageTGI implements IHuggingFaceLLMPlatformImage {
+export default class LocalLLMPlatformImageTGI implements ILocalLLMPlatformImage {
 	public readonly imageName = 'ghcr.io/huggingface/text-generation-inference:2.4.0';
 	public readonly cacheBindPath = '/data';
 	public readonly healthEndpoint = 'health';
 	
 	public getContainerConfig(): ContainerConfig {
-		const { model } = HuggingFaceLLMPlatform.configuration;
-		const contextSize = HuggingFaceLLMPlatform.contextSize;
+		const { model } = LocalLLMPlatform.configuration;
+		const contextSize = LocalLLMPlatform.contextSize;
 		const quantization = model.toLowerCase().includes('-awq') ? 'awq'
 			: model.toLowerCase().includes('-gptq') ? 'gptq'
 			: 'bitsandbytes-nf4';
@@ -28,7 +28,7 @@ export default class HuggingFaceLLMPlatformImageTGI implements IHuggingFaceLLMPl
 	}
 	
 	public async createUserContent(query: string, files: DataSourceItem<string, unknown>[]): Promise<OpenAI.Chat.Completions.ChatCompletionContentPart[]> {
-		const fileParts = await HuggingFaceLLMPlatform.createFileParts(files);
+		const fileParts = await LocalLLMPlatform.createFileParts(files);
 		
 		return [{ type: 'text', text: query }, ...fileParts];
 	}

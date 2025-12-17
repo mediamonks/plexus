@@ -9,9 +9,9 @@ import { staticImplements } from '../../types/common';
 import DataSourceItem from '../../entities/data-sources/origin/DataSourceItem';
 import OpenAI from 'openai';
 import UnsupportedError from '../../entities/error-handling/UnsupportedError';
-import IHuggingFaceLLMPlatformImage from './huggingface/IHuggingFaceLLMPlatformImage';
-import HuggingFaceLLMPlatformImageTGI from './huggingface/HuggingFaceLLMPlatformImageTGI';
-import HuggingFaceLLMPlatformImageLlamaCpp from './huggingface/HuggingFaceLLMPlatformImageLlamaCpp';
+import ILocalLLMPlatformImage from './huggingface/ILocalLLMPlatformImage';
+import LocalLLMPlatformImageTGI from './huggingface/LocalLLMPlatformImageTGI';
+import LocalLLMPlatformImageLlamaCpp from './huggingface/LocalLLMPlatformImageLlamaCpp';
 
 interface DockerPullEvent {
 	id?: string;
@@ -22,15 +22,15 @@ interface DockerPullEvent {
 
 const PORT = 8080;
 
-const IMAGES: Record<string, IHuggingFaceLLMPlatformImage> = {
-	tgi: new HuggingFaceLLMPlatformImageTGI(),
-	llamacpp: new HuggingFaceLLMPlatformImageLlamaCpp(),
+const IMAGES: Record<string, ILocalLLMPlatformImage> = {
+	tgi: new LocalLLMPlatformImageTGI(),
+	llamacpp: new LocalLLMPlatformImageLlamaCpp(),
 };
 
 const docker = new Docker();
 
 @staticImplements<ILLMPlatform>()
-export default class HuggingFaceLLMPlatform {
+export default class LocalLLMPlatform {
 	public static readonly supportedMimeTypes: Set<string> = new Set([
 		'application/json',
 		'application/pdf',
@@ -45,6 +45,7 @@ export default class HuggingFaceLLMPlatform {
 		model: string;
 		image: 'tgi' | 'llamacpp';
 		contextSize?: number;
+		visionProjector?: string;
 	};
 	
 	private static _container: Docker.Container;
@@ -64,7 +65,7 @@ export default class HuggingFaceLLMPlatform {
 	public static async query(query: string, { instructions, history, maxTokens, temperature, files }: QueryOptions): Promise<string> {
 		const messages = await this.createMessages(query, instructions, history, files);
 		
-		Debug.dump('HuggingFaceLLMPlatform messages', messages);
+		Debug.dump('LocalLLMPlatform messages', messages);
 		
 		const client = await this.getClient();
 		
@@ -93,8 +94,8 @@ export default class HuggingFaceLLMPlatform {
 		await this._container.stop();
 	}
 	
-	public static get configuration(): typeof HuggingFaceLLMPlatform.Configuration {
-		return Config.get('huggingface');
+	public static get configuration(): typeof LocalLLMPlatform.Configuration {
+		return Config.get('local-llm');
 	}
 	
 	public static get contextSize(): number {
@@ -124,7 +125,7 @@ export default class HuggingFaceLLMPlatform {
 		});
 	}
 	
-	private static get image(): IHuggingFaceLLMPlatformImage {
+	private static get image(): ILocalLLMPlatformImage {
 		return IMAGES[this.configuration.image];
 	}
 	
@@ -133,7 +134,7 @@ export default class HuggingFaceLLMPlatform {
 	}
 	
 	private static async waitForHealthCheck() {
-		Debug.log('Waiting for model to load', 'HuggingFaceLLMPlatform');
+		Debug.log('Waiting for model to load', 'LocalLLMPlatform');
 		
 		const url = `${this.endpointUrl}/${this.image.healthEndpoint}`;
 		const interval = 2000;
@@ -162,7 +163,7 @@ export default class HuggingFaceLLMPlatform {
 	
 	private static async downloadImage(): Promise<string> {
 		const { imageName } = this.image;
-		Debug.log(`Downloading ${imageName}`, 'HuggingFaceLLMPlatform');
+		Debug.log(`Downloading ${imageName}`, 'LocalLLMPlatform');
 		
 		return new Promise((resolve, reject) => {
 			docker.pull(imageName, (err: Error | null, stream: NodeJS.ReadableStream) => {
@@ -184,13 +185,11 @@ export default class HuggingFaceLLMPlatform {
 		const container = docker.getContainer(this.containerName);
 		
 		try {
-			const info = await container.inspect();
-			
-			if (this.containerConfigMatches(info.Config.Env, info.Config.Image)) {
+			if (await this.containerConfigMatches(container)) {
 				return this._container = container;
 			}
 			
-			Debug.log('Container config changed, recreating', 'HuggingFaceLLMPlatform');
+			Debug.log('Container config changed, recreating', 'LocalLLMPlatform');
 			await container.stop().catch(() => {});
 			await container.remove();
 		} catch {}
@@ -198,22 +197,24 @@ export default class HuggingFaceLLMPlatform {
 		return this._container = await this.createContainer();
 	}
 	
-	private static containerConfigMatches(containerEnv: string[], containerImage: string): boolean {
-		const expectedEnv = this.image.getContainerConfig().env;
-		const envMatches = expectedEnv.every(expected => containerEnv.includes(expected));
-		const imageMatches = containerImage === this.image.imageName;
-		return envMatches && imageMatches;
+	private static async containerConfigMatches(container: Docker.Container): Promise<boolean> {
+		const info = await container.inspect();
+		const expected = this.getContainerOptions();
+		
+		const imageMatches = info.Config.Image === expected.Image;
+		const envMatches = expected.Env!.every(e => info.Config.Env.includes(e));
+		const cmdMatches = JSON.stringify(info.Config.Cmd) === JSON.stringify(expected.Cmd);
+		const bindsMatch = JSON.stringify(info.HostConfig.Binds) === JSON.stringify(expected.HostConfig!.Binds);
+		
+		return imageMatches && envMatches && cmdMatches && bindsMatch;
 	}
 	
-	private static async createContainer(): Promise<Docker.Container> {
-		Debug.log(`Creating ${this.containerName} Docker Container`, 'HuggingFaceLLMPlatform');
-		
+	private static getContainerOptions(): Docker.ContainerCreateOptions {
 		const localCacheDir = path.resolve(Config.get('tempPath'), 'hf-data');
-		const dockerImage = await this.getDockerImage();
 		const { env, cmd } = this.image.getContainerConfig();
 		
-		return docker.createContainer({
-			Image: dockerImage,
+		return {
+			Image: this.image.imageName,
 			name: this.containerName,
 			ExposedPorts: {
 				'80/tcp': {}
@@ -234,7 +235,13 @@ export default class HuggingFaceLLMPlatform {
 				ShmSize: 1073741824,
 			},
 			Tty: true
-		});
+		};
+	}
+	
+	private static async createContainer(): Promise<Docker.Container> {
+		Debug.log(`Creating ${this.containerName} Docker Container`, 'LocalLLMPlatform');
+		await this.getDockerImage();
+		return docker.createContainer(this.getContainerOptions());
 	}
 	
 	private static async startContainer(): Promise<void> {
@@ -243,7 +250,7 @@ export default class HuggingFaceLLMPlatform {
 		const info = await container.inspect();
 		
 		if (!info.State.Running) {
-			Debug.log(`Starting ${this.containerName} Container`, 'HuggingFaceLLMPlatform');
+			Debug.log(`Starting ${this.containerName} Container`, 'LocalLLMPlatform');
 			await container.start();
 		}
 		

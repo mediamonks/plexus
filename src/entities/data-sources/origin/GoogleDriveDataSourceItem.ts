@@ -78,10 +78,6 @@ export default class GoogleDriveDataSourceItem extends DataSourceItem<string, Sp
 		throw new UnsupportedError('mime type for data extraction', metadata.mimeType);
 	}
 	
-	public toValue(): JsonField {
-		return this.metadata as JsonField;
-	}
-	
 	public async getTextContent(): Promise<string> {
 		const buffer = await GoogleDrive.getContent(this.metadata);
 		return buffer.toString('utf8');

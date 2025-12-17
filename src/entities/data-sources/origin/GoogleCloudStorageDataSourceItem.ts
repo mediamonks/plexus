@@ -77,10 +77,6 @@ export default class GoogleCloudStorageDataSourceItem extends DataSourceItem<str
 		return jsonl.read(file);
 	}
 	
-	public toValue(): string {
-		return this.uri;
-	}
-	
 	public async getTextContent(): Promise<string> {
 		const content = await CloudStorage.getContent(this.uri);
 		return content.toString('utf8');
