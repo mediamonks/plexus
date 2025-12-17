@@ -40,12 +40,15 @@ Commands:
 Options:
   --profile, -p    Enable profiling
   --dump, -d       Enable data dumps
+  --no-warmup, -W  Skip GCS authentication warmup
 `
 	console.error(help);
 	process.exit(1);
 }
 
 async function authentication() {
+	if (argv['no-warmup'] ?? argv['W']) return;
+	
 	console.log('Warming up GCS authentication...');
 	const startTime = performance.now();
 	

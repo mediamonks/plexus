@@ -32,3 +32,8 @@
 ## Chris
 - **Multimodal input/output** - base64
 - **UI**
+- **Serial processing** - Run each DataSourceItem through the Agent separately
+
+## Bosch
+- **GraphRAG** - Support GraphRAG datasources
+- **SDK** - Support using Plexus as an SDK 

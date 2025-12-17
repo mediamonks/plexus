@@ -11,10 +11,10 @@ const MODULES = [
 	'drive',
 	'firestore',
 	'genai', // TODO rename to google, nest under llm?
-	'huggingface',
 	'input-fields',
 	'lancedb',
 	'llm',
+	'local-llm',
 	'openai',
 	'storage',
 ];

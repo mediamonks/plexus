@@ -6,12 +6,15 @@ import Config from '../../core/Config';
 import Debug from '../../core/Debug';
 import RequestContext from '../../core/RequestContext';
 import { JsonField, InvokePayload, Configuration } from '../../types/common';
+import InputDataSourceItem from '../data-sources/origin/InputDataSourceItem';
 
 export default class InputCatalogField extends CatalogField {
 	static readonly Configuration: typeof CatalogField.BaseConfiguration & {
 		type: 'input';
 		field: string;
 		required?: boolean;
+		fileName?: string;
+		mimeType?: string;
 	};
 
 	public get configuration(): typeof InputCatalogField.Configuration {
@@ -39,6 +42,12 @@ export default class InputCatalogField extends CatalogField {
 			if (this.required) throw new CustomError(`Field "${this.payloadField}" must be provided in payload`);
 			
 			return;
+		}
+		
+		if (this.configuration.fileName) {
+			if (!this.configuration.mimeType) throw new CustomError(`Missing 'mimeType' property for input field "${this.id}"`);
+			
+			return [new InputDataSourceItem(this.configuration.fileName, this.configuration.mimeType, value)];
 		}
 		
 		const inputFields = Config.get('input-fields') as Configuration['input-fields'];

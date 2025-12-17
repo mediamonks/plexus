@@ -1,0 +1,5 @@
+{
+	"model": "ggml-org/Qwen2-VL-2B-Instruct-GGUF",
+	"image": "llamacpp",
+	"contextSize": 65536
+}

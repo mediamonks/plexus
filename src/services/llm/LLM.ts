@@ -9,7 +9,7 @@ import DataSourceItem from '../../entities/data-sources/origin/DataSourceItem';
 import UnknownError from '../../entities/error-handling/UnknownError';
 import UnsupportedError from '../../entities/error-handling/UnsupportedError';
 import EMBEDDING_MODELS from '../../../data/embedding-models.json';
-import HuggingFaceLLMPlatform from './HuggingFaceLLMPlatform';
+import LocalLLMPlatform from './LocalLLMPlatform';
 
 type QueryOptions = {
 	instructions?: string;
@@ -21,7 +21,7 @@ type QueryOptions = {
 
 export default class LLM {
 	public static readonly Configuration: {
-		platform: 'azure' | 'openai' | 'google' | 'huggingface';
+		platform: 'azure' | 'openai' | 'google' | 'local';
 		model?: string;
 		embeddingPlatform: 'azure' | 'openai' | 'google';
 		embeddingModel?: string;
@@ -90,7 +90,7 @@ export default class LLM {
 			azure: AzureLLMPlatform,
 			openai: OpenAILLMPlatform,
 			google: GoogleLLMPlatform,
-			huggingface: HuggingFaceLLMPlatform,
+			local: LocalLLMPlatform,
 		};
 		
 		const platformClass = mapping[platform];

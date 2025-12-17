@@ -2,6 +2,9 @@
 	"profiling": true,
 	"dataDumps": false,
 	"debug": true,
+	"llm": {
+		"platform": "local"
+	},
 	"agents": {
 		"hello": {
 			"instructions": "gs://monks-plexustest/hello.txt",
@@ -26,6 +29,12 @@
 			"context": [
 				"documents",
 				"input"
+			]
+		},
+		"image": {
+			"instructions": "Describe the provided image.",
+			"context": [
+				"image"
 			]
 		}
 	},
@@ -78,6 +87,19 @@
 			"type": "input",
 			"field": "input",
 			"example": "Please explain your findings."
+		},
+		"image": {
+			"type": "input",
+			"field": "image",
+			"example": "some_base64_string",
+			"fileName": "image.png",
+			"mimeType": "image/png"
+		},
+		"image-description": {
+			"type": "output",
+			"field": "description",
+			"example": "The description of the image",
+			"agent": "image"
 		}
 	},
 	"data-sources": {
@@ -96,6 +118,6 @@
 		}
 	},
 	"output": [
-		"summary"
+		"image-description"
 	]
 }

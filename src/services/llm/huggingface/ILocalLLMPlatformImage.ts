@@ -6,7 +6,7 @@ export interface ContainerConfig {
 	cmd?: string[];
 }
 
-export default interface IHuggingFaceLLMPlatformImage {
+export default interface ILocalLLMPlatformImage {
 	readonly imageName: string;
 	readonly healthEndpoint: string;
 	readonly cacheBindPath: string;
