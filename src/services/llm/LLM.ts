@@ -1,6 +1,7 @@
 import ILLMPlatform from './ILLMPlatform';
 import AzureLLMPlatform from './AzureLLMPlatform';
 import GoogleLLMPlatform from './GoogleLLMPlatform';
+import LocalLLMPlatform from './LocalLLMPlatform';
 import OpenAILLMPlatform from './OpenAILLMPlatform';
 import Config from '../../core/Config';
 import History from '../../core/History';
@@ -8,15 +9,17 @@ import Profiler from '../../core/Profiler';
 import DataSourceItem from '../../entities/data-sources/origin/DataSourceItem';
 import UnknownError from '../../entities/error-handling/UnknownError';
 import UnsupportedError from '../../entities/error-handling/UnsupportedError';
+import { LLMTool } from '../../types/common';
 import EMBEDDING_MODELS from '../../../data/embedding-models.json';
-import LocalLLMPlatform from './LocalLLMPlatform';
 
 type QueryOptions = {
 	instructions?: string;
 	history?: History;
 	temperature?: number;
+	outputTokens?: number;
 	structuredResponse?: boolean;
 	files?: DataSourceItem<string, unknown>[];
+	tools?: Record<string, LLMTool>;
 };
 
 export default class LLM {
@@ -26,37 +29,40 @@ export default class LLM {
 		embeddingPlatform: 'azure' | 'openai' | 'google';
 		embeddingModel?: string;
 		temperature?: number;
+		outputTokens?: number;
 	};
 	
 	public static async query(prompt: string, {
 		instructions,
 		history = new History(),
 		temperature,
+		outputTokens,
 		structuredResponse,
-		files
+		files,
+		tools,
 	}: QueryOptions): Promise<string> {
-		const { model, temperature: configTemperature } = this.configuration;
-		
-		temperature ??= configTemperature;
+		temperature ??= this.configuration.temperature;
+		outputTokens ??= this.configuration.outputTokens;
 		
 		await Profiler.run(async () => await history.ready, 'waiting for history to be ready');
 		
 		return this.platform.query(prompt, {
 			instructions,
 			temperature,
+			outputTokens,
 			history,
 			structuredResponse,
-			model,
 			files,
+			tools,
 		});
 	}
 	
 	public static async generateDocumentEmbeddings(text: string): Promise<number[]> {
-		return await this.embeddingPlatform.generateDocumentEmbeddings(text, this.configuration.embeddingModel);
+		return await this.embeddingPlatform.generateDocumentEmbeddings(text);
 	}
 	
 	public static async generateQueryEmbeddings(text: string): Promise<number[]> {
-		return await this.embeddingPlatform.generateQueryEmbeddings(text, this.configuration.embeddingModel);
+		return await this.embeddingPlatform.generateQueryEmbeddings(text);
 	}
 	
 	public static get embeddingModel(): string {

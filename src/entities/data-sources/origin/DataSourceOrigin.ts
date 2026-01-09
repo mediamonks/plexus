@@ -3,11 +3,11 @@ import DataSource from '../DataSource';
 import { JsonObject, SpreadSheetData } from '../../../types/common';
 
 export default abstract class DataSourceOrigin {
-	private readonly _dataSource: DataSource;
 	
-	public constructor(dataSource: DataSource) {
-		this._dataSource = dataSource;
-	}
+	public constructor(
+		private readonly _dataSource: DataSource,
+		private readonly _configuration: typeof DataSource.Configuration,
+	) {};
 	
 	public get dataSource(): DataSource {
 		return this._dataSource;
@@ -24,4 +24,8 @@ export default abstract class DataSourceOrigin {
 	public abstract getData(): Promise<AsyncGenerator<JsonObject>>;
 	
 	public abstract getItems(): Promise<DataSourceItem<string, AsyncGenerator<JsonObject> | SpreadSheetData>[] | never>;
+	
+	protected get configuration(): typeof DataSource.Configuration {
+		return this._configuration;
+	}
 }

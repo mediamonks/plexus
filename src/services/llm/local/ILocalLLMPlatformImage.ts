@@ -1,16 +1,22 @@
 import OpenAI from 'openai';
 import DataSourceItem from '../../../entities/data-sources/origin/DataSourceItem';
 
-export interface ContainerConfig {
+export type ContainerOptions = {
 	env: string[];
 	cmd?: string[];
 }
+
+export type ContainerConfiguration = {
+	model: string;
+	visionProjector?: string;
+	contextSize: number;
+};
 
 export default interface ILocalLLMPlatformImage {
 	readonly imageName: string;
 	readonly healthEndpoint: string;
 	readonly cacheBindPath: string;
 	
-	getContainerConfig(): ContainerConfig;
+	getContainerOptions(configuration: ContainerConfiguration): ContainerOptions;
 	createUserContent(query: string, files: DataSourceItem<string, unknown>[]): Promise<string | OpenAI.Chat.Completions.ChatCompletionContentPart[]>;
 }

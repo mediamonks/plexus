@@ -9,16 +9,16 @@ export default class ApiDataSourceOrigin extends DataSourceOrigin {
 		payload?: JsonObject;
 		method?: 'GET' | 'POST';
 		collectionPath?: string;
-	}
+	};
 	
 	public async read(): Promise<JsonField> {
 		// TODO: field-based payload
 		
 		const response = await axios.request({
 			url: await this.dataSource.getResolvedUri(),
-			method: this.dataSource.configuration.method,
-			headers: this.dataSource.configuration.headers,
-			data: this.dataSource.configuration.payload,
+			method: this.configuration.method ?? 'GET',
+			headers: this.configuration.headers,
+			data: this.configuration.payload,
 			responseType: 'json',
 		});
 		
@@ -30,28 +30,30 @@ export default class ApiDataSourceOrigin extends DataSourceOrigin {
 		
 		if (typeof data !== 'string') data = JSON.stringify(data);
 		
-		return data;
+		return data as string;
 	}
 	
 	public async getData(): Promise<AsyncGenerator<JsonObject>> {
-		const data = await this.read();
-		const { collectionPath } = this.dataSource.configuration;
-		const path = collectionPath.split('.');
-		let collection = data;
-		while (path.length) {
-			const key = path.shift();
-			collection = collection[key];
-			if (!collection) {
-				throw new CustomError(`Invalid collection path "${collectionPath}" for data source "${this.dataSource.id}"`);
+		let data = await this.read();
+		
+		const { collectionPath } = this.configuration;
+		if (collectionPath) {
+			const path = collectionPath.split('.');
+			while (path.length) {
+				const key = path.shift();
+				data = data[key];
+				if (!data) {
+					throw new CustomError(`Invalid collection path "${collectionPath}" for data source "${this.dataSource.id}"`);
+				}
 			}
 		}
 		
-		if (!Array.isArray(collection)) {
+		if (!Array.isArray(data)) {
 			throw new CustomError(`Item at collection path "${collectionPath}" for data source "${this.dataSource.id}" is not an array`);
 		}
 		
 		return (async function* () {
-			for await (const item of collection) {
+			for await (const item of data) {
 				yield item as JsonObject;
 			}
 		})();

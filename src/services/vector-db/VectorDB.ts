@@ -1,90 +1,109 @@
-import { SchemaLike } from '@lancedb/lancedb';
+import IVectorDBEngine from './IVectorDBEngine';
+import CloudSQL from './CloudSQL';
 import LanceDB from './LanceDB';
+import PgVector from './PgVector';
 import LLM from '../llm/LLM';
+import Config from '../../core/Config';
+import Console from '../../core/Console';
+import Debug from '../../core/Debug';
 import Profiler from '../../core/Profiler';
-import CustomError from '../../entities/error-handling/CustomError';
 import { JsonObject, JsonPrimitive } from '../../types/common';
 
-// TODO refactor this class
+type Engine = 'lancedb' | 'pgvector' | 'cloudsql';
+
+const ENGINES: Record<Engine, IVectorDBEngine<string | JsonObject>> = {
+	lancedb: LanceDB,
+	pgvector: PgVector,
+	cloudsql: CloudSQL,
+};
 
 export default class VectorDB {
-	public static async append(tableName: string, source: AsyncIterable<JsonObject>): Promise<void> {
-		return LanceDB.append(this.getTableName(tableName), await Array.fromAsync(source));
+	public static readonly Configuration: {
+		engine?: Engine;
+	};
+	
+	private static get engine(): IVectorDBEngine<string | JsonObject> {
+		const engineName = Config.get('vectordb')?.engine ?? 'lancedb';
+		return ENGINES[engineName];
 	}
 	
-	public static async create(tableName: string, source: AsyncGenerator<JsonObject>, { schema }: { schema?: SchemaLike } = {}): Promise<void> {
-		const promises = [];
+	public static async create(tableName: string, source: AsyncGenerator<JsonObject>): Promise<void> {
 		const internalTableName = this.getTableName(tableName);
-		let tableCreated: Promise<void>;
 		
-		for await (const data of source) {
-			promises.push((async () => {
-				if (tableCreated) {
-					await tableCreated;
-					return LanceDB.append(internalTableName, [data]);
-				}
-				
-				return tableCreated = LanceDB.createTable(internalTableName, [data], schema);
-			})());
-		}
-		
-		await Promise.all(promises);
+		await this.engine.createTable(internalTableName, source);
 	}
 	
-	public static async createEmpty(tableName: string, schema: SchemaLike): Promise<void> {
-		schema.fields.find(field => field.name === 'vector').type.listSize = LLM.dimensions;
-		await LanceDB.createTable(this.getTableName(tableName), [], schema);
+	public static async append(tableName: string, source: AsyncGenerator<JsonObject>): Promise<void> {
+		const internalTableName = this.getTableName(tableName);
+		
+		await this.engine.append(internalTableName, source);
 	}
 	
 	public static async search(tableName: string, input: string, { limit, filter, fields }: { limit?: number; filter?: Record<string, JsonPrimitive>; fields?: string[] } = {}): Promise<JsonObject[]> {
 		const embeddings = await LLM.generateQueryEmbeddings(input);
-		
-		return await Profiler.run(() => LanceDB.search(this.getTableName(tableName), embeddings, { limit, filter, fields }), `vectordb search ${tableName}`);
+		return Profiler.run(
+			() => this.engine.search(this.getTableName(tableName), embeddings, { limit, filter, fields }),
+			`vectordb search ${tableName}`
+		);
 	}
 	
-	public static async ensureTableExists(tableName: string, schema: SchemaLike): Promise<void> {
-		schema.fields.find(field => field.name === 'vector').type.listSize = LLM.dimensions;
-		return LanceDB.ensureTableExists(this.getTableName(tableName), schema);
-	}
-	
-	public static async ingest(tableName: string, source: AsyncIterable<JsonObject>, searchField: string = 'text', { excludeSearchField }: { excludeSearchField?: boolean } = {}): Promise<void> {
-		const promises = [];
-		const internalTableName = this.getTableName(tableName);
-		
-		for await (const data of source) {
-			if (!data[searchField]) continue;
-			
-			if (typeof data[searchField] !== 'string') {
-				throw new CustomError(`Vector search fields must be of type string, got type ${typeof data[searchField]} for table "${tableName}", field "${searchField}"`);
-			}
-			
-			promises.push((async () => {
-				const vector = await LLM.generateDocumentEmbeddings(data[searchField] as string);
-				
-				if (excludeSearchField) delete data[searchField];
-				
-				const record = { ...data, vector };
-				
-				return LanceDB.append(internalTableName, [record]);
-			})());
-		}
-		
-		await Promise.all(promises);
-	}
-	
-	public static async drop(tableName: string): Promise<any> {
-		return LanceDB.dropTable(this.getTableName(tableName));
+	public static async drop(tableName: string): Promise<void> {
+		return this.engine.dropTable(this.getTableName(tableName));
 	}
 	
 	public static async tableExists(tableName: string): Promise<boolean> {
-		return LanceDB.tableExists(this.getTableName(tableName));
+		return this.engine.tableExists(this.getTableName(tableName));
 	}
 	
 	public static async getIds(tableName: string): Promise<Set<string>> {
-		return LanceDB.getIds(this.getTableName(tableName));
+		return this.engine.getIds(this.getTableName(tableName));
+	}
+	
+	public static async query(query: string | JsonObject): Promise<JsonObject[]> {
+		if (typeof query === 'string') {
+			query = await this.replaceEmbeddingPlaceholders(query);
+		}
+		
+		Debug.dump('vectordb query', query);
+		return this.engine.query(query);
+	}
+	
+	private static async replaceEmbeddingPlaceholders(query: string): Promise<string> {
+		const regex = /EMBEDDING\('([^']+)'\)/g;
+		let match;
+		const replacements: { start: number; end: number; replacement: string }[] = [];
+		
+		while ((match = regex.exec(query)) !== null) {
+			const text = match[1];
+			const vector = await LLM.generateQueryEmbeddings(text);
+			replacements.push({
+				start: match.index,
+				end: match.index + match[0].length,
+				replacement: `'[${vector.join(',')}]'`
+			});
+		}
+		
+		// Apply replacements from back to front to avoid messing up indices
+		for (let i = replacements.length - 1; i >= 0; i--) {
+			const { start, end, replacement } = replacements[i];
+			query = query.substring(0, start) + replacement + query.substring(end);
+		}
+		
+		return query;
 	}
 	
 	private static getTableName(tableName: string): string {
-		return `${tableName}-${LLM.embeddingModel}`;
+		return `${tableName}_${LLM.embeddingModel}`.replace(/-/g, '_');
 	}
-};
+	
+	private static async *generateRecordsWithEmbeddings(source: AsyncGenerator<JsonObject>, tableName: string, searchField: string): AsyncGenerator<JsonObject> {
+		let totalCount = 0;
+		for await (const data of source) {
+			if (!data[searchField] || typeof data[searchField] !== 'string') continue;
+			const vector = await LLM.generateDocumentEmbeddings(data[searchField] as string);
+			totalCount++;
+			Console.activity(totalCount, `Ingesting vector table "${tableName}"`);
+			yield { ...data, vector };
+		}
+	}
+}

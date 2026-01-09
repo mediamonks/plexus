@@ -16,7 +16,6 @@ export default class GoogleDriveDataSourceItem extends DataSourceItem<string, Sp
 	static readonly Content: typeof GoogleDriveDataSourceItem.TextContent | typeof GoogleDriveDataSourceItem.DataContent;
 	
 	private readonly _metadata: Metadata;
-	private _localFile: Promise<string>;
 
 	public constructor(dataSource: DataSource, metadata: Metadata) {
 		super(dataSource);
@@ -32,50 +31,46 @@ export default class GoogleDriveDataSourceItem extends DataSourceItem<string, Sp
 	}
 	
 	public get mimeType(): string {
-		return this._metadata.mimeType;
+		return this.metadata.mimeType;
 	}
 	
 	public get fileName(): string {
-		return this._metadata.name;
+		return this.metadata.name;
 	}
 	
 	public getLocalFile(): Promise<string> {
-		return this._localFile ??= this._getLocalFile();
+		return this.allowCache ? GoogleDrive.cache(this.metadata) : GoogleDrive.download(this.metadata);
 	}
 	
 	public async toText(): Promise<typeof GoogleDriveDataSourceItem.TextContent> {
-		const { metadata } = this;
-		
-		if (metadata.mimeType === 'application/vnd.google-apps.document') {
-			return await GoogleDocs.getMarkdown(metadata.id);
+		if (this.mimeType === 'application/vnd.google-apps.document') {
+			return await GoogleDocs.getMarkdown(this.id);
 		}
 		
 		const file = (await this.getLocalFile()) as string;
 		
-		if (metadata.mimeType === 'application/pdf') return await pdf.getPdfText(file);
+		if (this.mimeType === 'application/pdf') return await pdf.getPdfText(file);
 		
-		if (metadata.mimeType === 'text/plain') {
+		if (this.mimeType === 'text/plain') {
 			const buffer = await fs.readFile(file);
 			return buffer.toString();
 		}
 		
-		throw new UnsupportedError('mime type for text extraction', metadata.mimeType);
+		throw new UnsupportedError('mime type for text extraction', this.mimeType);
 	}
 	
 	public async toData(): Promise<typeof GoogleDriveDataSourceItem.DataContent> {
-		const { metadata } = this;
-		
-		if (metadata.mimeType === 'application/vnd.google-apps.spreadsheet') {
-			return await GoogleSheets.getData(metadata.id);
+		if (this.mimeType === 'application/vnd.google-apps.spreadsheet') {
+			return await GoogleSheets.getData(this.id);
 		}
 		
 		const file = await this.getLocalFile();
 		
-		if (metadata.mimeType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') return await xlsx.getData(file);
+		if (this.mimeType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') return await xlsx.getData(file);
 		
 		// TODO add JSON & JSONL support
 		
-		throw new UnsupportedError('mime type for data extraction', metadata.mimeType);
+		throw new UnsupportedError('mime type for data extraction', this.mimeType);
 	}
 	
 	public async getTextContent(): Promise<string> {
@@ -88,12 +83,12 @@ export default class GoogleDriveDataSourceItem extends DataSourceItem<string, Sp
 		return buffer.toString('base64');
 	}
 	
-	// TODO llm conversion logic should probably live in the LLMPlatform class
-	private async _getLocalFile(): Promise<string> {
+	public toJSON(): JsonField {
+		return this.metadata as JsonField;
+	}
+	
+	public async toPDF(): Promise<string> {
 		let metadata = this.metadata;
-		
-		if (LLM.supportedMimeTypes.has(this.mimeType))
-			return (this.allowCache ? GoogleDrive.cache(metadata) : GoogleDrive.download(metadata));
 		
 		if (!this.mimeType.startsWith('application/vnd.google-apps.'))
 			metadata = await GoogleDrive.import(metadata, this.allowCache);

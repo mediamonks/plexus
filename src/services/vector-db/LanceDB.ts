@@ -1,13 +1,15 @@
 import { performance } from 'node:perf_hooks';
 import lancedb, { Connection, SchemaLike, Table } from '@lancedb/lancedb';
 import Config from '../../core/Config';
-import { JsonObject, JsonPrimitive } from '../../types/common';
+import IVectorDBEngine from './IVectorDBEngine';
+import { JsonObject, JsonPrimitive, staticImplements } from '../../types/common';
 
-const _tables = {};
-const lastTableWrites = {};
-const tableRecordBuffers = {};
-const tableWriteTimeouts = {};
+const _tables: Record<string, Table> = {};
+const lastTableWrites: Record<string, number> = {};
+const tableRecordBuffers: Record<string, JsonObject[]> = {};
+const tableWriteTimeouts: Record<string, Promise<void>> = {};
 
+@staticImplements<IVectorDBEngine<JsonObject>>()
 export default class LanceDB {
 	public static readonly Configuration: {
 		databaseUri?: string;
@@ -29,29 +31,29 @@ export default class LanceDB {
 		}
 	}
 	
-	public static async createTable(name: string, records: JsonObject[], schema?: SchemaLike): Promise<void> {
+	public static async createTable(name: string, records: AsyncGenerator<JsonObject>): Promise<void> {
 		const connection = await this.getConnection();
+		const firstRecord = await records.next();
+		
+		if (firstRecord.done) return;
 		
 		lastTableWrites[name] = performance.now();
-		if (schema) {
-			_tables[name] = await connection.createEmptyTable(name, schema);
-			await this.append(name, records);
-		} else {
-			await connection.createTable(name, records);
-		}
+		await connection.createTable(name, [firstRecord.value]);
+		
+		await this.append(name, records);
 	}
 	
-	public static async append(tableName: string, records: JsonObject[]): Promise<void> {
-		if (!records.length) return;
-		
-		tableRecordBuffers[tableName] ??= [];
-		tableRecordBuffers[tableName].push(...records);
-		tableWriteTimeouts[tableName] ??= new Promise(resolve => setTimeout(
-			() => this.writeRecordBuffer(tableName).then(resolve),
-			Math.max(0, (lastTableWrites[tableName] ?? 0) + this.configuration.rateLimitDelayMs - performance.now())
-		));
-		
-		return tableWriteTimeouts[tableName];
+	public static async append(tableName: string, records: AsyncGenerator<JsonObject>): Promise<void> {
+		for await (const record of records) {
+			tableRecordBuffers[tableName] ??= [];
+			tableRecordBuffers[tableName].push(record);
+			tableWriteTimeouts[tableName] ??= new Promise(resolve => setTimeout(
+				() => this.writeRecordBuffer(tableName).then(resolve),
+				Math.max(0, (lastTableWrites[tableName] ?? 0) + this.configuration.rateLimitDelayMs - performance.now())
+			));
+			
+			await tableWriteTimeouts[tableName];
+		}
 	}
 	
 	public static async upsert(tableName: string, records: JsonObject[]): Promise<void> {
@@ -70,7 +72,12 @@ export default class LanceDB {
 		if (fields) vectorQuery = vectorQuery.select(fields);
 		
 		if (filter) vectorQuery = vectorQuery.where(
-			Object.keys(filter).map(key => `${key} = '${filter[key]}'`).join(' AND ') // TODO does this work only with string values?
+			Object.keys(filter).map(key => {
+				const value = filter[key];
+				if (value === null) return `${key} IS NULL`;
+				if (typeof value === 'string') return `${key} = '${value.replace(/'/g, "''")}'`;
+				return `${key} = ${value}`;
+			}).join(' AND ')
 		);
 		
 		return await vectorQuery
@@ -98,8 +105,14 @@ export default class LanceDB {
 	
 	public static async getIds(tableName: string): Promise<Set<string>> {
 		const table = await this.getTable(tableName);
-		const records = await table.query().select('_id').toArray();
+		const records = await table.query().select(['_id']).toArray();
 		return new Set(records.map(item => item._id));
+	}
+	
+	public static async query(query: JsonObject): Promise<JsonObject[]> {
+		const { tableName, vector, where, select, limit } = query as any;
+		const table = await this.getTable(tableName);
+		return table.vectorSearch(vector).where(where).select(select).limit(limit).toArray();
 	}
 	
 	private static async getConnection(): Promise<Connection> {
@@ -120,7 +133,7 @@ export default class LanceDB {
 	private static async getTable(name: string): Promise<Table> {
 		const connection = await this.getConnection();
 		
-		_tables[name] ??= connection.openTable(name);
+		_tables[name] ??= await connection.openTable(name);
 		
 		return _tables[name];
 	}

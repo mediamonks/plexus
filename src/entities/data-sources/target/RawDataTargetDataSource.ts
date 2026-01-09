@@ -4,11 +4,14 @@ import DataSourceCatalogField from '../../catalog/DataSourceCatalogField';
 import Storage from '../../storage/Storage';
 import StorageFile from '../../storage/StorageFile';
 import { JsonObject } from '../../../types/common';
+import Debug from '../../../core/Debug';
 
 type QueryResult = JsonObject[];
 
 export default class RawDataTargetDataSource extends DataSource {
 	public async ingest(): Promise<void> {
+		Debug.log(`Ingesting raw data target data source "${this.id}"`, 'RawDataTargetDataSource');
+		
 		const data: AsyncGenerator<JsonObject> = await this.origin.getData();
 		
 		await Storage.get(StorageFile.TYPE.STRUCTURED_DATA, this.id).write(data);

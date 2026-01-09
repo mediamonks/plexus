@@ -3,7 +3,6 @@ import { ConfidentialClientApplication } from '@azure/msal-node';
 import ILLMPlatform from './ILLMPlatform';
 import OpenAILLMPlatform from './OpenAILLMPlatform';
 import CustomError from '../../entities/error-handling/CustomError';
-import Config from '../../core/Config';
 import { staticImplements } from '../../types/common';
 
 const { AZURE_TENANT_ID, AZURE_CLIENT_ID, AZURE_CLIENT_SECRET } = process.env;
@@ -11,17 +10,20 @@ const ACCESS_TOKEN_TTL_MS = 60000;
 
 @staticImplements<ILLMPlatform>()
 export default class AzureLLMPlatform extends OpenAILLMPlatform {
+	protected static readonly configModuleName: 'azure' = 'azure';
+	
 	public static readonly Configuration: typeof OpenAILLMPlatform.Configuration & {
 		baseUrl: string;
 		apiVersion: string;
 		embeddingApiVersion: string;
+		outputTokens?: number;
 	};
 	
 	private static _accessToken: string;
 	private static _expirationTimestamp: number;
 	
 	protected static get configuration(): typeof AzureLLMPlatform.Configuration {
-		return Config.get('azure', { includeGlobal: true });
+		return super.configuration as typeof AzureLLMPlatform.Configuration;
 	}
 	
 	protected static async getClient(model?: string): Promise<OpenAI> {
@@ -29,9 +31,9 @@ export default class AzureLLMPlatform extends OpenAILLMPlatform {
 		
 		const token = await this.getAccessToken();
 		
-		const { model: configModel, baseUrl, apiVersion } = this.configuration;
+		const { baseUrl, apiVersion } = this.configuration;
 		
-		model ??= configModel;
+		model ??= this.model;
 		
 		const baseURL = `${baseUrl}/openai/deployments/${model}`;
 		

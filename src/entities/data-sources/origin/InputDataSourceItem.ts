@@ -1,6 +1,7 @@
 import DataSourceItem from './DataSourceItem';
 import LocalFileCache from '../../../services/LocalFileCache';
-import { JsonObject } from '../../../types/common';
+import GoogleDrive from '../../../services/google-drive/GoogleDrive';
+import { JsonField, JsonObject } from '../../../types/common';
 import hash from '../../../utils/hash';
 
 export default class InputDataSourceItem extends DataSourceItem<string, unknown> {
@@ -40,5 +41,14 @@ export default class InputDataSourceItem extends DataSourceItem<string, unknown>
 	
 	public getLocalFile(): Promise<string> {
 		return LocalFileCache.create(this._fileName, this._base64);
+	}
+	
+	public toJSON(): JsonField {
+		return this.fileName;
+	}
+	
+	public async toPDF(): Promise<string> {
+		const metadata = await GoogleDrive.createFile(this.fileName, GoogleDrive.tempFolderId, this.mimeType, Buffer.from(this._base64, 'base64'));
+		return GoogleDrive.exportToPdf(metadata, this.dataSource.configuration.allowCache);
 	}
 }

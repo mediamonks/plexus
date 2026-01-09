@@ -1,12 +1,15 @@
 import RequestContext from './RequestContext';
 import CustomError from '../entities/error-handling/CustomError';
-import { Configuration, InvokePayload, ValueOf } from '../types/common';
+import Configuration from '../types/Configuration';
+import { InvokePayload, ValueOf } from '../types/common';
 import global from '../../config/global.json';
+import Profiler from './Profiler';
 
 const MODULES = [
 	'agents',
 	'azure',
 	'catalog',
+	'cloud-sql',
 	'data-sources',
 	'drive',
 	'firestore',
@@ -48,7 +51,7 @@ export default class Config {
 				if (includeGlobal) {
 					const globalConfig = includeRequest ? this.merge(this.staticGlobalConfig, this.requestGlobalConfig) : this.staticGlobalConfig;
 					
-					result = this.merge(globalConfig, result, true);
+					result = this.merge(globalConfig, result);
 				}
 			}
 			
@@ -66,20 +69,27 @@ export default class Config {
 	private static get staticConfig(): Configuration {
 		if (this._staticConfig) return this._staticConfig;
 		
-		const config = { ...global };
-		for (const module of MODULES) {
-			config[module] = this.loadModuleConfig(module);
-			if (module in global) {
-				if (typeof global[module] === 'object' && typeof config[module] === 'object') config[module] = { ...config[module], ...global[module] };
-				else throw new CustomError(`Configuration conflict: module "${module}" and global key "${module}"`);
+		// return Profiler.run(() => {
+			const config = { ...global };
+			for (const module of MODULES) {
+				config[module] = this.loadModuleConfig(module);
+				if (module in global) {
+					if (typeof global[module] === 'object' && typeof config[module] === 'object') config[module] = { ...config[module], ...global[module] };
+					else throw new CustomError(`Configuration conflict: module "${module}" and global key "${module}"`);
+				}
 			}
-		}
-		
-		return this._staticConfig = config;
+			
+			return this._staticConfig = config;
+		// }, 'Config.staticConfig');
 	}
 	
 	private static get requestConfig(): Configuration {
-		return (RequestContext.store?.payload as InvokePayload)?.config ?? {} as Configuration;
+		const config = (RequestContext.store?.payload as InvokePayload)?.config;
+		
+		// TODO cache config in requestcontext.config. or not? because require() already caches
+		if (typeof config === 'string') return this.loadCustomConfig(config);
+		
+		return config ?? {} as Configuration;
 	}
 	
 	private static get staticGlobalConfig(): Configuration {
@@ -100,6 +110,15 @@ export default class Config {
 		}
 	}
 	
+	private static loadCustomConfig(name: string): Configuration {
+		try {
+			return require(`../../config/custom/${name}.json`);
+		} catch {
+			return {};
+		}
+	}
+	
+	// TODO remove strict?
 	private static merge(value1: Configuration | ValueOf<Configuration>, value2: Configuration | ValueOf<Configuration>, strict: boolean = false): Configuration | Configuration[keyof Configuration]{
 		if (value2 === undefined) return value1;
 		if (value1 === undefined) return value2;

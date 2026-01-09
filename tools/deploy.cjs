@@ -66,11 +66,13 @@ async function deployFunction({ name, entryPoint, timeout, env, minInstances, cp
     `);
 	}
 	
+	const nodeJsMajorVersion = packageJson.engines.node.replace(/^[^0-9]*([0-9]+).*/, '$1');
+	
 	gcloud(`
 		functions deploy ${name}
 			--gen2
 			--region=${global.region}
-			--runtime=nodejs${packageJson.engines.node}
+			--runtime=nodejs${nodeJsMajorVersion}
 			--source=.
 			--entry-point=${entryPoint}
 			--trigger-http

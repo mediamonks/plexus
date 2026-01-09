@@ -5,6 +5,5 @@ export default class UnsupportedError extends CustomError {
 		let message = `Unsupported ${name}: "${value}"`;
 		if (values) message += `. Must be one of: ${values.map(value => `"${value}"`).join(', ')}`;
 		super(message);
-		this.name = 'UnsupportedError';
 	}
 };

@@ -21,7 +21,7 @@ export default async (_: void, payload: InvokePayload): Promise<{
 	if (!outputFields || !outputFields.length) throw new CustomError('No output specified');
 	
 	await Promise.all(outputFields.map(async outputField => {
-		output[outputField] = await Profiler.run(() => Catalog.instance.get(outputField).toJSON(), `get value for "${outputField}"`);
+		output[outputField] = await Catalog.instance.get(outputField).toJSON();
 	}));
 	
 	await History.instance.save(output);

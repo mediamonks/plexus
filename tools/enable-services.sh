@@ -23,3 +23,9 @@ gcloud projects add-iam-policy-binding monks-plexus --member="serviceAccount:ple
 gcloud projects add-iam-policy-binding monks-plexus --member="serviceAccount:plexus@monks-plexus.iam.gserviceaccount.com" --role="roles/storage.admin"
 gcloud projects add-iam-policy-binding monks-plexus --member="serviceAccount:plexus@monks-plexus.iam.gserviceaccount.com" --role="roles/datastore.user"
 gcloud projects add-iam-policy-binding monks-plexus --member="serviceAccount:plexus@monks-plexus.iam.gserviceaccount.com" --role="roles/drive.file"
+gcloud services enable sqladmin.googleapis.com --project monks-plexus
+gcloud sql instances create plexus --database-version=POSTGRES_15 --tier=db-f1-micro --region=europe-west1 --root-password=postgres --project monks-plexus --database-flags=cloudsql.iam_authentication=on
+gcloud projects add-iam-policy-binding monks-plexus --member="serviceAccount:plexus@monks-plexus.iam.gserviceaccount.com" --role="roles/cloudsql.client"
+gcloud projects add-iam-policy-binding monks-plexus --member="serviceAccount:plexus@monks-plexus.iam.gserviceaccount.com" --role="roles/cloudsql.instanceUser"
+gcloud sql users create plexus@monks-plexus.iam --instance=plexus --type=cloud_iam_service_account --project monks-plexus
+echo "CREATE EXTENSION IF NOT EXISTS vector; GRANT ALL PRIVILEGES ON DATABASE postgres TO \"plexus@monks-plexus.iam\"; GRANT ALL ON SCHEMA public TO \"plexus@monks-plexus.iam\";" | gcloud sql connect plexus --user=postgres --project monks-plexus --quiet

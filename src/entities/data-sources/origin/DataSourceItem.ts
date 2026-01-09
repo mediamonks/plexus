@@ -1,4 +1,5 @@
 import DataSource from '../DataSource';
+import { JsonField } from '../../../types/common';
 
 export default abstract class DataSourceItem<TTextContent, TDataContent> {
 	private readonly _dataSource: DataSource;
@@ -34,4 +35,8 @@ export default abstract class DataSourceItem<TTextContent, TDataContent> {
 	public abstract toBase64(): Promise<string>;
 	
 	public abstract getLocalFile(): Promise<string>;
+	
+	public abstract toJSON(): JsonField;
+	
+	public abstract toPDF(): Promise<string>;
 }

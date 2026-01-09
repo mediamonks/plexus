@@ -1,4 +1,6 @@
 const minimist = require('minimist');
+const fs = require('node:fs');
+const Console = require('./dist/core/Console').default;
 const RequestContext = require('./dist/core/RequestContext').default;
 const ErrorHandler = require('./dist/entities/error-handling/ErrorHandler').default;
 const ingestHandler = require('./dist/handlers/ingest').default;
@@ -12,12 +14,21 @@ const [command, configName, ...args] = argv._;
 const COMMANDS = {
 	ingest: () => {
 		const [namespace] = args;
-		const fn = ingestHandler.bind(null, namespace);
+		const fn = ingestHandler.bind(null, { namespace });
 		return { fn };
 	},
 	invoke: () => {
-		const [fields, threadId] = args;
+		const [fieldsJson, threadId] = args;
 		const fn = invokeHandler.bind(null, null, { threadId });
+		let fields = {};
+		if (fieldsJson) {
+			try {
+				fields = JSON.parse(fieldsJson);
+			} catch {
+				console.error(`Input fields JSON invalid.\n`);
+				sendHelp();
+			}
+		}
 		return { fields, fn };
 	},
 };
@@ -49,27 +60,36 @@ Options:
 async function authentication() {
 	if (argv['no-warmup'] ?? argv['W']) return;
 	
-	console.log('Warming up GCS authentication...');
 	const startTime = performance.now();
+	const interval = setInterval(
+		() => Console.progress(performance.now() - startTime, 15000, 'Warming up GCS authentication...'),
+		100
+	);
 	
 	try {
 		await CloudStorage.list('gs://monks-plexus');
+		Console.done();
 		
-		console.log(`GCS authentication warmup completed in ${Math.floor(performance.now() - startTime)}ms`);
+		console.error(`GCS authentication warmup completed in ${Math.floor(performance.now() - startTime)}ms`);
 	} catch (error) {
-		console.warn('GCS authentication failed:', error.message);
+		console.error('GCS authentication failed:', error.message);
 	}
+	clearInterval(interval);
 }
 
 if (!COMMANDS[command] || !configName) sendHelp();
 
-const configPath = `./config/${configName}.json`;
+const configPath = `./config/custom/${configName}.json`;
 
+if (!fs.existsSync(configPath)) {
+	console.error(`Configuration "${configPath}" not found.\n`);
+	sendHelp();
+}
 let config;
 try {
 	config = require(configPath);
 } catch (error) {
-	console.error(`Configuration "${configPath}" not found.\n`);
+	console.error(`Configuration "${configPath}" is invalid JSON.\n`);
 	sendHelp();
 }
 
@@ -87,9 +107,13 @@ process.env.PLEXUS_MODE = 'cli';
 		await authentication();
 	
 		try {
-			console.log(await fn());
+			const startTime = performance.now();
+			const result = await fn();
+			if (result) console.log(JSON.stringify(result, null, 2));
+			console.error(`\n${command} operation completed in ${Math.floor(performance.now() - startTime)}ms`);
 		} catch (error) {
 			ErrorHandler.log(error);
 		}
+		process.exit(0);
 	});
 }());

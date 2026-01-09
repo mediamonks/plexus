@@ -1,5 +1,5 @@
 import OpenAI from 'openai';
-import ILocalLLMPlatformImage, { ContainerConfig } from './ILocalLLMPlatformImage';
+import ILocalLLMPlatformImage, { ContainerOptions } from './ILocalLLMPlatformImage';
 import LocalLLMPlatform from '../LocalLLMPlatform';
 import DataSourceItem from '../../../entities/data-sources/origin/DataSourceItem';
 
@@ -8,9 +8,7 @@ export default class LocalLLMPlatformImageLlamaCpp implements ILocalLLMPlatformI
 	public readonly cacheBindPath = '/root/.cache/llama.cpp';
 	public readonly healthEndpoint = 'health';
 	
-	public getContainerConfig(): ContainerConfig {
-		const { model, visionProjector } = LocalLLMPlatform.configuration;
-		const contextSize = LocalLLMPlatform.contextSize;
+	public getContainerOptions({ model, visionProjector, contextSize }: { model: string; visionProjector?: string, contextSize: number }): ContainerOptions {
 		const [hfRepo, hfFile] = model.includes('/') && model.endsWith('.gguf')
 			? [model.substring(0, model.lastIndexOf('/')), model.split('/').pop()!]
 			: [model, undefined];

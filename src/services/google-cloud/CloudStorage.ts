@@ -104,6 +104,10 @@ export default class CloudStorage {
 		}, `gcs.getContent "${uri}"`);
 	}
 	
+	public static async delete(uri: string): Promise<void> {
+		await this.file(uri).delete();
+	}
+	
 	private static get client(): Storage {
 		return this._client ??= new Storage();
 	}

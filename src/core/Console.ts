@@ -7,7 +7,7 @@ export default class Console {
 		PERF: 'PERF',
 	} as const;
 	
-	static output(type: string, ...args: any[]) {
+	public static output(type: string, ...args: any[]) {
 		if (type === this.OUTPUT_TYPE.DUMP && !Config.get('dataDumps')) return;
 		if (type === this.OUTPUT_TYPE.PERF && !Config.get('profiling')) return;
 		
@@ -17,11 +17,33 @@ export default class Console {
 				console.debug(`[${type}]`, ...args);
 				break;
 			case 'cli':
-				console.log(`[${type}]`, ...args);
+				process.stderr.write(`[${type}] ${args.map(arg =>
+					typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+				).join(' ')}\n`);
 				break;
 			default:
 				console.debug(`[${type}]`, ...args);
 				break;
 		}
+	}
+	
+	public static progress(value: number, max: number, label: string = '') {
+		if (process.env['PLEXUS_MODE'] !== 'cli') return;
+		
+		const MAX_PIPS = 20;
+		
+		const pips = Math.round((value / max) * MAX_PIPS);
+		process.stderr.write(`\r[${'='.repeat(pips)}${' '.repeat(Math.max(MAX_PIPS - pips, 0))}] ${label}`);
+	}
+	
+	public static activity(value: number, label: string = '') {
+		if (process.env['PLEXUS_MODE'] !== 'cli') return;
+		
+		const char = ['|', '/', '-', '\\'][value % 4];
+		process.stderr.write(`\r[${char}] ${label}`);
+	}
+	
+	public static done() {
+		if (process.env['PLEXUS_MODE'] === 'cli') process.stderr.write('\r\n');
 	}
 }
