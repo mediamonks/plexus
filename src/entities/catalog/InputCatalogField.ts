@@ -5,13 +5,14 @@ import UnknownError from '../error-handling/UnknownError';
 import Config from '../../core/Config';
 import Debug from '../../core/Debug';
 import RequestContext from '../../core/RequestContext';
-import { JsonField, InvokePayload, Configuration } from '../../types/common';
+import Configuration from '../../types/Configuration';
+import { JsonField, InvokePayload } from '../../types/common';
 import InputDataSourceItem from '../data-sources/origin/InputDataSourceItem';
 
 export default class InputCatalogField extends CatalogField {
 	static readonly Configuration: typeof CatalogField.BaseConfiguration & {
 		type: 'input';
-		field: string;
+		field?: string;
 		required?: boolean;
 		fileName?: string;
 		mimeType?: string;
@@ -22,9 +23,7 @@ export default class InputCatalogField extends CatalogField {
 	}
 
 	public get payloadField(): string {
-		if (!this.configuration.field) throw new CustomError(`Missing 'field' property for input field "${this.id}"`);
-		
-		return this.configuration.field;
+		return this.configuration.field ?? this.id;
 	}
 	
 	public get required(): boolean {

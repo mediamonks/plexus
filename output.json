@@ -1,0 +1,4465 @@
+{
+  "output": {
+    "product-data": [
+      {
+        "product_name": "Expert Multi Material Hole Saw, 14pc Set",
+        "sku_id": "2608900447",
+        "retail_price": "341.40",
+        "currency_code": "GBP",
+        "discount_group": null,
+        "included_products": [],
+        "source": "Hole Saws.pptx.pdf",
+        "image_page": 2,
+        "image_coordinates": [
+          0.19551371474258805,
+          0.03690044583320618,
+          0.7264144355773926,
+          0.36347958445548056
+        ]
+      },
+      {
+        "product_name": "Expert Multi Material Hole Saw, 13pc Set",
+        "sku_id": "2608900448",
+        "retail_price": "343.30",
+        "currency_code": "GBP",
+        "discount_group": null,
+        "included_products": [],
+        "source": "Hole Saws.pptx.pdf",
+        "image_page": 2,
+        "image_coordinates": [
+          0.19551371474258805,
+          0.03690044583320618,
+          0.7264144355773926,
+          0.36347958445548056
+        ]
+      },
+      {
+        "product_name": "EXPERT Tough Material Hole Saw Set, 15pcs",
+        "sku_id": "2608900489",
+        "retail_price": "289.32",
+        "currency_code": "GBP",
+        "discount_group": null,
+        "included_products": [],
+        "source": "Hole Saws.pptx.pdf",
+        "image_page": 3,
+        "image_coordinates": [
+          0.48000351786613465,
+          0.03868629665374756,
+          0.8370176553726196,
+          0.3788862717151642
+        ]
+      },
+      {
+        "product_name": "EXPERT Sheet Metal PC Plus Universal Hole Saw Set, 6pcs",
+        "sku_id": "2608900502",
+        "retail_price": "148.92",
+        "currency_code": "GBP",
+        "discount_group": null,
+        "included_products": [],
+        "source": "Hole Saws.pptx.pdf",
+        "image_page": 4,
+        "image_coordinates": [
+          0.48988524079322815,
+          0.03632273553550719,
+          0.8564413118362427,
+          0.37727950740451816
+        ]
+      },
+      {
+        "product_name": "PRO Multi Material PC Plus Hole Saw Set, 14 pcs",
+        "sku_id": "2608594425",
+        "retail_price": "199.64",
+        "currency_code": "GBP",
+        "discount_group": null,
+        "included_products": [],
+        "source": "Hole Saws.pptx.pdf",
+        "image_page": 5,
+        "image_coordinates": [
+          0.4839159894001007,
+          0.03572309374141693,
+          0.836915385723114,
+          0.37716622948646544
+        ]
+      },
+      {
+        "product_name": "PRO Multi Material PC Plus Hole Saw Set, 9 pcs",
+        "sku_id": "2608594435",
+        "retail_price": "118.79",
+        "currency_code": "GBP",
+        "discount_group": null,
+        "included_products": [],
+        "source": "Hole Saws.pptx.pdf",
+        "image_page": 6,
+        "image_coordinates": [
+          0.48511478304862976,
+          0.03661546105146408,
+          0.8364110064506531,
+          0.37727950740451816
+        ]
+      },
+      {
+        "product_name": "PRO Multi Material PC Plus Hole Saw Set, 14 pcs",
+        "sku_id": "2608594434",
+        "retail_price": "167.73",
+        "currency_code": "GBP",
+        "discount_group": null,
+        "included_products": [],
+        "source": "Hole Saws.pptx.pdf",
+        "image_page": 7,
+        "image_coordinates": [
+          0.48427080392837524,
+          0.03604207050204038,
+          0.837417101858139,
+          0.37776945245266
+        ]
+      },
+      {
+        "product_name": "Standard HSS Bi-Metal Hole Saw Plumbers 9pc Set",
+        "sku_id": "2608580803",
+        "retail_price": "70.00",
+        "currency_code": "GBP",
+        "discount_group": null,
+        "included_products": [],
+        "source": "Hole Saws.pptx.pdf",
+        "image_page": 8,
+        "image_coordinates": [
+          0.4707009434700012,
+          0.03616058987259865,
+          0.7784539455108643,
+          0.37777094710350034
+        ]
+      },
+      {
+        "product_name": "Standard HSS Bi-Metal Hole Saw Electricians 9pc Set",
+        "sku_id": "2608580804",
+        "retail_price": "70.00",
+        "currency_code": "GBP",
+        "discount_group": null,
+        "included_products": [],
+        "source": "Hole Saws.pptx.pdf",
+        "image_page": 8,
+        "image_coordinates": [
+          0.4707009434700012,
+          0.03616058987259865,
+          0.7784539455108643,
+          0.37777094710350034
+        ]
+      },
+      {
+        "product_name": "Hammer Drill SDS-Plus GBH 18V-18 X",
+        "sku_id": "0611927100",
+        "retail_price": "158.73",
+        "currency_code": "GBP",
+        "source": "GBH 18V-18 X & 22 X Sales Play_final_A.pdf",
+        "image_page": 3,
+        "image_coordinates": [
+          0.078,
+          0.065,
+          0.487,
+          0.347
+        ]
+      },
+      {
+        "product_name": "Hammer Drill SDS-Plus GBH 18V-18 X (2x 4.0Ah GBA, GAL 18V-40, Carry Case)",
+        "sku_id": "0611927170",
+        "retail_price": "320.72",
+        "currency_code": "GBP",
+        "source": "GBH 18V-18 X & 22 X Sales Play_final_A.pdf",
+        "image_page": 5,
+        "image_coordinates": [
+          0.684,
+          0.07,
+          0.827,
+          0.206
+        ]
+      },
+      {
+        "product_name": "Hammer Drill SDS-Plus GBH 18V-18 X (2x 5.0Ah GBA, GAL 18V-40, Carry Case)",
+        "sku_id": "0611927171",
+        "retail_price": "333.74",
+        "currency_code": "GBP",
+        "source": "GBH 18V-18 X & 22 X Sales Play_final_A.pdf",
+        "image_page": 5,
+        "image_coordinates": [
+          0.684,
+          0.07,
+          0.827,
+          0.206
+        ]
+      },
+      {
+        "product_name": "Hammer Drill SDS-Plus GBH 18V-22 X",
+        "sku_id": "0611924100",
+        "retail_price": "209.88",
+        "currency_code": "GBP",
+        "source": "GBH 18V-18 X & 22 X Sales Play_final_A.pdf",
+        "image_page": 3,
+        "image_coordinates": [
+          0.076,
+          0.66,
+          0.488,
+          0.931
+        ]
+      },
+      {
+        "product_name": "Hammer Drill SDS-Plus GBH 18V-22 X (2x 4.0Ah GBA, GAL 18V-40, L-BOXX)",
+        "sku_id": "0611924170",
+        "retail_price": "382.54",
+        "currency_code": "GBP",
+        "source": "GBH 18V-18 X & 22 X Sales Play_final_A.pdf",
+        "image_page": 5,
+        "image_coordinates": [
+          0.684,
+          0.205,
+          0.827,
+          0.341
+        ]
+      },
+      {
+        "product_name": "Hammer Drill SDS-Plus GBH 18V-22 X (2x 5.0Ah GBA, GAL 18V-40, L-BOXX)",
+        "sku_id": "0611924171",
+        "retail_price": "395.21",
+        "currency_code": "GBP",
+        "source": "GBH 18V-18 X & 22 X Sales Play_final_A.pdf",
+        "image_page": 5,
+        "image_coordinates": [
+          0.684,
+          0.205,
+          0.827,
+          0.341
+        ]
+      },
+      {
+        "product_name": "2 x ProCORE18V 5.5Ah + GAL 1880 CV Professional",
+        "sku_id": "1600A0214D",
+        "retail_price": "279.31",
+        "currency_code": "GBP",
+        "source": "GBH 18V-18 X & 22 X Sales Play_final_A.pdf",
+        "image_page": 5,
+        "image_coordinates": [
+          0.686,
+          0.344,
+          0.827,
+          0.466
+        ]
+      },
+      {
+        "product_name": "HEX-9 MultiConstruction",
+        "sku_id": "0615997616",
+        "retail_price": "435.72",
+        "currency_code": "GBP",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 3,
+        "image_coordinates": [
+          154,
+          177,
+          318,
+          489
+        ]
+      },
+      {
+        "product_name": "HEX-9 HardCeramic",
+        "sku_id": "0615997613",
+        "retail_price": "467.10",
+        "currency_code": "GBP",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 3,
+        "image_coordinates": [
+          329,
+          176,
+          492,
+          492
+        ]
+      },
+      {
+        "product_name": "Self Cut Speed Set",
+        "sku_id": "061599761E",
+        "retail_price": "146.35",
+        "currency_code": "GBP",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 3,
+        "image_coordinates": [
+          503,
+          177,
+          664,
+          490
+        ]
+      },
+      {
+        "product_name": "EXPERT S471 Standard Block Super Fine",
+        "sku_id": "2608901180",
+        "retail_price": "43.00",
+        "currency_code": "GBP",
+        "discount_group": "B13",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 4,
+        "image_coordinates": [
+          394,
+          500,
+          551,
+          733
+        ]
+      },
+      {
+        "product_name": "EXPERT S471 Standard Block Fine",
+        "sku_id": "2608901170",
+        "retail_price": "43.00",
+        "currency_code": "GBP",
+        "discount_group": "B13",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 4,
+        "image_coordinates": [
+          571,
+          500,
+          726,
+          734
+        ]
+      },
+      {
+        "product_name": "EXPERT S471 Standard Block Medium",
+        "sku_id": "2608901169",
+        "retail_price": "44.00",
+        "currency_code": "GBP",
+        "discount_group": "B13",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 4,
+        "image_coordinates": [
+          741,
+          500,
+          900,
+          735
+        ]
+      },
+      {
+        "product_name": "EXPERT S470 Combi Block Fine",
+        "sku_id": "2608901168",
+        "retail_price": "97.50",
+        "currency_code": "GBP",
+        "discount_group": "B13",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 5,
+        "image_coordinates": [
+          427,
+          187,
+          593,
+          420
+        ]
+      },
+      {
+        "product_name": "EXPERT S473 Flex Pad Medium",
+        "sku_id": "2608901171",
+        "retail_price": "43.00",
+        "currency_code": "GBP",
+        "discount_group": "B13",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 5,
+        "image_coordinates": [
+          426,
+          538,
+          593,
+          770
+        ]
+      },
+      {
+        "product_name": "EXPERT S473 Flex Pad Fine",
+        "sku_id": "2608901172",
+        "retail_price": "43.00",
+        "currency_code": "GBP",
+        "discount_group": "B13",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 5,
+        "image_coordinates": [
+          672,
+          184,
+          841,
+          421
+        ]
+      },
+      {
+        "product_name": "EXPERT S473 Flex Pad Super Fine",
+        "sku_id": "2608901173",
+        "retail_price": "43.00",
+        "currency_code": "GBP",
+        "discount_group": "B13",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 5,
+        "image_coordinates": [
+          671,
+          537,
+          840,
+          771
+        ]
+      },
+      {
+        "product_name": "M480 Dust-Free Sanding 125mm 3-Step Sanding Solution",
+        "sku_id": "061599761B",
+        "retail_price": "130.40",
+        "currency_code": "GBP",
+        "discount_group": "B13",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 6,
+        "image_coordinates": [
+          147,
+          177,
+          328,
+          492
+        ]
+      },
+      {
+        "product_name": "M480 Dust-Free Sanding 150mm 3-Step Sanding Solution",
+        "sku_id": "0615997612",
+        "retail_price": "151.30",
+        "currency_code": "GBP",
+        "discount_group": "B13",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 6,
+        "image_coordinates": [
+          335,
+          178,
+          502,
+          494
+        ]
+      },
+      {
+        "product_name": "X-LOCK Carbide Multi Wheel",
+        "sku_id": "2608901194",
+        "retail_price": "161.42",
+        "currency_code": "GBP",
+        "discount_group": "B13",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 6,
+        "image_coordinates": [
+          655,
+          516,
+          844,
+          760
+        ]
+      },
+      {
+        "product_name": "PRO Impact Screwdriving Set, 31pc",
+        "sku_id": "2608521071",
+        "retail_price": "267.54",
+        "currency_code": "GBP",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 8,
+        "image_coordinates": [
+          367,
+          183,
+          548,
+          493
+        ]
+      },
+      {
+        "product_name": "PRO Impact Screwdriving Set, 36pc",
+        "sku_id": "2608522517",
+        "retail_price": "334.44",
+        "currency_code": "GBP",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 8,
+        "image_coordinates": [
+          567,
+          185,
+          749,
+          492
+        ]
+      },
+      {
+        "product_name": "PRO Impact MC Mixed Set, 35pc",
+        "sku_id": "2608522518",
+        "retail_price": "334.44",
+        "currency_code": "GBP",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 8,
+        "image_coordinates": [
+          769,
+          183,
+          919,
+          495
+        ]
+      },
+      {
+        "product_name": "PRO Impact Metal Set, 35pc",
+        "sku_id": "2608521U80",
+        "retail_price": "334.44",
+        "currency_code": "GBP",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 8,
+        "image_coordinates": [
+          921,
+          183,
+          999,
+          496
+        ]
+      },
+      {
+        "product_name": "35pc Concrete Set",
+        "sku_id": "2607017724",
+        "retail_price": "214.08",
+        "currency_code": "GBP",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 9,
+        "image_coordinates": [
+          370,
+          510,
+          534,
+          767
+        ]
+      },
+      {
+        "product_name": "35pc Wood Set",
+        "sku_id": "2607017725",
+        "retail_price": "254.16",
+        "currency_code": "GBP",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 9,
+        "image_coordinates": [
+          557,
+          511,
+          719,
+          768
+        ]
+      },
+      {
+        "product_name": "35pc Metal Set",
+        "sku_id": "2607017726",
+        "retail_price": "254.16",
+        "currency_code": "GBP",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 9,
+        "image_coordinates": [
+          741,
+          511,
+          855,
+          768
+        ]
+      },
+      {
+        "product_name": "43pc Set",
+        "sku_id": "2607017723",
+        "retail_price": "200.70",
+        "currency_code": "GBP",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 9,
+        "image_coordinates": [
+          878,
+          511,
+          995,
+          768
+        ]
+      },
+      {
+        "product_name": "44+1 Set with handle",
+        "sku_id": "2607017733",
+        "retail_price": "177.85",
+        "currency_code": "GBP",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 9,
+        "image_coordinates": [
+          996,
+          510,
+          1111,
+          767
+        ]
+      },
+      {
+        "product_name": "Extra Hard TicTac Box Display, PH2",
+        "sku_id": "2607002797",
+        "retail_price": "102.50",
+        "currency_code": "GBP",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 10,
+        "image_coordinates": [
+          461,
+          185,
+          645,
+          416
+        ]
+      },
+      {
+        "product_name": "Extra Hard TicTac Box Display, PZ2",
+        "sku_id": "2607002798",
+        "retail_price": "102.50",
+        "currency_code": "GBP",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 10,
+        "image_coordinates": [
+          461,
+          473,
+          645,
+          704
+        ]
+      },
+      {
+        "product_name": "Extra Hard TicTac Box Display, T20",
+        "sku_id": "2607002799",
+        "retail_price": "102.50",
+        "currency_code": "GBP",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 10,
+        "image_coordinates": [
+          461,
+          761,
+          644,
+          992
+        ]
+      },
+      {
+        "product_name": "Extra Hard TicTac Box Display, T25",
+        "sku_id": "2607002800",
+        "retail_price": "102.50",
+        "currency_code": "GBP",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 10,
+        "image_coordinates": [
+          714,
+          185,
+          899,
+          417
+        ]
+      },
+      {
+        "product_name": "Extra Hard TicTac Box Display, T30",
+        "sku_id": "2607002801",
+        "retail_price": "102.50",
+        "currency_code": "GBP",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 10,
+        "image_coordinates": [
+          714,
+          473,
+          899,
+          705
+        ]
+      },
+      {
+        "product_name": "Extra Hard TicTac Box Display, T40",
+        "sku_id": "2607002802",
+        "retail_price": "102.50",
+        "currency_code": "GBP",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 10,
+        "image_coordinates": [
+          713,
+          760,
+          899,
+          993
+        ]
+      },
+      {
+        "product_name": "Impact Control TicTac Box Display, PH2",
+        "sku_id": "2607002803",
+        "retail_price": "125.00",
+        "currency_code": "GBP",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 11,
+        "image_coordinates": [
+          462,
+          175,
+          652,
+          358
+        ]
+      },
+      {
+        "product_name": "Impact Control TicTac Box Display, PZ2",
+        "sku_id": "2607002804",
+        "retail_price": "125.00",
+        "currency_code": "GBP",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 11,
+        "image_coordinates": [
+          463,
+          381,
+          654,
+          567
+        ]
+      },
+      {
+        "product_name": "Impact Control TicTac Box Display, T20",
+        "sku_id": "2607002805",
+        "retail_price": "125.00",
+        "currency_code": "GBP",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 11,
+        "image_coordinates": [
+          464,
+          592,
+          654,
+          777
+        ]
+      },
+      {
+        "product_name": "Impact Control TicTac Box Display, T25",
+        "sku_id": "2607002806",
+        "retail_price": "125.00",
+        "currency_code": "GBP",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 11,
+        "image_coordinates": [
+          714,
+          175,
+          904,
+          358
+        ]
+      },
+      {
+        "product_name": "Impact Control TicTac Box Display, T30",
+        "sku_id": "2607002807",
+        "retail_price": "125.00",
+        "currency_code": "GBP",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 11,
+        "image_coordinates": [
+          715,
+          377,
+          905,
+          565
+        ]
+      },
+      {
+        "product_name": "50pc Screwdriving Set",
+        "sku_id": "2607012081",
+        "retail_price": "213.48",
+        "currency_code": "GBP",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 12,
+        "image_coordinates": [
+          409,
+          498,
+          573,
+          727
+        ]
+      },
+      {
+        "product_name": "32pc Screwdriving Bit Set PRO",
+        "sku_id": "2607017319",
+        "retail_price": "210.00",
+        "currency_code": "GBP",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 12,
+        "image_coordinates": [
+          626,
+          498,
+          789,
+          729
+        ]
+      },
+      {
+        "product_name": "6pc Nutsetter Set",
+        "sku_id": "2608551079",
+        "retail_price": "357.80",
+        "currency_code": "GBP",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 12,
+        "image_coordinates": [
+          841,
+          498,
+          997,
+          729
+        ]
+      },
+      {
+        "product_name": "Precision Screwdriver Bit Set",
+        "sku_id": "2607002837",
+        "retail_price": "171.30",
+        "currency_code": "GBP",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 13,
+        "image_coordinates": [
+          404,
+          499,
+          564,
+          732
+        ]
+      },
+      {
+        "product_name": "Easy Fit Handle for Sabre Saw Blades",
+        "sku_id": "2608000495",
+        "retail_price": "366.00",
+        "currency_code": "GBP",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 13,
+        "image_coordinates": [
+          704,
+          499,
+          882,
+          731
+        ]
+      },
+      {
+        "product_name": "Starlock Dumpbin 50pc Set",
+        "sku_id": "061599760C",
+        "retail_price": "645.60",
+        "currency_code": "GBP",
+        "discount_group": "BR Group B",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 14,
+        "image_coordinates": [
+          608,
+          505,
+          807,
+          777
+        ]
+      },
+      {
+        "product_name": "Starlock Best of Cutting 5pc Set",
+        "sku_id": "2608664131",
+        "retail_price": "336.05",
+        "currency_code": "GBP",
+        "discount_group": "B11",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 15,
+        "image_coordinates": [
+          401,
+          178,
+          589,
+          409
+        ]
+      },
+      {
+        "product_name": "Starlock for Renovation 5pc Set",
+        "sku_id": "2608664624",
+        "retail_price": "369.05",
+        "currency_code": "GBP",
+        "discount_group": "B11",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 15,
+        "image_coordinates": [
+          401,
+          518,
+          589,
+          749
+        ]
+      },
+      {
+        "product_name": "Starlock Best of Heavy Duty 4pc Set",
+        "sku_id": "2608664132",
+        "retail_price": "377.35",
+        "currency_code": "GBP",
+        "discount_group": "B11",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 15,
+        "image_coordinates": [
+          634,
+          178,
+          821,
+          409
+        ]
+      },
+      {
+        "product_name": "Starlock Best of Sanding 3pc Set",
+        "sku_id": "2608664133",
+        "retail_price": "349.85",
+        "currency_code": "GBP",
+        "discount_group": "B11",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 15,
+        "image_coordinates": [
+          633,
+          518,
+          821,
+          748
+        ]
+      },
+      {
+        "product_name": "Starlock for Electrician & Drywall 6pc Set",
+        "sku_id": "2608664622",
+        "retail_price": "369.05",
+        "currency_code": "GBP",
+        "discount_group": "B11",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 15,
+        "image_coordinates": [
+          855,
+          177,
+          998,
+          409
+        ]
+      },
+      {
+        "product_name": "Starlock for Wood 7pc Set",
+        "sku_id": "2608664623",
+        "retail_price": "369.05",
+        "currency_code": "GBP",
+        "discount_group": "B11",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 15,
+        "image_coordinates": [
+          854,
+          519,
+          999,
+          751
+        ]
+      },
+      {
+        "product_name": "Starlock 5+1 CTU 6pc Set",
+        "sku_id": "2608664677",
+        "retail_price": "396.10",
+        "currency_code": "GBP",
+        "discount_group": "B11",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 16,
+        "image_coordinates": [
+          442,
+          183,
+          617,
+          430
+        ]
+      },
+      {
+        "product_name": "Starlock 8+1 CTU 9pc Set",
+        "sku_id": "2608669146",
+        "retail_price": "691.70",
+        "currency_code": "GBP",
+        "discount_group": "B11",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 16,
+        "image_coordinates": [
+          443,
+          525,
+          617,
+          774
+        ]
+      },
+      {
+        "product_name": "Starlock Tiling 3pc Set",
+        "sku_id": "2608662342",
+        "retail_price": "273.30",
+        "currency_code": "GBP",
+        "discount_group": "B11",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 16,
+        "image_coordinates": [
+          708,
+          184,
+          886,
+          431
+        ]
+      },
+      {
+        "product_name": "Starlock Wood and Metal 3pc Set",
+        "sku_id": "2608662343",
+        "retail_price": "299.70",
+        "currency_code": "GBP",
+        "discount_group": "B11",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 16,
+        "image_coordinates": [
+          708,
+          526,
+          886,
+          775
+        ]
+      },
+      {
+        "product_name": "XLOCK 115mm Diamond Blade Twinpack",
+        "sku_id": "0615997625",
+        "retail_price": "27.62",
+        "currency_code": "GBP",
+        "discount_group": "B15",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 17,
+        "image_coordinates": [
+          358,
+          178,
+          544,
+          408
+        ]
+      },
+      {
+        "product_name": "115mm Diamond Blade Twin Pack",
+        "sku_id": "06159975S9",
+        "retail_price": "27.62",
+        "currency_code": "GBP",
+        "discount_group": "B15",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 17,
+        "image_coordinates": [
+          358,
+          520,
+          544,
+          751
+        ]
+      },
+      {
+        "product_name": "230mm Diamond Blade Twin Pack",
+        "sku_id": "06159975T0",
+        "retail_price": "64.46",
+        "currency_code": "GBP",
+        "discount_group": "B15",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 17,
+        "image_coordinates": [
+          358,
+          780,
+          544,
+          996
+        ]
+      },
+      {
+        "product_name": "XLOCK 115mm Diamond Blade Twin Pack Display Unit",
+        "sku_id": "2608615246",
+        "retail_price": "331.44",
+        "currency_code": "GBP",
+        "discount_group": "B15",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 17,
+        "image_coordinates": [
+          618,
+          179,
+          793,
+          424
+        ]
+      },
+      {
+        "product_name": "115mm Diamond Blade Twin Pack Display Unit",
+        "sku_id": "2608615057",
+        "retail_price": "497.16",
+        "currency_code": "GBP",
+        "discount_group": "B15",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 17,
+        "image_coordinates": [
+          617,
+          518,
+          793,
+          767
+        ]
+      },
+      {
+        "product_name": "SDS Clic Nut Display 15pc",
+        "sku_id": "2607019033",
+        "retail_price": "420.56",
+        "currency_code": "GBP",
+        "discount_group": "B15",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 17,
+        "image_coordinates": [
+          618,
+          778,
+          792,
+          998
+        ]
+      },
+      {
+        "product_name": "115mm Bonded Tins",
+        "sku_id": "2608619266",
+        "retail_price": "137.50",
+        "currency_code": "GBP",
+        "discount_group": "B11",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 18,
+        "image_coordinates": [
+          677,
+          187,
+          857,
+          424
+        ]
+      },
+      {
+        "product_name": "125mm Bonded Tins",
+        "sku_id": "2608619267",
+        "retail_price": "158.20",
+        "currency_code": "GBP",
+        "discount_group": "B11",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf",
+        "image_page": 18,
+        "image_coordinates": [
+          676,
+          530,
+          856,
+          774
+        ]
+      },
+      {
+        "product_name": "Hammer Drill SDS-Plus GBH 18V-18 X",
+        "sku_id": "0611927100",
+        "retail_price": "158.73",
+        "currency_code": "GBP",
+        "source": "GBH 18V-18 X & 22 X Sales Play_final_version.pptx.pdf",
+        "image_page": 10,
+        "image_coordinates": [
+          351,
+          341,
+          499,
+          506
+        ]
+      },
+      {
+        "product_name": "Hammer Drill SDS-Plus GBH 18V-22 X",
+        "sku_id": "0611924100",
+        "retail_price": "209.88",
+        "currency_code": "GBP",
+        "source": "GBH 18V-18 X & 22 X Sales Play_final_version.pptx.pdf",
+        "image_page": 12,
+        "image_coordinates": [
+          343,
+          370,
+          498,
+          521
+        ]
+      },
+      {
+        "product_name": "ProCORE18V 5.5Ah + GAL 1880 CV Professional",
+        "sku_id": "1600A0214D",
+        "source": "GBH 18V-18 X & 22 X Sales Play_final_version.pptx.pdf",
+        "image_page": 5,
+        "image_coordinates": [
+          797,
+          279,
+          872,
+          462
+        ]
+      },
+      {
+        "product_name": "GBA 18V 4.0Ah battery",
+        "source": "GBH 18V-18 X & 22 X Sales Play_final_version.pptx.pdf",
+        "image_page": 5,
+        "image_coordinates": [
+          797,
+          799,
+          869,
+          937
+        ]
+      },
+      {
+        "product_name": "1m & 2m Stand Planograms",
+        "sku_id": "1m2mStandPlanograms",
+        "source": "AC Stands - 1m, 2m planograms.pptx.pdf",
+        "image_page": 1,
+        "image_coordinates": [
+          0.07585106382978724,
+          0.00197605779267404,
+          0.9999694520872906,
+          0.9978363414269863
+        ]
+      },
+      {
+        "product_name": "EXPERT Tough Material Hole Saw 14pcs Set",
+        "sku_id": "2608900447",
+        "retail_price": "341.40",
+        "currency_code": "GBP",
+        "source": "Sales Play_Electricians_GBP.pptx.pdf",
+        "image_page": 4,
+        "image_coordinates": [
+          0.0844,
+          0.0741,
+          0.4745,
+          0.4755
+        ]
+      },
+      {
+        "product_name": "BOSCH HSS Bi-Metal Hole Saw 9pcs Set for electricians",
+        "sku_id": "2608580804",
+        "retail_price": "70.00",
+        "currency_code": "GBP",
+        "source": "Sales Play_Electricians_GBP.pptx.pdf",
+        "image_page": 4,
+        "image_coordinates": [
+          0.0739,
+          0.5343,
+          0.4869,
+          0.9295
+        ]
+      },
+      {
+        "product_name": "VDE ELECTRICIAN 37pcs SET",
+        "sku_id": "1600A02NG4",
+        "retail_price": "406.19",
+        "currency_code": "GBP",
+        "source": "Sales Play_Electricians_GBP.pptx.pdf",
+        "image_page": 6,
+        "image_coordinates": [
+          0.1146,
+          0.1049,
+          0.7708,
+          0.4725
+        ]
+      },
+      {
+        "product_name": "EXPERT Carbide Multi Wheel CTU",
+        "sku_id": "2608901194",
+        "retail_price": "161.42",
+        "currency_code": "GBP",
+        "source": "Sales Play_Electricians_GBP.pptx.pdf",
+        "image_page": 8,
+        "image_coordinates": [
+          0.1786,
+          0.1036,
+          0.4714,
+          0.4545
+        ]
+      },
+      {
+        "product_name": "Carbide Multi Wheel",
+        "sku_id": "2608901193",
+        "retail_price": "60.05",
+        "currency_code": "GBP",
+        "source": "Sales Play_Electricians_GBP.pptx.pdf",
+        "image_page": 7,
+        "image_coordinates": [
+          0.1458,
+          0.0708,
+          0.7698,
+          0.3521
+        ]
+      },
+      {
+        "product_name": "32-piece screwdriver bit set PH, PZ, H, T and Quick-Change Universal Holder",
+        "sku_id": "2607017319",
+        "retail_price": "244.19",
+        "currency_code": "EUR",
+        "discount_group": "10",
+        "source": "RA_Sales Play_AC CTUs_EUR.pdf",
+        "image_page": 5,
+        "image_coordinates": [
+          0.13543024,
+          0.13785157,
+          0.24487472,
+          0.2543296
+        ]
+      },
+      {
+        "product_name": "Extra Hard Screwdriver Bit Set, 43 pcs",
+        "sku_id": "2607017723",
+        "retail_price": "233.37",
+        "currency_code": "EUR",
+        "discount_group": "6",
+        "source": "RA_Sales Play_AC CTUs_EUR.pdf",
+        "image_page": 5,
+        "image_coordinates": [
+          0.31785774,
+          0.13766054,
+          0.44086814,
+          0.25472608
+        ]
+      },
+      {
+        "product_name": "PRO Impact MC Mixed Set, 35pc",
+        "sku_id": "2608522518",
+        "retail_price": "388.88",
+        "currency_code": "EUR",
+        "discount_group": "6",
+        "source": "RA_Sales Play_AC CTUs_EUR.pdf",
+        "image_page": 5,
+        "image_coordinates": [
+          0.47988514,
+          0.13825985,
+          0.5894115,
+          0.2551224
+        ]
+      },
+      {
+        "product_name": "Precision Screwdriver Bit 43pc Set",
+        "sku_id": "2607002837",
+        "retail_price": "199.19",
+        "currency_code": "EUR",
+        "discount_group": "5",
+        "source": "RA_Sales Play_AC CTUs_EUR.pdf",
+        "image_page": 5,
+        "image_coordinates": [
+          0.6324952,
+          0.13825985,
+          0.75174745,
+          0.2551224
+        ]
+      },
+      {
+        "product_name": "EXPERT Carbide Multi Wheel X-LOCK Cutting Disc 115 mm, 22.23 mm",
+        "sku_id": "2608901194",
+        "retail_price": "187.70",
+        "currency_code": "EUR",
+        "discount_group": "10",
+        "source": "RA_Sales Play_AC CTUs_EUR.pdf",
+        "image_page": 5,
+        "image_coordinates": [
+          0.7860307,
+          0.13606834,
+          0.87654633,
+          0.25364335
+        ]
+      },
+      {
+        "product_name": "Self Cut Speed 6pc Set",
+        "sku_id": "061599761E",
+        "retail_price": "170.17",
+        "currency_code": "EUR",
+        "discount_group": "5",
+        "source": "RA_Sales Play_AC CTUs_EUR.pdf",
+        "image_page": 6,
+        "image_coordinates": [
+          0.15528996,
+          0.13806882,
+          0.23682762,
+          0.25345234
+        ]
+      },
+      {
+        "product_name": "Bonded Tins X-LOCK Standard for Inox Straight Cutting Disc Tin",
+        "sku_id": "2608619266",
+        "retail_price": "159.88",
+        "currency_code": "EUR",
+        "discount_group": "10",
+        "source": "RA_Sales Play_AC CTUs_EUR.pdf",
+        "image_page": 6,
+        "image_coordinates": [
+          0.28405004,
+          0.13806882,
+          0.36142943,
+          0.25364335
+        ]
+      },
+      {
+        "product_name": "Starlock Dumpbin Set",
+        "sku_id": "061599760C",
+        "retail_price": "750.70",
+        "currency_code": "EUR",
+        "discount_group": "50",
+        "source": "RA_Sales Play_AC CTUs_EUR.pdf",
+        "image_page": 6,
+        "image_coordinates": [
+          0.42974427,
+          0.13766054,
+          0.5239303,
+          0.25383434
+        ]
+      },
+      {
+        "product_name": "5 + 1 Starlock Wood and Metal Multi Tool Blade Set",
+        "sku_id": "2608664677",
+        "retail_price": "460.58",
+        "currency_code": "EUR",
+        "discount_group": "10",
+        "source": "RA_Sales Play_AC CTUs_EUR.pdf",
+        "image_page": 6,
+        "image_coordinates": [
+          0.5647377,
+          0.13785157,
+          0.6605578,
+          0.25364335
+        ]
+      },
+      {
+        "product_name": "Starlock Basic Wood and Metal set 3pc set",
+        "sku_id": "2608662343",
+        "retail_price": "348.49",
+        "currency_code": "EUR",
+        "discount_group": "10",
+        "source": "RA_Sales Play_AC CTUs_EUR.pdf",
+        "image_page": 6,
+        "image_coordinates": [
+          0.7066654,
+          0.13785157,
+          0.7858284,
+          0.25364335
+        ]
+      },
+      {
+        "product_name": "32-piece screwdriver bit set PH, PZ, H, T and Quick-Change Universal Holder",
+        "sku_id": "2607017319",
+        "retail_price": "69.99",
+        "currency_code": "GBP",
+        "discount_group": "10",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf",
+        "image_page": 5,
+        "image_coordinates": [
+          0.173,
+          0.175,
+          0.277,
+          0.269
+        ]
+      },
+      {
+        "product_name": "Extra Hard Screwdriver Bit Set, 43 pcs",
+        "sku_id": "2607017723",
+        "retail_price": "76.31",
+        "currency_code": "GBP",
+        "discount_group": "6",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf",
+        "image_page": 5,
+        "image_coordinates": [
+          0.281,
+          0.175,
+          0.386,
+          0.27
+        ]
+      },
+      {
+        "product_name": "PRO Impact MC Mixed Set, 35pc",
+        "sku_id": "2608522518",
+        "retail_price": "127.09",
+        "currency_code": "GBP",
+        "discount_group": "6",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf",
+        "image_page": 5,
+        "image_coordinates": [
+          0.39,
+          0.176,
+          0.5,
+          0.27
+        ]
+      },
+      {
+        "product_name": "Precision Screwdriver Bit 43pc Set",
+        "sku_id": "2607002837",
+        "retail_price": "72.45",
+        "currency_code": "GBP",
+        "discount_group": "5",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf",
+        "image_page": 5,
+        "image_coordinates": [
+          0.504,
+          0.176,
+          0.597,
+          0.271
+        ]
+      },
+      {
+        "product_name": "EXPERT Carbide Multi Wheel X-LOCK Cutting Disc 115 mm, 22.23 mm",
+        "sku_id": "2608901194",
+        "retail_price": "60.99",
+        "currency_code": "GBP",
+        "discount_group": "10",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf",
+        "image_page": 5,
+        "image_coordinates": [
+          0.653,
+          0.18,
+          0.752,
+          0.265
+        ]
+      },
+      {
+        "product_name": "Self Cut Speed 6pc Set",
+        "sku_id": "061599761E",
+        "retail_price": "55.99",
+        "currency_code": "GBP",
+        "discount_group": "5",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf",
+        "image_page": 6,
+        "image_coordinates": [
+          0.182,
+          0.169,
+          0.275,
+          0.267
+        ]
+      },
+      {
+        "product_name": "Bonded Tins X-LOCK Standard for Inox Straight Cutting Disc Tin",
+        "sku_id": "2608619266",
+        "retail_price": "41.99",
+        "currency_code": "GBP",
+        "discount_group": "10",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf",
+        "image_page": 6,
+        "image_coordinates": [
+          0.3,
+          0.173,
+          0.392,
+          0.266
+        ]
+      },
+      {
+        "product_name": "Starlock Dumpbin Set",
+        "sku_id": "061599760C",
+        "retail_price": "229.99",
+        "currency_code": "GBP",
+        "discount_group": "50",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf",
+        "image_page": 6,
+        "image_coordinates": [
+          0.434,
+          0.175,
+          0.541,
+          0.267
+        ]
+      },
+      {
+        "product_name": "5 + 1 Starlock Wood and Metal Multi Tool Blade Set",
+        "sku_id": "2608664677",
+        "retail_price": "154.99",
+        "currency_code": "GBP",
+        "discount_group": "10",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf",
+        "image_page": 6,
+        "image_coordinates": [
+          0.577,
+          0.174,
+          0.673,
+          0.267
+        ]
+      },
+      {
+        "product_name": "Starlock Basic Wood and Metal set 3pc set",
+        "sku_id": "2608662343",
+        "retail_price": "89.99",
+        "currency_code": "GBP",
+        "discount_group": "10",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf",
+        "image_page": 6,
+        "image_coordinates": [
+          0.706,
+          0.176,
+          0.794,
+          0.266
+        ]
+      },
+      {
+        "product_name": "Hammer Drill SDS-Plus GBH 18V-18 X",
+        "sku_id": "0611927100",
+        "retail_price": "158.73",
+        "currency_code": "GBP",
+        "source": "GBH 18V-18 X & 22 X Sales Play_final_BPP.pdf",
+        "image_page": 3,
+        "image_coordinates": [
+          0.063671875,
+          0.040625,
+          0.44375,
+          0.365625
+        ]
+      },
+      {
+        "product_name": "Hammer Drill SDS-Plus GBH 18V-18 X (2x 4.0Ah GBA, GAL 18V-40, Carry Case)",
+        "sku_id": "0611927170",
+        "retail_price": "320.72",
+        "currency_code": "GBP",
+        "included_products": [
+          "0611927100"
+        ],
+        "source": "GBH 18V-18 X & 22 X Sales Play_final_BPP.pdf",
+        "image_page": 3,
+        "image_coordinates": [
+          0.063671875,
+          0.040625,
+          0.44375,
+          0.365625
+        ]
+      },
+      {
+        "product_name": "Hammer Drill SDS-Plus GBH 18V-18 X (2x 5.0Ah GBA, GAL 18V-40, Carry Case)",
+        "sku_id": "0611927171",
+        "retail_price": "333.74",
+        "currency_code": "GBP",
+        "included_products": [
+          "0611927100"
+        ],
+        "source": "GBH 18V-18 X & 22 X Sales Play_final_BPP.pdf",
+        "image_page": 3,
+        "image_coordinates": [
+          0.063671875,
+          0.040625,
+          0.44375,
+          0.365625
+        ]
+      },
+      {
+        "product_name": "Hammer Drill SDS-Plus GBH 18V-22 X",
+        "sku_id": "0611924100",
+        "retail_price": "209.88",
+        "currency_code": "GBP",
+        "source": "GBH 18V-18 X & 22 X Sales Play_final_BPP.pdf",
+        "image_page": 3,
+        "image_coordinates": [
+          0.053125,
+          0.621875,
+          0.43359375,
+          0.940625
+        ]
+      },
+      {
+        "product_name": "Hammer Drill SDS-Plus GBH 18V-22 X (2x 4.0Ah GBA, GAL 18V-40, L-BOXX)",
+        "sku_id": "0611924170",
+        "retail_price": "382.54",
+        "currency_code": "GBP",
+        "included_products": [
+          "0611924100"
+        ],
+        "source": "GBH 18V-18 X & 22 X Sales Play_final_BPP.pdf",
+        "image_page": 3,
+        "image_coordinates": [
+          0.053125,
+          0.621875,
+          0.43359375,
+          0.940625
+        ]
+      },
+      {
+        "product_name": "Hammer Drill SDS-Plus GBH 18V-22 X (2x 5.0Ah GBA, GAL 18V-40, L-BOXX)",
+        "sku_id": "0611924171",
+        "retail_price": "395.21",
+        "currency_code": "GBP",
+        "included_products": [
+          "0611924100"
+        ],
+        "source": "GBH 18V-18 X & 22 X Sales Play_final_BPP.pdf",
+        "image_page": 3,
+        "image_coordinates": [
+          0.053125,
+          0.621875,
+          0.43359375,
+          0.940625
+        ]
+      },
+      {
+        "product_name": "2 x ProCORE18V 5.5Ah + GAL 1880 CV Professional",
+        "sku_id": "1600A0214D",
+        "retail_price": "279.31",
+        "currency_code": "GBP",
+        "source": "GBH 18V-18 X & 22 X Sales Play_final_BPP.pdf",
+        "image_page": 5,
+        "image_coordinates": [
+          0.696875,
+          0.2015625,
+          0.8578125,
+          0.3421875
+        ]
+      }
+    ],
+    "promotion-data": [
+      {
+        "sku_id": "2608900447",
+        "promotion_type": "discount",
+        "promotion_unit": "%",
+        "promotion_amount": 65,
+        "end_date": "2025-04-23",
+        "condition": "Promo includes: 14pc Set & 13pc Set",
+        "source": "Hole Saws.pptx.pdf"
+      },
+      {
+        "sku_id": "2608900448",
+        "promotion_type": "discount",
+        "promotion_unit": "%",
+        "promotion_amount": 65,
+        "end_date": "2025-04-23",
+        "condition": "Promo includes: 14pc Set & 13pc Set",
+        "source": "Hole Saws.pptx.pdf"
+      },
+      {
+        "sku_id": "2608900489",
+        "promotion_type": "discount",
+        "promotion_unit": "%",
+        "promotion_amount": 65,
+        "end_date": "2025-04-23",
+        "condition": "Promo includes: 15pc Set",
+        "source": "Hole Saws.pptx.pdf"
+      },
+      {
+        "sku_id": "2608900502",
+        "promotion_type": "discount",
+        "promotion_unit": "%",
+        "promotion_amount": 66,
+        "end_date": "2025-04-23",
+        "condition": "Promo includes: 6pc Set",
+        "source": "Hole Saws.pptx.pdf"
+      },
+      {
+        "sku_id": "2608594425",
+        "promotion_type": "discount",
+        "promotion_unit": "%",
+        "promotion_amount": 65,
+        "end_date": "2025-04-23",
+        "condition": "Promo includes: 14pc Set",
+        "source": "Hole Saws.pptx.pdf"
+      },
+      {
+        "sku_id": "2608594435",
+        "promotion_type": "discount",
+        "promotion_unit": "%",
+        "promotion_amount": 65,
+        "end_date": "2025-04-23",
+        "condition": "Promo includes: 9pc Set",
+        "source": "Hole Saws.pptx.pdf"
+      },
+      {
+        "sku_id": "2608594434",
+        "promotion_type": "discount",
+        "promotion_unit": "%",
+        "promotion_amount": 65,
+        "end_date": "2025-04-23",
+        "condition": "Promo includes: 14pc Set",
+        "source": "Hole Saws.pptx.pdf"
+      },
+      {
+        "sku_id": "2608580803",
+        "promotion_type": "discount",
+        "promotion_unit": "%",
+        "promotion_amount": 64,
+        "end_date": "2025-04-23",
+        "condition": "Promo includes: Plumbers 9pc Set & Electricians 9pc Set",
+        "source": "Hole Saws.pptx.pdf"
+      },
+      {
+        "sku_id": "2608580804",
+        "promotion_type": "discount",
+        "promotion_unit": "%",
+        "promotion_amount": 64,
+        "end_date": "2025-04-23",
+        "condition": "Promo includes: Plumbers 9pc Set & Electricians 9pc Set",
+        "source": "Hole Saws.pptx.pdf"
+      },
+      {
+        "sku_id": "0615997616",
+        "promotion_type": "discount",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "0615997613",
+        "promotion_type": "discount",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "061599761E",
+        "promotion_type": "discount",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608901180",
+        "promotion_type": "discount",
+        "discount_group": "B13",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608901170",
+        "promotion_type": "discount",
+        "discount_group": "B13",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608901169",
+        "promotion_type": "discount",
+        "discount_group": "B13",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608901168",
+        "promotion_type": "discount",
+        "discount_group": "B13",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608901171",
+        "promotion_type": "discount",
+        "discount_group": "B13",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608901172",
+        "promotion_type": "discount",
+        "discount_group": "B13",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608901173",
+        "promotion_type": "discount",
+        "discount_group": "B13",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "061599761B",
+        "promotion_type": "discount",
+        "discount_group": "B13",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "0615997612",
+        "promotion_type": "discount",
+        "discount_group": "B13",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608901194",
+        "promotion_type": "discount",
+        "discount_group": "B13",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608521071",
+        "promotion_type": "discount",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608522517",
+        "promotion_type": "discount",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608522518",
+        "promotion_type": "discount",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608521U80",
+        "promotion_type": "discount",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607017724",
+        "promotion_type": "discount",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607017725",
+        "promotion_type": "discount",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607017726",
+        "promotion_type": "discount",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607017723",
+        "promotion_type": "discount",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607017733",
+        "promotion_type": "discount",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607002797",
+        "promotion_type": "discount",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607002798",
+        "promotion_type": "discount",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607002799",
+        "promotion_type": "discount",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607002800",
+        "promotion_type": "discount",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607002801",
+        "promotion_type": "discount",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607002802",
+        "promotion_type": "discount",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607002803",
+        "promotion_type": "discount",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607002804",
+        "promotion_type": "discount",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607002805",
+        "promotion_type": "discount",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607002806",
+        "promotion_type": "discount",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607002807",
+        "promotion_type": "discount",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607012081",
+        "promotion_type": "discount",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607017319",
+        "promotion_type": "discount",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608551079",
+        "promotion_type": "discount",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607002837",
+        "promotion_type": "discount",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607017733",
+        "promotion_type": "discount",
+        "discount_group": "B14",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "061599760C",
+        "promotion_type": "discount",
+        "discount_group": "BR Group B",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608664131",
+        "promotion_type": "discount",
+        "discount_group": "B11",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608664624",
+        "promotion_type": "discount",
+        "discount_group": "B11",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608664132",
+        "promotion_type": "discount",
+        "discount_group": "B11",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608664133",
+        "promotion_type": "discount",
+        "discount_group": "B11",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608664622",
+        "promotion_type": "discount",
+        "discount_group": "B11",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608664623",
+        "promotion_type": "discount",
+        "discount_group": "B11",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608664677",
+        "promotion_type": "discount",
+        "discount_group": "B11",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608669146",
+        "promotion_type": "discount",
+        "discount_group": "B11",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608662342",
+        "promotion_type": "discount",
+        "discount_group": "B11",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608662343",
+        "promotion_type": "discount",
+        "discount_group": "B11",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "0615997625",
+        "promotion_type": "discount",
+        "discount_group": "B15",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "06159975S9",
+        "promotion_type": "discount",
+        "discount_group": "B15",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "06159975T0",
+        "promotion_type": "discount",
+        "discount_group": "B15",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608615246",
+        "promotion_type": "discount",
+        "discount_group": "B15",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608615057",
+        "promotion_type": "discount",
+        "discount_group": "B15",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607019033",
+        "promotion_type": "discount",
+        "discount_group": "B15",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608619266",
+        "promotion_type": "discount",
+        "discount_group": "B11",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608619267",
+        "promotion_type": "discount",
+        "discount_group": "B11",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607017319",
+        "promotion_type": "discount",
+        "discount_group": "10",
+        "source": "RA_Sales Play_AC CTUs_EUR.pdf"
+      },
+      {
+        "sku_id": "2607017723",
+        "promotion_type": "discount",
+        "discount_group": "6",
+        "source": "RA_Sales Play_AC CTUs_EUR.pdf"
+      },
+      {
+        "sku_id": "2608522518",
+        "promotion_type": "discount",
+        "discount_group": "6",
+        "source": "RA_Sales Play_AC CTUs_EUR.pdf"
+      },
+      {
+        "sku_id": "2607002837",
+        "promotion_type": "discount",
+        "discount_group": "5",
+        "source": "RA_Sales Play_AC CTUs_EUR.pdf"
+      },
+      {
+        "sku_id": "2608901194",
+        "promotion_type": "discount",
+        "discount_group": "10",
+        "source": "RA_Sales Play_AC CTUs_EUR.pdf"
+      },
+      {
+        "sku_id": "061599761E",
+        "promotion_type": "discount",
+        "discount_group": "5",
+        "source": "RA_Sales Play_AC CTUs_EUR.pdf"
+      },
+      {
+        "sku_id": "2608619266",
+        "promotion_type": "discount",
+        "discount_group": "10",
+        "source": "RA_Sales Play_AC CTUs_EUR.pdf"
+      },
+      {
+        "sku_id": "061599760C",
+        "promotion_type": "discount",
+        "discount_group": "50",
+        "source": "RA_Sales Play_AC CTUs_EUR.pdf"
+      },
+      {
+        "sku_id": "2608664677",
+        "promotion_type": "discount",
+        "discount_group": "10",
+        "source": "RA_Sales Play_AC CTUs_EUR.pdf"
+      },
+      {
+        "sku_id": "2608662343",
+        "promotion_type": "discount",
+        "discount_group": "10",
+        "source": "RA_Sales Play_AC CTUs_EUR.pdf"
+      },
+      {
+        "sku_id": "2607017319",
+        "promotion_type": "discount",
+        "discount_group": "10",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "2607017723",
+        "promotion_type": "discount",
+        "discount_group": "6",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "2608522518",
+        "promotion_type": "discount",
+        "discount_group": "6",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "2607002837",
+        "promotion_type": "discount",
+        "discount_group": "5",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "2608901194",
+        "promotion_type": "discount",
+        "discount_group": "10",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "061599761E",
+        "promotion_type": "discount",
+        "discount_group": "5",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "2608619266",
+        "promotion_type": "discount",
+        "discount_group": "10",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "061599760C",
+        "promotion_type": "discount",
+        "discount_group": "50",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "2608664677",
+        "promotion_type": "discount",
+        "discount_group": "10",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "2608662343",
+        "promotion_type": "discount",
+        "discount_group": "10",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "0611927170",
+        "promotion_type": "discount",
+        "condition": "included with SKU 0611927100",
+        "source": "GBH 18V-18 X & 22 X Sales Play_final_BPP.pdf"
+      },
+      {
+        "sku_id": "0611927171",
+        "promotion_type": "discount",
+        "condition": "included with SKU 0611927100",
+        "source": "GBH 18V-18 X & 22 X Sales Play_final_BPP.pdf"
+      },
+      {
+        "sku_id": "0611924170",
+        "promotion_type": "discount",
+        "condition": "included with SKU 0611924100",
+        "source": "GBH 18V-18 X & 22 X Sales Play_final_BPP.pdf"
+      },
+      {
+        "sku_id": "0611924171",
+        "promotion_type": "discount",
+        "condition": "included with SKU 0611924100",
+        "source": "GBH 18V-18 X & 22 X Sales Play_final_BPP.pdf"
+      },
+      {
+        "sku_id": "2608900447",
+        "promotion_type": "discount",
+        "end_date": "2025-04-23",
+        "condition": "Promo includes: 14pc Set",
+        "source": "Sales Play_Electricians_GBP.pptx.pdf"
+      },
+      {
+        "sku_id": "2608580804",
+        "promotion_type": "discount",
+        "end_date": "2025-04-23",
+        "condition": "Promo includes: Plumbers 9pc Set & Electricians 9pc Set",
+        "source": "Sales Play_Electricians_GBP.pptx.pdf"
+      },
+      {
+        "sku_id": "1600A02NG4",
+        "promotion_type": "discount",
+        "end_date": "2025-04-23",
+        "source": "Sales Play_Electricians_GBP.pptx.pdf"
+      },
+      {
+        "sku_id": "2608901194",
+        "promotion_type": "discount",
+        "end_date": "2025-04-23",
+        "source": "Sales Play_Electricians_GBP.pptx.pdf"
+      },
+      {
+        "sku_id": "2608901193",
+        "promotion_type": "discount",
+        "end_date": "2025-04-23",
+        "source": "Sales Play_Electricians_GBP.pptx.pdf"
+      },
+      {
+        "sku_id": "1600A0214D",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 165,
+        "start_date": null,
+        "end_date": null,
+        "condition": "Via Redemption Coupon when you BUY 1 x Hammer Drill SDS-Plus GBH 18V-18 X or GBH 18V-22 X",
+        "source": "GBH 18V-18 X & 22 X Sales Play_final_BPP.pdf"
+      },
+      {
+        "sku_id": "0615997616",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 165.57,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "0615997616",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 162.09,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "0615997613",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 165.99,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "0615997613",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 159.99,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "061599761E",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 55.99,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "061599761E",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 52.99,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608901180",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 16.34,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608901180",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 15.65,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608901170",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 16.34,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608901170",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 15.65,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608901169",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 16.72,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608901169",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 16.02,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608901168",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 37.05,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608901168",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 35.49,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608901171",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 16.34,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608901171",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 15.65,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608901172",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 16.34,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608901172",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 15.65,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608901173",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 16.34,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608901173",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 15.65,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "061599761B",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 47.49,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "061599761B",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 45.19,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "0615997612",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 54.99,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "0615997612",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 52.99,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608901194",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 61.34,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608901194",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 60.05,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608521071",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 101.69,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608521071",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 93.66,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608522517",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 127.09,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608522517",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 117.05,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608522518",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 127.09,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608522518",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 117.05,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608521U80",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 127.09,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608521U80",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 117.05,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607017724",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 81.3,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607017724",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 74.89,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607017725",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 96.63,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607017725",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 89,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607017726",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 96.63,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607017726",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 89,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607017723",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 76.31,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607017723",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 70.29,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607017733",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 67.58,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607017733",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 62.25,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607002797",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 38.49,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607002797",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 37.31,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607002798",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 38.49,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607002798",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 37.31,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607002799",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 38.49,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607002799",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 37.31,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607002800",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 38.49,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607002800",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 37.31,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607002801",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 38.49,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607002801",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 37.31,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607002802",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 38.49,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607002802",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 37.31,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607002803",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 49,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607002803",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 48.5,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607002804",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 49,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607002804",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 48.5,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607002805",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 49,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607002805",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 48.5,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607002806",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 49,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607002806",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 48.5,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607002807",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 49,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607002807",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 48.5,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607012081",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 81.09,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607012081",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 75.11,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607017319",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 69.99,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607017319",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 59.99,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608551079",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 119.99,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608551079",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 109.99,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607002837",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 67.15,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607002837",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 65.78,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608000495",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 119.99,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608000495",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 101.99,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "061599760C",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 229.99,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "061599760C",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 206.59,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608664131",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 114.99,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608664131",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 103.99,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608664624",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 134.99,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608664624",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 130.99,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608664132",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 114.99,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608664132",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 107.99,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608664133",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 114.99,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608664133",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 99.99,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608664622",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 134.99,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608664622",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 130.99,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608664623",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 134.99,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608664623",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 130.99,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608664677",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 154.99,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608664677",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 144.99,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608669146",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 229.99,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608669146",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 214.99,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608662342",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 92.92,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608662342",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 87.46,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608662343",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 101.9,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608662343",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 95.9,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "0615997625",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 10.39,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "0615997625",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 9.94,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "06159975S9",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 10.39,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "06159975S9",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 9.94,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "06159975T0",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 24.24,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "06159975T0",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 23.21,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608615246",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 119.32,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608615246",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 115.34,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608615057",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 178.98,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608615057",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 173.01,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607019033",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 169.99,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607019033",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 159.99,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608619266",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 41.99,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608619266",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 39.99,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608619267",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 46.99,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2608619267",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 44.99,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10pc rate",
+        "source": "T2 2025 CTU Catalogue.pptx.pdf"
+      },
+      {
+        "sku_id": "2607017319",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 69.99,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "2607017723",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 76.31,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "6",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "2608522518",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 127.09,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "6",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "2607002837",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 72.45,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "2608901194",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 60.99,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "061599761E",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 55.99,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "5",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "2608619266",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 41.99,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "061599760C",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 229.99,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "50",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "2608664677",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 154.99,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "2608662343",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 89.99,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "10",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "0611927170",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 165,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "Buy 1 x Hammer Drill SDS-Plus GBH 18V-18 X / GBH 18V-22 X and Select 1 x STARTER SET 2 x ProCORE18V 5.5Ah + GAL 1880 CV Professional",
+        "source": "GBH 18V-18 X & 22 X Sales Play_final_A.pdf"
+      },
+      {
+        "sku_id": "0611927171",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 165,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "Buy 1 x Hammer Drill SDS-Plus GBH 18V-18 X / GBH 18V-22 X and Select 1 x STARTER SET 2 x ProCORE18V 5.5Ah + GAL 1880 CV Professional",
+        "source": "GBH 18V-18 X & 22 X Sales Play_final_A.pdf"
+      },
+      {
+        "sku_id": "1600A0214D",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 165,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "Buy 1 x Hammer Drill SDS-Plus GBH 18V-18 X / GBH 18V-22 X and Select 1 x STARTER SET 2 x ProCORE18V 5.5Ah + GAL 1880 CV Professional",
+        "source": "GBH 18V-18 X & 22 X Sales Play_final_A.pdf"
+      },
+      {
+        "sku_id": "1600A0214D",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 165,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "Buy 1 x Hammer Drill SDS-Plus GBH 18V-18 X (body only, carton) and select 2 x ProCORE18V 5.5Ah + GAL 1880 CV Professional",
+        "source": "GBH 18V-18 X & 22 X Sales Play_final_BPP.pdf"
+      },
+      {
+        "sku_id": "0611927100",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 165,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "Buy 1 x Hammer Drill SDS-Plus GBH 18V-18 X (body only, carton) and select 2 x ProCORE18V 5.5Ah + GAL 1880 CV Professional",
+        "source": "GBH 18V-18 X & 22 X Sales Play_final_BPP.pdf"
+      },
+      {
+        "sku_id": "0611924100",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 165,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "Buy 1 x Hammer Drill SDS-Plus GBH 18V-18 X (body only, carton) and select 2 x ProCORE18V 5.5Ah + GAL 1880 CV Professional",
+        "source": "GBH 18V-18 X & 22 X Sales Play_final_BPP.pdf"
+      },
+      {
+        "sku_id": "0611927100",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 165,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "Buy 1 x Hammer Drill SDS-Plus GBH 18V-18 X (body only, carton) and Select 1 x STARTER SET 2 x ProCORE18V 5.5Ah + GAL 1880 CV Professional",
+        "source": "GBH 18V-18 X & 22 X Sales Play_final_version.pptx.pdf"
+      },
+      {
+        "sku_id": "0611924100",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 165,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "Buy 1 x Hammer Drill SDS-Plus GBH 18V-18 X (body only, carton) and Select 1 x STARTER SET 2 x ProCORE18V 5.5Ah + GAL 1880 CV Professional",
+        "source": "GBH 18V-18 X & 22 X Sales Play_final_version.pptx.pdf"
+      },
+      {
+        "sku_id": "1600A0214D",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 165,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "Buy 1 x Hammer Drill SDS-Plus GBH 18V-18 X (body only, carton) and Select 1 x STARTER SET 2 x ProCORE18V 5.5Ah + GAL 1880 CV Professional",
+        "source": "GBH 18V-18 X & 22 X Sales Play_final_version.pptx.pdf"
+      },
+      {
+        "sku_id": "0611927100",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 165,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "Buy 1 x Hammer Drill SDS-Plus GBH 18V-18 X (body only, carton)",
+        "source": "Sales Play_Electricians_GBP.pptx.pdf"
+      },
+      {
+        "sku_id": "0611924100",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 165,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "Buy 1 x Hammer Drill SDS-Plus GBH 18V-18 X (body only, carton)",
+        "source": "Sales Play_Electricians_GBP.pptx.pdf"
+      },
+      {
+        "sku_id": "1600A0214D",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 165,
+        "start_date": "2025-05-01",
+        "end_date": "2025-08-31",
+        "condition": "Buy 1 x Hammer Drill SDS-Plus GBH 18V-18 X (body only, carton)",
+        "source": "Sales Play_Electricians_GBP.pptx.pdf"
+      },
+      {
+        "sku_id": "2607017319",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 69.99,
+        "start_date": null,
+        "end_date": null,
+        "condition": "10",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "2607017723",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 76.31,
+        "start_date": null,
+        "end_date": null,
+        "condition": "6",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "2608522518",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 127.09,
+        "start_date": null,
+        "end_date": null,
+        "condition": "6",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "2607002837",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 72.45,
+        "start_date": null,
+        "end_date": null,
+        "condition": "5",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "2608901194",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 60.99,
+        "start_date": null,
+        "end_date": null,
+        "condition": "10",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "061599761E",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 55.99,
+        "start_date": null,
+        "end_date": null,
+        "condition": "5",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "2608619266",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 41.99,
+        "start_date": null,
+        "end_date": null,
+        "condition": "10",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "061599760C",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 229.99,
+        "start_date": null,
+        "end_date": null,
+        "condition": "50",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "2608664677",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 154.99,
+        "start_date": null,
+        "end_date": null,
+        "condition": "10",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "2608662343",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 89.99,
+        "start_date": null,
+        "end_date": null,
+        "condition": "10",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "1600A0214D",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 349,
+        "start_date": null,
+        "end_date": null,
+        "condition": "Spend minimum £349 (invoice value incl. VAT) receive a ProCORE 18V 5.5 Ah battery",
+        "source": "GBH 18V-18 X & 22 X Sales Play_final_A.pdf"
+      },
+      {
+        "sku_id": "1600A0214D",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 199,
+        "start_date": null,
+        "end_date": null,
+        "condition": "Spend minimum £199 (invoice value incl. VAT) receive a GBA 18V 4.0Ah battery",
+        "source": "GBH 18V-18 X & 22 X Sales Play_final_A.pdf"
+      },
+      {
+        "sku_id": "1600A0214D",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 349,
+        "start_date": null,
+        "end_date": null,
+        "condition": "Spend minimum £349 (invoice value incl. VAT) receive a ProCORE 18V 5.5 Ah battery",
+        "source": "GBH 18V-18 X & 22 X Sales Play_final_version.pptx.pdf"
+      },
+      {
+        "sku_id": "1600A0214D",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 199,
+        "start_date": null,
+        "end_date": null,
+        "condition": "Spend minimum £199 (invoice value incl. VAT) receive a GBA 18V 4.0Ah battery",
+        "source": "GBH 18V-18 X & 22 X Sales Play_final_version.pptx.pdf"
+      },
+      {
+        "sku_id": "1600A0214D",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 349,
+        "start_date": null,
+        "end_date": null,
+        "condition": "Spend minimum £349 (invoice value incl. VAT) receive a ProCORE 18V 5.5 Ah battery",
+        "source": "GBH 18V-18 X & 22 X Sales Play_final_BPP.pdf"
+      },
+      {
+        "sku_id": "1600A0214D",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 199,
+        "start_date": null,
+        "end_date": null,
+        "condition": "Spend minimum £199 (invoice value incl. VAT) receive a GBA 18V 4.0Ah battery",
+        "source": "GBH 18V-18 X & 22 X Sales Play_final_BPP.pdf"
+      },
+      {
+        "sku_id": "2608900447",
+        "promotion_type": "discount",
+        "promotion_unit": "%",
+        "promotion_amount": 15,
+        "end_date": "2025-12-31",
+        "condition": "Sales Play_Electricians_GBP.pptx.pdf",
+        "source": "Sales Play_Electricians_GBP.pptx.pdf"
+      },
+      {
+        "sku_id": "2608580804",
+        "promotion_type": "discount",
+        "promotion_unit": "%",
+        "promotion_amount": 15,
+        "end_date": "2025-12-31",
+        "condition": "Sales Play_Electricians_GBP.pptx.pdf",
+        "source": "Sales Play_Electricians_GBP.pptx.pdf"
+      },
+      {
+        "sku_id": "1600A02NG4",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 199.99,
+        "end_date": "2025-12-31",
+        "condition": "Sales Play_Electricians_GBP.pptx.pdf",
+        "source": "Sales Play_Electricians_GBP.pptx.pdf"
+      },
+      {
+        "sku_id": "2608901194",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 60.05,
+        "end_date": "2025-12-31",
+        "condition": "Sales Play_Electricians_GBP.pptx.pdf",
+        "source": "Sales Play_Electricians_GBP.pptx.pdf"
+      },
+      {
+        "sku_id": "2607017319",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 69.99,
+        "end_date": "2025-12-31",
+        "condition": "RA_Sales Play_AC CTUs_GBP.pdf",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "2607017723",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 76.31,
+        "end_date": "2025-12-31",
+        "condition": "RA_Sales Play_AC CTUs_GBP.pdf",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "2608522518",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 127.09,
+        "end_date": "2025-12-31",
+        "condition": "RA_Sales Play_AC CTUs_GBP.pdf",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "2607002837",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 72.45,
+        "end_date": "2025-12-31",
+        "condition": "RA_Sales Play_AC CTUs_GBP.pdf",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "2608901194",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 60.99,
+        "end_date": "2025-12-31",
+        "condition": "RA_Sales Play_AC CTUs_GBP.pdf",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "061599761E",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 55.99,
+        "end_date": "2025-12-31",
+        "condition": "RA_Sales Play_AC CTUs_GBP.pdf",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "2608619266",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 41.99,
+        "end_date": "2025-12-31",
+        "condition": "RA_Sales Play_AC CTUs_GBP.pdf",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "061599760C",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 229.99,
+        "end_date": "2025-12-31",
+        "condition": "RA_Sales Play_AC CTUs_GBP.pdf",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "2608664677",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 154.99,
+        "end_date": "2025-12-31",
+        "condition": "RA_Sales Play_AC CTUs_GBP.pdf",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "2608662343",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 89.99,
+        "end_date": "2025-12-31",
+        "condition": "RA_Sales Play_AC CTUs_GBP.pdf",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "2607017319",
+        "promotion_type": "discount",
+        "promotion_unit": "%",
+        "promotion_amount": 70,
+        "start_date": null,
+        "end_date": null,
+        "condition": "CTU QTY: Order 10 x 2607017319 to receive as a CTU of 10 sets",
+        "source": "RA_Sales Play_AC CTUs_EUR.pdf"
+      },
+      {
+        "sku_id": "2607017723",
+        "promotion_type": "discount",
+        "promotion_unit": "%",
+        "promotion_amount": 6,
+        "start_date": null,
+        "end_date": null,
+        "condition": "CTU QTY: Order 6 x 2607017723 to receive as a CTU of 6 sets",
+        "source": "RA_Sales Play_AC CTUs_EUR.pdf"
+      },
+      {
+        "sku_id": "2608522518",
+        "promotion_type": "discount",
+        "promotion_unit": "%",
+        "promotion_amount": 6,
+        "start_date": null,
+        "end_date": null,
+        "condition": "CTU QTY: Order 6 x 2608522518 to receive as a CTU of 6 sets",
+        "source": "RA_Sales Play_AC CTUs_EUR.pdf"
+      },
+      {
+        "sku_id": "2607002837",
+        "promotion_type": "discount",
+        "promotion_unit": "%",
+        "promotion_amount": 5,
+        "start_date": null,
+        "end_date": null,
+        "condition": "CTU QTY: Order 5 x 2607002837 to receive as a CTU of 5 sets",
+        "source": "RA_Sales Play_AC CTUs_EUR.pdf"
+      },
+      {
+        "sku_id": "2608901194",
+        "promotion_type": "discount",
+        "promotion_unit": "%",
+        "promotion_amount": 10,
+        "start_date": null,
+        "end_date": null,
+        "condition": "CTU QTY: Order 10 x 2608901194 to receive as a CTU of 10 sets",
+        "source": "RA_Sales Play_AC CTUs_EUR.pdf"
+      },
+      {
+        "sku_id": "061599761E",
+        "promotion_type": "discount",
+        "promotion_unit": "%",
+        "promotion_amount": 5,
+        "start_date": null,
+        "end_date": null,
+        "condition": "CTU QTY: Order 1 x 061599761E to receive as a CTU of 5 sets",
+        "source": "RA_Sales Play_AC CTUs_EUR.pdf"
+      },
+      {
+        "sku_id": "2608619266",
+        "promotion_type": "discount",
+        "promotion_unit": "%",
+        "promotion_amount": 10,
+        "start_date": null,
+        "end_date": null,
+        "condition": "CTU QTY: Order 10 x 2608619266 to receive as a CTU of 10 sets",
+        "source": "RA_Sales Play_AC CTUs_EUR.pdf"
+      },
+      {
+        "sku_id": "061599760C",
+        "promotion_type": "discount",
+        "promotion_unit": "%",
+        "promotion_amount": 50,
+        "start_date": null,
+        "end_date": null,
+        "condition": "CTU QTY: Order 1 x 061599760C to receive as a CTU of 50 blades",
+        "source": "RA_Sales Play_AC CTUs_EUR.pdf"
+      },
+      {
+        "sku_id": "2608664677",
+        "promotion_type": "discount",
+        "promotion_unit": "%",
+        "promotion_amount": 10,
+        "start_date": null,
+        "end_date": null,
+        "condition": "CTU QTY: Order 10 x 2608664677 to receive as a CTU of 10 sets",
+        "source": "RA_Sales Play_AC CTUs_EUR.pdf"
+      },
+      {
+        "sku_id": "2608662343",
+        "promotion_type": "discount",
+        "promotion_unit": "%",
+        "promotion_amount": 10,
+        "start_date": null,
+        "end_date": null,
+        "condition": "CTU QTY: Order 10 x 2608662343 to receive as a CTU of 10 sets",
+        "source": "RA_Sales Play_AC CTUs_EUR.pdf"
+      },
+      {
+        "sku_id": "2607017319",
+        "promotion_type": "discount",
+        "promotion_unit": "%",
+        "promotion_amount": 10,
+        "start_date": null,
+        "end_date": null,
+        "condition": "CTU QTY: Order 10 x 2607017319 to receive as a CTU of 10 sets",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "2607017723",
+        "promotion_type": "discount",
+        "promotion_unit": "%",
+        "promotion_amount": 6,
+        "start_date": null,
+        "end_date": null,
+        "condition": "CTU QTY: Order 6 x 2607017723 to receive as a CTU of 6 sets",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "2608522518",
+        "promotion_type": "discount",
+        "promotion_unit": "%",
+        "promotion_amount": 6,
+        "start_date": null,
+        "end_date": null,
+        "condition": "CTU QTY: Order 6 x 2608522518 to receive as a CTU of 6 sets",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "2607002837",
+        "promotion_type": "discount",
+        "promotion_unit": "%",
+        "promotion_amount": 5,
+        "start_date": null,
+        "end_date": null,
+        "condition": "CTU QTY: Order 5 x 2607002837 to receive as a CTU of 5 sets",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "2608901194",
+        "promotion_type": "discount",
+        "promotion_unit": "%",
+        "promotion_amount": 10,
+        "start_date": null,
+        "end_date": null,
+        "condition": "CTU QTY: Order 10 x 2608901194 to receive as a CTU of 10 sets",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "061599761E",
+        "promotion_type": "discount",
+        "promotion_unit": "%",
+        "promotion_amount": 5,
+        "start_date": null,
+        "end_date": null,
+        "condition": "CTU QTY: Order 1 x 061599761E to receive as a CTU of 5 sets",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "2608619266",
+        "promotion_type": "discount",
+        "promotion_unit": "%",
+        "promotion_amount": 10,
+        "start_date": null,
+        "end_date": null,
+        "condition": "CTU QTY: Order 10 x 2608619266 to receive as a CTU of 10 sets",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "061599760C",
+        "promotion_type": "discount",
+        "promotion_unit": "%",
+        "promotion_amount": 50,
+        "start_date": null,
+        "end_date": null,
+        "condition": "CTU QTY: Order 1 x 061599760C to receive as a CTU of 50 blades",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "2608664677",
+        "promotion_type": "discount",
+        "promotion_unit": "%",
+        "promotion_amount": 10,
+        "start_date": null,
+        "end_date": null,
+        "condition": "CTU QTY: Order 10 x 2608664677 to receive as a CTU of 10 sets",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "2608662343",
+        "promotion_type": "discount",
+        "promotion_unit": "%",
+        "promotion_amount": 10,
+        "start_date": null,
+        "end_date": null,
+        "condition": "CTU QTY: Order 10 x 2608662343 to receive as a CTU of 10 sets",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "2607017319",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 69.99,
+        "start_date": null,
+        "end_date": null,
+        "condition": "CTU QTY: Order 10 x 2607017319 to receive as a CTU of 10 sets",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "2607017723",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 76.31,
+        "start_date": null,
+        "end_date": null,
+        "condition": "CTU QTY: Order 6 x 2607017723 to receive as a CTU of 6 sets",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "2608522518",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 127.09,
+        "start_date": null,
+        "end_date": null,
+        "condition": "CTU QTY: Order 6 x 2608522518 to receive as a CTU of 6 sets",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "2607002837",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 72.45,
+        "start_date": null,
+        "end_date": null,
+        "condition": "CTU QTY: Order 5 x 2607002837 to receive as a CTU of 5 sets",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "2608901194",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 60.99,
+        "start_date": null,
+        "end_date": null,
+        "condition": "CTU QTY: Order 10 x 2608901194 to receive as a CTU of 10 sets",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "061599761E",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 55.99,
+        "start_date": null,
+        "end_date": null,
+        "condition": "CTU QTY: Order 1 x 061599761E to receive as a CTU of 5 sets",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "2608619266",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 41.99,
+        "start_date": null,
+        "end_date": null,
+        "condition": "CTU QTY: Order 10 x 2608619266 to receive as a CTU of 10 sets",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "061599760C",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 229.99,
+        "start_date": null,
+        "end_date": null,
+        "condition": "CTU QTY: Order 1 x 061599760C to receive as a CTU of 50 blades",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "2608664677",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 154.99,
+        "start_date": null,
+        "end_date": null,
+        "condition": "CTU QTY: Order 10 x 2608664677 to receive as a CTU of 10 sets",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "2608662343",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 89.99,
+        "start_date": null,
+        "end_date": null,
+        "condition": "CTU QTY: Order 10 x 2608662343 to receive as a CTU of 10 sets",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "0611927100",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 165,
+        "end_date": "2025-08-31",
+        "condition": "Via Redemption Coupon when you BUY 1 x Hammer Drill SDS-Plus GBH 18V-18 X or GBH 18V-22 X",
+        "source": "GBH 18V-18 X & 22 X Sales Play_final_BPP.pdf"
+      },
+      {
+        "sku_id": "0611924100",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 165,
+        "end_date": "2025-08-31",
+        "condition": "Via Redemption Coupon when you BUY 1 x Hammer Drill SDS-Plus GBH 18V-18 X or GBH 18V-22 X",
+        "source": "GBH 18V-18 X & 22 X Sales Play_final_BPP.pdf"
+      },
+      {
+        "sku_id": "1600A0214D",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 165,
+        "end_date": "2025-08-31",
+        "condition": "Via Redemption Coupon when you BUY 1 x Hammer Drill SDS-Plus GBH 18V-18 X or GBH 18V-22 X",
+        "source": "GBH 18V-18 X & 22 X Sales Play_final_BPP.pdf"
+      },
+      {
+        "sku_id": "0611927100",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 199,
+        "end_date": "2025-08-31",
+        "condition": "Buy one or more product on a single invoice and spend minimum £199 (invoice value incl. VAT) receive a GBA 18V 4.0Ah battery",
+        "source": "GBH 18V-18 X & 22 X Sales Play_final_A.pdf"
+      },
+      {
+        "sku_id": "0611924100",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 199,
+        "end_date": "2025-08-31",
+        "condition": "Buy one or more product on a single invoice and spend minimum £199 (invoice value incl. VAT) receive a GBA 18V 4.0Ah battery",
+        "source": "GBH 18V-18 X & 22 X Sales Play_final_A.pdf"
+      },
+      {
+        "sku_id": "1600A0214D",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 199,
+        "end_date": "2025-08-31",
+        "condition": "Buy one or more product on a single invoice and spend minimum £199 (invoice value incl. VAT) receive a GBA 18V 4.0Ah battery",
+        "source": "GBH 18V-18 X & 22 X Sales Play_final_A.pdf"
+      },
+      {
+        "sku_id": "0611927100",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 349,
+        "end_date": "2025-08-31",
+        "condition": "Buy one or more product on a single invoice and spend minimum £349 (invoice value incl. VAT) receive a ProCORE 18V 5.5 Ah battery",
+        "source": "GBH 18V-18 X & 22 X Sales Play_final_A.pdf"
+      },
+      {
+        "sku_id": "0611924100",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 349,
+        "end_date": "2025-08-31",
+        "condition": "Buy one or more product on a single invoice and spend minimum £349 (invoice value incl. VAT) receive a ProCORE 18V 5.5 Ah battery",
+        "source": "GBH 18V-18 X & 22 X Sales Play_final_A.pdf"
+      },
+      {
+        "sku_id": "1600A0214D",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 349,
+        "end_date": "2025-08-31",
+        "condition": "Buy one or more product on a single invoice and spend minimum £349 (invoice value incl. VAT) receive a ProCORE 18V 5.5 Ah battery",
+        "source": "GBH 18V-18 X & 22 X Sales Play_final_A.pdf"
+      },
+      {
+        "sku_id": "2607017319",
+        "promotion_type": "discount",
+        "promotion_unit": "EUR",
+        "promotion_amount": 10,
+        "end_date": "2025-12-31",
+        "condition": "10",
+        "source": "RA_Sales Play_AC CTUs_EUR.pdf"
+      },
+      {
+        "sku_id": "2607017723",
+        "promotion_type": "discount",
+        "promotion_unit": "EUR",
+        "promotion_amount": 6,
+        "end_date": "2025-12-31",
+        "condition": "6",
+        "source": "RA_Sales Play_AC CTUs_EUR.pdf"
+      },
+      {
+        "sku_id": "2608522518",
+        "promotion_type": "discount",
+        "promotion_unit": "EUR",
+        "promotion_amount": 6,
+        "end_date": "2025-12-31",
+        "condition": "6",
+        "source": "RA_Sales Play_AC CTUs_EUR.pdf"
+      },
+      {
+        "sku_id": "2607002837",
+        "promotion_type": "discount",
+        "promotion_unit": "EUR",
+        "promotion_amount": 5,
+        "end_date": "2025-12-31",
+        "condition": "5",
+        "source": "RA_Sales Play_AC CTUs_EUR.pdf"
+      },
+      {
+        "sku_id": "2608901194",
+        "promotion_type": "discount",
+        "promotion_unit": "EUR",
+        "promotion_amount": 10,
+        "end_date": "2025-12-31",
+        "condition": "10",
+        "source": "RA_Sales Play_AC CTUs_EUR.pdf"
+      },
+      {
+        "sku_id": "061599761E",
+        "promotion_type": "discount",
+        "promotion_unit": "EUR",
+        "promotion_amount": 5,
+        "end_date": "2025-12-31",
+        "condition": "5",
+        "source": "RA_Sales Play_AC CTUs_EUR.pdf"
+      },
+      {
+        "sku_id": "2608619266",
+        "promotion_type": "discount",
+        "promotion_unit": "EUR",
+        "promotion_amount": 10,
+        "end_date": "2025-12-31",
+        "condition": "10",
+        "source": "RA_Sales Play_AC CTUs_EUR.pdf"
+      },
+      {
+        "sku_id": "061599760C",
+        "promotion_type": "discount",
+        "promotion_unit": "EUR",
+        "promotion_amount": 50,
+        "end_date": "2025-12-31",
+        "condition": "50",
+        "source": "RA_Sales Play_AC CTUs_EUR.pdf"
+      },
+      {
+        "sku_id": "2608664677",
+        "promotion_type": "discount",
+        "promotion_unit": "EUR",
+        "promotion_amount": 10,
+        "end_date": "2025-12-31",
+        "condition": "10",
+        "source": "RA_Sales Play_AC CTUs_EUR.pdf"
+      },
+      {
+        "sku_id": "2608662343",
+        "promotion_type": "discount",
+        "promotion_unit": "EUR",
+        "promotion_amount": 10,
+        "end_date": "2025-12-31",
+        "condition": "10",
+        "source": "RA_Sales Play_AC CTUs_EUR.pdf"
+      },
+      {
+        "sku_id": "2607017319",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 10,
+        "end_date": "2025-12-31",
+        "condition": "10",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "2607017723",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 6,
+        "end_date": "2025-12-31",
+        "condition": "6",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "2608522518",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 6,
+        "end_date": "2025-12-31",
+        "condition": "6",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "2607002837",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 5,
+        "end_date": "2025-12-31",
+        "condition": "5",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "2608901194",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 10,
+        "end_date": "2025-12-31",
+        "condition": "10",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "061599761E",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 5,
+        "end_date": "2025-12-31",
+        "condition": "5",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "2608619266",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 10,
+        "end_date": "2025-12-31",
+        "condition": "10",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "061599760C",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 50,
+        "end_date": "2025-12-31",
+        "condition": "50",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "2608664677",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 10,
+        "end_date": "2025-12-31",
+        "condition": "10",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      },
+      {
+        "sku_id": "2608662343",
+        "promotion_type": "discount",
+        "promotion_unit": "GBP",
+        "promotion_amount": 10,
+        "end_date": "2025-12-31",
+        "condition": "10",
+        "source": "RA_Sales Play_AC CTUs_GBP.pdf"
+      }
+    ]
+  },
+  "threadId": "20ff9943-ef5f-46cc-b98a-1dd7e571c7b8"
+}

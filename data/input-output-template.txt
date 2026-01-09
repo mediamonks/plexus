@@ -1,8 +1,7 @@
----
+Output only JSON. Do **not** use markdown.
 
 ### **Input Format (JSON)**
 {input}
 
 ### **Output Format (JSON)**
-Output only JSON. Do not output markdown.
 {output}

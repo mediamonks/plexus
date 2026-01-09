@@ -1,16 +1,14 @@
 import OpenAI from 'openai';
-import ILocalLLMPlatformImage, { ContainerConfig } from './ILocalLLMPlatformImage';
+import ILocalLLMPlatformImage, { ContainerConfiguration, ContainerOptions } from './ILocalLLMPlatformImage';
 import LocalLLMPlatform from '../LocalLLMPlatform';
 import DataSourceItem from '../../../entities/data-sources/origin/DataSourceItem';
 
 export default class LocalLLMPlatformImageTGI implements ILocalLLMPlatformImage {
-	public readonly imageName = 'ghcr.io/huggingface/text-generation-inference:2.4.0';
+	public readonly imageName = 'ghcr.io/local/text-generation-inference:2.4.0';
 	public readonly cacheBindPath = '/data';
 	public readonly healthEndpoint = 'health';
 	
-	public getContainerConfig(): ContainerConfig {
-		const { model } = LocalLLMPlatform.configuration;
-		const contextSize = LocalLLMPlatform.contextSize;
+	public getContainerOptions({ model, contextSize }: ContainerConfiguration): ContainerOptions {
 		const quantization = model.toLowerCase().includes('-awq') ? 'awq'
 			: model.toLowerCase().includes('-gptq') ? 'gptq'
 			: 'bitsandbytes-nf4';

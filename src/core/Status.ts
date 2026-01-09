@@ -1,5 +1,5 @@
 import Config from './Config';
-import { Configuration } from '../types/common';
+import Configuration from '../types/Configuration';
 
 export default class Status {
 	public static send(message: string, isRunning?: boolean): void {

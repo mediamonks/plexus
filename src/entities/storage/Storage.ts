@@ -9,6 +9,7 @@ import Config from '../../core/Config';
 type TextFileTypes = typeof StorageFile.TYPE.DIGEST_INSTRUCTIONS | typeof StorageFile.TYPE.AGENT_INSTRUCTIONS | typeof StorageFile.TYPE.UNSTRUCTURED_DATA;
 
 // TODO is this a service?
+// TODO implement local storage, switch between local and cloud storage based on config
 export default class Storage {
 	private static readonly _storageFiles = {};
 	
@@ -41,10 +42,11 @@ export default class Storage {
 	
 	public static async save(namespace: string, localPath: string, fileName: string): Promise<void> {
 		const uri = `gs://${Config.get('storage.bucket')}/files/${namespace}/${path.basename(localPath)}`;
+		// TODO check if the originalName metadata method is working
 		await CloudStorage.upload(localPath, uri, { originalName: fileName });
 	}
 	
-	public static async getFiles(namespace: string): Promise<{ uri: string; name: string }[]> {
+	public static async getFiles(namespace: string): Promise<{ uri: string; name: string; internalName: string }[]> {
 		const cachePath = `gs://${Config.get('storage.bucket')}/files/${namespace}`;
 		const files = await CloudStorage.files(cachePath);
 		return Promise.all(files.map(async file => {
@@ -52,7 +54,13 @@ export default class Storage {
 			return {
 				uri: file.cloudStorageURI.toString(),
 				name: metadata.originalName as string,
+				internalName: path.basename(file.name),
 			};
 		}));
+	}
+	
+	public static async delete(namespace: string, internalName: string): Promise<void> {
+		const uri = `gs://${Config.get('storage.bucket')}/files/${namespace}/${internalName}`;
+		return CloudStorage.delete(uri);
 	}
 };

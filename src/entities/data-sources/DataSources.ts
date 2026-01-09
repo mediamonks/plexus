@@ -67,7 +67,7 @@ export default class DataSources {
 	}
 	
 	private static create(id: string, configuration: typeof DataSource.ShorthandConfiguration): DataSource {
-		Debug.log(`Instantiating data source "${id}"`, 'DataSources');
+		Debug.log(`Connecting to data source "${id}"`, 'DataSources');
 		
 		let { target, dataType } = DataSource.parseConfiguration(configuration);
 		

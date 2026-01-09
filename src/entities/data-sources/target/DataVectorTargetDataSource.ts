@@ -1,22 +1,29 @@
 import VectorTargetDataSource from './VectorTargetDataSource';
 import DataSourceCatalogField from '../../catalog/DataSourceCatalogField';
 import CustomError from '../../error-handling/CustomError';
-import { JsonObject } from '../../../types/common';
 import LLM from '../../../services/llm/LLM';
 import VectorDB from '../../../services/vector-db/VectorDB';
+import { JsonObject, VectorDBRecord } from '../../../types/common';
+import hash from '../../../utils/hash';
 
 export default class DataVectorTargetDataSource extends VectorTargetDataSource {
 	declare protected readonly _configuration: typeof DataVectorTargetDataSource.Configuration;
 	
 	public static readonly Configuration: typeof VectorTargetDataSource.Configuration & {
-		searchField?: string;
+		searchField?: string; // TODO for backwards compatibility
+		vectorFields?: string[];
 	}
 	
-	get configuration(): typeof DataVectorTargetDataSource.Configuration {
+	public get configuration(): typeof DataVectorTargetDataSource.Configuration {
 		return {
 			...super.configuration,
-			searchField: this._configuration.searchField,
+			vectorFields: this._configuration.vectorFields,
 		} as typeof DataVectorTargetDataSource.Configuration;
+	}
+	
+	protected get vectorFields(): string[] {
+		const { searchField, vectorFields } = this.configuration;
+		return vectorFields ?? (searchField && [searchField]) ?? [];
 	}
 	
 	public async query({ input, limit, filter, fields }: typeof DataSourceCatalogField.QueryParameters): Promise<JsonObject[]> {
@@ -27,22 +34,27 @@ export default class DataVectorTargetDataSource extends VectorTargetDataSource {
 		}
 	}
 	
-	protected async *generator(): AsyncGenerator<JsonObject & { _vector: number[], _id: string }> {
+	protected async *generator(): AsyncGenerator<VectorDBRecord> {
 		const items = await this.origin.getItems();
 		
 		for await (const item of items) {
 			const data = await item.toData();
 			
-			if (!(Symbol.iterator in data)) {
-				throw new CustomError('Spreadsheet to vector data not yet supported');
-			}
+			if (!(Symbol.asyncIterator in data)) throw new CustomError('Spreadsheet to vector data not yet supported');
 			
 			for await (const record of data as AsyncGenerator<JsonObject>) {
-				const text = record[this.configuration.searchField];
+				let vector: number[];
+				if (this.vectorFields.length) {
+					const text = this.vectorFields
+						.map(field => record[field])
+						.filter(Boolean)
+						.join(' ');
+					if (text.trim()) vector = await LLM.generateDocumentEmbeddings(text);
+				}
 				
-				if (typeof text !== 'string') throw new CustomError('Vector target data source search field must be of type string');
-				
-				yield { ...record, _vector: await LLM.generateDocumentEmbeddings(text), _id: item.id };
+				// TODO check if the source data contains _id, _source, or _vector, catch collision
+
+				yield { ...record, _vector: vector, _source: item.id, _id: hash(JSON.stringify(record)) };
 			}
 		}
 	}

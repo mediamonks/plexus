@@ -1,0 +1,142 @@
+{
+	"profiling": true,
+	"vectordb": {
+		"engine": "cloudsql"
+	},
+	"agents": {
+		"bosch-chatbot": {
+			"context": [
+				"userPrompt",
+				"now",
+				"client",
+				"product",
+				"divisions",
+				"bonus-targets"
+			],
+			"required": [
+				"userPrompt",
+				"now",
+				"divisions",
+				"bonus-targets"
+			],
+			"dataSources": [
+				"sales-data"
+			]
+		}
+	},
+	"catalog": {
+		"divisions": {
+			"type": "data",
+			"dataSource": "divisions",
+			"example": [
+				{
+					"division_name": "Some Division",
+					"division_display_name": "Some Division Display Name",
+					"division_code": "some division code",
+					"division_id": 123
+				}
+			]
+		},
+		"customers": {
+			"type": "data",
+			"dataSource": "customers",
+			"example": [
+				{
+					"customer_id": 123,
+					"customer_name": "Some Customer",
+					"postal_code": "AB1 2CD",
+					"city": "LONDON"
+				}
+			]
+		},
+		"bonus-targets": {
+			"type": "data",
+			"dataSource": "bonus-targets",
+			"example": [
+				{
+					"bonus_segment": "PRO",
+					"bonus_type": "Turnover classification bonus",
+					"target_min": 0,
+					"target_max": 25000,
+					"target_unit": "£",
+					"bonus_percentage": 0
+				}
+			]
+		},
+		"userPrompt": {
+			"type": "input",
+			"field": "prompt",
+			"required": true,
+			"example": "Based on the last 12 months of sales data for [Client Name], which 3 product categories showed the highest year-over-year growth, and which 3 categories underperformed their targets by more than 15%?"
+		},
+		"now": {
+			"type": "input",
+			"field": "now",
+			"required": true,
+			"example": "2025-12-31"
+		},
+		"response": {
+			"type": "output",
+			"agent": "bosch-chatbot",
+			"field": "response",
+			"example": "Your response to the user prompt goes here."
+		},
+		"client": {
+			"type": "input",
+			"field": "client",
+			"example": "The currently selected client, if any. If the user refers to \"this client\" or \"the client\", or something similar, this is the one they mean"
+		},
+		"product": {
+			"type": "input",
+			"field": "product",
+			"example": "The currently selected product, if any. If the user refers to \"this product\" or \"the product\", or something similar, this is the one they mean"
+		}
+	},
+	"data-sources": {
+		"sales-data": {
+			"namespace": "sales-data",
+			"uri": "gs://bosch-pt-sales-agent-data/data-export.jsonl",
+			"target": "vector",
+			"dataType": "data",
+			"folder": false,
+			"vectorFields": ["customer_name", "city", "sku_desc", "division_display_name"]
+		},
+		"sales-plays": {
+			"namespace": "sales-plays",
+			"uri": "gs://bosch-pt-sales-agent-docs/sales-plays",
+			"target": "file",
+			"folder": true
+		},
+		"bonus-targets": {
+			"namespace": "chat",
+			"uri": "gs://bosch-pt-sales-agent-docs/bonus-targets/bonus-targets.csv",
+			"target": "raw",
+			"dataType": "data",
+			"folder": false
+		},
+		"divisions": {
+			"namespace": "chat",
+			"uri": "https://bosch-pt-sales-agent-6hsz3xbg.ew.gateway.dev/product-categories",
+			"target": "raw",
+			"dataType": "data"
+		},
+		"customers":{
+			"namespace": "chat",
+			"uri": "https://bosch-pt-sales-agent-6hsz3xbg.ew.gateway.dev/customers",
+			"target": "raw",
+			"dataType": "data",
+			"vectorFields": ["customer_name"]
+		},
+		"promotions": {
+			"namespace": "disabled",
+			"uri": "https://bosch-pt-sales-agent-6hsz3xbg.ew.gateway.dev/promotions",
+			"target": "raw",
+			"dataType": "data",
+			"vectorFields": [],
+			"collectionPath": "inactive"
+		}
+	},
+	"output": [
+		"response"
+	]
+}

@@ -7,11 +7,11 @@ import CustomError from '../../error-handling/CustomError';
 import UnsupportedError from '../../error-handling/UnsupportedError';
 import CloudStorage from '../../../services/google-cloud/CloudStorage';
 import GoogleDrive from '../../../services/google-drive/GoogleDrive';
-import LLM from '../../../services/llm/LLM';
 import hash from '../../../utils/hash';
 import jsonl from '../../../utils/jsonl';
 import pdf from '../../../utils/pdf';
-import { JsonObject, ValueOf } from '../../../types/common';
+import { JsonField, JsonObject, ValueOf } from '../../../types/common';
+import csv from '../../../utils/csv';
 
 export default class GoogleCloudStorageDataSourceItem extends DataSourceItem<string, AsyncGenerator<JsonObject>> {
 	public constructor(
@@ -52,11 +52,7 @@ export default class GoogleCloudStorageDataSourceItem extends DataSourceItem<str
 	}
 	
 	public async getLocalFile(): Promise<string> {
-		const localPath = this.allowCache ? await CloudStorage.cache(this.uri) : await CloudStorage.download(this.uri);
-		
-		if (LLM.supportedMimeTypes.has(this.mimeType)) return localPath;
-		
-		return await GoogleDrive.convertToPdf(localPath);
+		return this.allowCache ? CloudStorage.cache(this.uri) : CloudStorage.download(this.uri);
 	}
 	
 	public async toText(): Promise<string> {
@@ -67,14 +63,22 @@ export default class GoogleCloudStorageDataSourceItem extends DataSourceItem<str
 			txt: async () => (await fs.readFile(file)).toString()
 		};
 		
-		if (!mapping[this.extension]) throw new UnsupportedError('file type', this.extension, Object.keys(mapping));
+		if (!mapping[this.extension]) throw new UnsupportedError('file type for text extraction', this.extension, Object.keys(mapping));
 		
-		return await mapping[this.extension]();
+		return mapping[this.extension]();
 	}
 	
 	public async toData(): Promise<AsyncGenerator<JsonObject>> {
 		const file = await this.getLocalFile();
-		return jsonl.read(file);
+		
+		const mapping = {
+			jsonl: () => jsonl.read(file),
+			csv: () => csv.read(file),
+		};
+		
+		if (!mapping[this.extension]) throw new UnsupportedError('file type for data extraction', this.extension, Object.keys(mapping));
+		
+		return mapping[this.extension]();
 	}
 	
 	public async getTextContent(): Promise<string> {
@@ -85,6 +89,16 @@ export default class GoogleCloudStorageDataSourceItem extends DataSourceItem<str
 	public async toBase64(): Promise<string> {
 		const content = await CloudStorage.getContent(this.uri);
 		return content.toString('base64');
+	}
+	
+	public toJSON(): JsonField {
+		return this.uri;
+	}
+	
+	public async toPDF(): Promise<string> {
+		const localPath = this.allowCache ? await CloudStorage.cache(this.uri) : await CloudStorage.download(this.uri);
+		
+		return await GoogleDrive.convertToPdf(localPath);
 	}
 	
 	private detectDataType(): ValueOf<typeof DataSource.DATA_TYPE> {

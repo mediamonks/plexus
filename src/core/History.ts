@@ -37,29 +37,29 @@ export default class History {
 		this._threadId = threadId;
 		
 		// TODO ready is not actually used, so race conditions can occur
-		this.ready = this._load();
+		this.ready = this.load();
 	}
 	
 	public get threadId(): string {
 		return this._threadId ??= uuid();
 	}
 	
-	private async _load(): Promise<void> {
-		await Profiler.run(async () => {
-			let history: HistoryItem[];
+	private async load(): Promise<void> {
+		let history: HistoryItem[];
 		
-			if (this._threadId) {
+		if (this._threadId) {
+			await Profiler.run(async () => {
 				const thread = await Profiler.run(() => Firestore.getDocument('threads', this._threadId), 'retrieve thread');
 				
 				if (!thread) throw new CustomError('Invalid threadId');
 				
 				history = thread.history as HistoryItem[];
-			}
-			
-			if (!history || !history.length) return;
-			
-			this._history = history;
-		}, 'load history');
+			}, 'History.load');
+		}
+		
+		if (!history || !history.length) return;
+		
+		this._history = history;
 	}
 	
 	public async save(output: JsonObject): Promise<void> {

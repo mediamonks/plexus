@@ -135,7 +135,7 @@ Invokes an agent workflow.
 Retrieves available options for a specific input field.
 
 **Path Parameters:**
-- **`field`** (string): Name of the field to get options for
+- **`field`** (string): Name of the field to start options for
 
 **Response:**
 ```json
@@ -333,7 +333,8 @@ Defines behavior and context for each AI agent in your workflow. Each agent is i
       "context": ["field1", "field2"],
       "temperature": 0.7,
       "useHistory": true,
-      "required": ["requiredField"]
+      "required": ["requiredField"],
+      "outputTokens": 1024
     }
   }
 }
@@ -345,6 +346,7 @@ Defines behavior and context for each AI agent in your workflow. Each agent is i
 - **`temperature`** (number, optional): AI model temperature setting (0.0-1.0).
 - **`useHistory`** (boolean, optional): Whether to provide the agent with the conversation history.
 - **`required`** (array, optional): Required (typically `input`-type) context fields for the agent. If a required field is left empty, the agent will not run and will simply return an empty response object, but the workflow will continue as normal.
+- **`outputTokens`** (number): Maximum output tokens for this agent
 
 ### `catalog`
 
@@ -485,7 +487,8 @@ Configuration for the LLM. Can also be set at the global level.
 		"model": "gemini-2.5-flash-lite",
 		"embeddingPlatform": "google",
 		"embeddingModel": "gemini-embedding-001",
-    "temperature": 0.7
+    "temperature": 0.7,
+		"outputTokens": 1024
   }
 }
 ```
@@ -493,8 +496,9 @@ Configuration for the LLM. Can also be set at the global level.
 - **`platform`** (string): Primary AI platform ("google", "azure", "openai")
 - **`model`** (string): Primary model name, can also be set at the platform level
 - **`embeddingPlatform`** (string): AI platform for text embeddings ("google", "azure", "openai")
-- **`embeddingModel`** (string): Embedding model name, can also be set at the platform level
+- **`embeddingModel`** (string): Default embedding model name
 - **`temperature`** (number, optional): Default AI model temperature setting (0.0-1.0), defaults to 0
+- **`outputTokens`** (number): Default maximum output tokens
 
 ### `azure`
 
@@ -507,16 +511,18 @@ Configuration for Azure OpenAI services:
 		"embeddingModel": "text-embedding-ada-002",
 		"baseUrl": "https://your-resource.openai.azure.com/",
 		"apiVersion": "2025-01-01-preview",
-		"embeddingApiVersion": "2023-05-15"
+		"embeddingApiVersion": "2023-05-15",
+		"outputTokens": 1024
   }
 }
 ```
 
 - **`model`** (string): Name of the deployed model, can also be set at the `llm` level
-- **`embeddingModel`** (string): Model name for text embeddings, can also be set at the `llm` level
+- **`embeddingModel`** (string): Model name for text embeddings, defaults to the `embeddingModel` set at the `llm` level
 - **`baseUrl`** (string): Azure OpenAI endpoint URL
 - **`apiVersion`** (string): API version for chat completions
 - **`embeddingApiVersion`** (string): API version for embeddings
+- **`outputTokens`** (number): Default maximum output tokens when using this LLM platform
 
 ### `genai`
 
@@ -532,19 +538,21 @@ Google Generative AI (Gemini) configuration:
 		"projectId": "your-project-id",
 		"location": "your-location",
 		"embeddingLocation": "europe-west1",
-		"apiKey": "your-api-key"
+		"apiKey": "your-api-key",
+		"outputTokens": 1024
   }
 }
 ```
 
 - **`model`** (string): Primary model name, can also be set at the `llm` level
-- **`embeddingModel`** (string): Embedding model name, can also be set at the `llm` level
+- **`embeddingModel`** (string): Model name for text embeddings, defaults to the `embeddingModel` set at the `llm` level
 - **`quotaDelayMs`** (number, optional): Delay between API calls for quota management
 - **`useVertexAi`** (boolean, optional): Whether to use Vertex AI instead of the GenAI API
 - **`projectId`** (string, optional): GCP project to use, defaults to the project associated with the API key, can also be set at the global level, only applies when `useVertexAi` is true
 - **`location`** (string, optional): GCP location to use, defaults to the location associated with the API key, can also be set at the global level, only applies when `useVertexAi` is true
 - **`embeddingLocation`** (string, optional): Region for embedding API, defaults to `genai.location`, only applies when `useVertexAi` is true
 - **`apiKey`** (number, optional): Your custom Google AI Studio API key, Plexus will use its own if not provided, only applies when `useVertexAi` is false
+- **`outputTokens`** (number): Default maximum output tokens when using this LLM platform
 
 ### `openai`
 
@@ -554,13 +562,15 @@ OpenAI API configuration:
 {
   "openai": {
 		"model": "gpt-4o-mini",
-    "embeddingModel": "text-embedding-3-small"
+    "embeddingModel": "text-embedding-3-small",
+		"outputTokens": 1024
   }
 }
 ```
 
 - **`model`** (string): Primary model name, can also be set at the `llm` level
-- **`embeddingModel`** (string): Embedding model name, can also be set at the `llm` level
+- **`embeddingModel`** (string): Model name for text embeddings, defaults to the `embeddingModel` set at the `llm` level
+- **`outputTokens`** (number): Default maximum output tokens when using this LLM platform
 
 ### `local-llm`
 

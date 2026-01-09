@@ -1,14 +1,16 @@
 import OpenAI from 'openai';
 import ILLMPlatform, { QueryOptions } from './ILLMPlatform';
-import DataSourceItem from '../../entities/data-sources/origin/DataSourceItem';
-import Config from '../../core/Config';
-import { staticImplements } from '../../types/common';
-import UnsupportedError from '../../entities/error-handling/UnsupportedError';
-import Profiler from '../../core/Profiler';
+import LLMPlatform from './LLMPlatform';
 import History from '../../core/History';
+import Profiler from '../../core/Profiler';
+import DataSourceItem from '../../entities/data-sources/origin/DataSourceItem';
+import UnsupportedError from '../../entities/error-handling/UnsupportedError';
+import { staticImplements } from '../../types/common';
 
 @staticImplements<ILLMPlatform>()
-export default class OpenAILLMPlatform {
+export default class OpenAILLMPlatform extends LLMPlatform {
+	protected static readonly configModuleName: 'azure' | 'openai' = 'openai';
+	
 	public static readonly supportedMimeTypes: Set<string> = new Set([
 		'application/json',
 		'application/pdf',
@@ -22,6 +24,7 @@ export default class OpenAILLMPlatform {
 	public static readonly Configuration: {
 		model: string;
 		embeddingModel: string;
+		outputTokens?: number;
 	};
 	
 	protected static _client: OpenAI;
@@ -31,13 +34,15 @@ export default class OpenAILLMPlatform {
 	public static async query(query: string, {
 		instructions,
 		history,
-		temperature,
-		maxTokens,
-		structuredResponse,
 		model,
-		files
+		temperature,
+		outputTokens,
+		structuredResponse,
+		files,
+		tools,
 	}: QueryOptions = {}): Promise<string> {
 		model ??= this.configuration.model;
+		outputTokens ??= this.outputTokens;
 		
 		const messages = await this.createMessages(instructions, history, query, files);
 		
@@ -46,7 +51,7 @@ export default class OpenAILLMPlatform {
 		const response = await Profiler.run(async () =>  await client.chat.completions.create({
 			messages,
 			model,
-			max_completion_tokens: maxTokens,
+			max_completion_tokens: outputTokens,
 			temperature,
 			response_format: structuredResponse ? { type: 'json_object' } : undefined,
 		}), 'OpenAILLMPlatform.query');
@@ -62,12 +67,8 @@ export default class OpenAILLMPlatform {
 		return await this.generateEmbeddings(text, model);
 	}
 	
-	public static get embeddingModel(): string {
-		return this.configuration.embeddingModel;
-	}
-	
 	protected static get configuration(): typeof OpenAILLMPlatform.Configuration {
-		return Config.get('openai', { includeGlobal: true });
+		return super.configuration as typeof OpenAILLMPlatform.Configuration;
 	}
 	
 	protected static async getClient(_?: string): Promise<OpenAI> {

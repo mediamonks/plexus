@@ -10,7 +10,7 @@ Use your understanding of historical timelines to propose realistic plans. While
 - **Delivery**
 
 Each phase may include multiple tasks and sub-tasks. Use your judgment to determine what is relevant based on the deliverable.
-Use the provided historical timelines to get an understanding of which tasks belong to which phases and how that affects the timeline.
+Use the provided historical timelines to start an understanding of which tasks belong to which phases and how that affects the timeline.
 
 **Start days** must be expressed as a number, starting at 1 for the first day of the project.
 Do **not** use calendar dates.

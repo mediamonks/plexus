@@ -30,10 +30,21 @@
 - **Add OCR capability for image-heavy PDFs** - Support PDFs with mostly text in images through OCR (`src/utils/pdf.ts:13`)
 
 ## Chris
-- **Multimodal input/output** - base64
 - **UI**
 - **Serial processing** - Run each DataSourceItem through the Agent separately
 
 ## Bosch
+- Use regular structured response for custom tool calling (rather than built-in tool calling)
+- Move tool calling to the Agent
+- Wrap tool calls + llm calls with status feedback
+- Support for multiple tables per vector data source
+- Support for no vectorFields in vector data source (so regular structured data source?)
+- Make tool calling generic (any data source)
+- Support for "static" data sources (data injected into instructions rather than prompt)
+- Support for ingesting documents to data (e.g. pdfs to table)
+-----
 - **GraphRAG** - Support GraphRAG datasources
 - **SDK** - Support using Plexus as an SDK 
+
+## Ingestion
+- Fix incremental ingestion for vector dbs

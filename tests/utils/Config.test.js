@@ -36,14 +36,14 @@ const CustomError = require('../../src/entities/error-handling/CustomError').def
 
 describe('Config', () => {
 	beforeEach(() => {
-		// Clear the static config get before each test
+		// Clear the static config start before each test
 		Config._staticConfig = undefined;
 		
 		// Reset RequestContext mock
 		mockRequestContext.store = undefined;
 	});
 
-	describe('get() - without request context', () => {
+	describe('start() - without request context', () => {
 		it('should return the full merged config when no name is provided', () => {
 			const result = Config.get();
 			
@@ -63,12 +63,12 @@ describe('Config', () => {
 			});
 		});
 
-		it('should get a top-level config value by key', () => {
+		it('should start a top-level config value by key', () => {
 			expect(Config.get('projectId')).toBe('static-global-projectId');
 			expect(Config.get('location')).toBe('static-global-location');
 		});
 
-		it('should get a module config by module name', () => {
+		it('should start a module config by module name', () => {
 			const genaiConfig = Config.get('genai');
 			expect(genaiConfig).toEqual({
 				model: 'static-genai-model',
@@ -78,13 +78,13 @@ describe('Config', () => {
 			});
 		});
 
-		it('should get a specific module config value using dot notation', () => {
+		it('should start a specific module config value using dot notation', () => {
 			expect(Config.get('genai.model')).toBe('static-genai-model');
 			expect(Config.get('genai.embeddingModel')).toBe('static-genai-embeddingModel');
 			expect(Config.get('azure.deploymentName')).toBe('static-azure-deploymentName');
 		});
 
-		it('should get a specific module config value using slash notation', () => {
+		it('should start a specific module config value using slash notation', () => {
 			expect(Config.get('genai/model')).toBe('static-genai-model');
 			expect(Config.get('azure/baseUrl')).toBe('static-azure-baseUrl');
 		});
@@ -95,7 +95,7 @@ describe('Config', () => {
 		});
 	});
 
-	describe('get() - with request context', () => {
+	describe('start() - with request context', () => {
 		beforeEach(() => {
 			// Mock RequestContext with request-specific config
 			mockRequestContext.store = {
@@ -147,7 +147,7 @@ describe('Config', () => {
 		});
 	});
 
-	describe('get() - includeGlobal option', () => {
+	describe('start() - includeGlobal option', () => {
 		it('should merge global config when includeGlobal: true for module configs', () => {
 			const result = Config.get('genai', { includeGlobal: true });
 			
@@ -260,7 +260,7 @@ describe('Config', () => {
 		});
 	});
 
-	describe('get() - error handling', () => {
+	describe('start() - error handling', () => {
 		it('should throw CustomError for configuration type conflicts', () => {
 			// Setup conflicting config
 			mockRequestContext.store = {
@@ -276,7 +276,7 @@ describe('Config', () => {
 		
 	});
 
-	describe('get() - edge cases', () => {
+	describe('start() - edge cases', () => {
 		it('should handle missing RequestContext gracefully', () => {
 			mockRequestContext.store = undefined;
 			

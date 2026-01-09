@@ -11,7 +11,8 @@ import Config from '../../core/Config';
 import Debug from '../../core/Debug';
 import Profiler from '../../core/Profiler';
 import CustomError from '../../entities/error-handling/CustomError';
-import { Configuration, JsonObject, staticImplements } from '../../types/common';
+import { JsonObject, staticImplements } from '../../types/common';
+import Configuration from '../../types/Configuration';
 
 const FIELDS = ['id', 'name', 'mimeType'];
 
@@ -230,7 +231,6 @@ export default class GoogleDrive {
 		}) as Metadata;
 	}
 	
-	// TODO abstract common file get logic (see CloudStorage.ts) with a LocalFileCache class
 	public static async cache(metadata: Metadata): Promise<string> {
 		const destination = path.join(this.downloadPath, `${metadata.id}.${mime.extension(metadata.mimeType)}`);
 		
@@ -238,6 +238,7 @@ export default class GoogleDrive {
 	}
 	
 	public static async convertToPdf(localPath: string): Promise<string> {
+		// TODO add check for already exported PDFs (need to keep track?)
 		const uploadedFileMetadata = await this.upload(localPath, this.tempFolderId);
 		
 		const importedFileMetadata = await this.import(uploadedFileMetadata);
@@ -305,7 +306,7 @@ export default class GoogleDrive {
 		return path.join(this.configuration.tempPath, 'download', 'drive');
 	}
 	
-	private static get tempFolderId(): string {
+	public static get tempFolderId(): string {
 		return this.configuration.tempFolderId;
 	}
 	

@@ -9,7 +9,7 @@ export default class OutputCatalogField extends CatalogField {
 	static readonly Configuration: typeof CatalogField.BaseConfiguration & {
 		type: 'output';
 		agent: string;
-		field: string;
+		field?: string;
 	};
 
 	public get configuration(): typeof OutputCatalogField.Configuration {
@@ -17,11 +17,7 @@ export default class OutputCatalogField extends CatalogField {
 	}
 
 	public get outputField(): string {
-		const { field } = this.configuration;
-		
-		if (typeof field !== 'string') throw new CustomError(`Missing or invalid 'field' property for output field "${this.id}"`);
-		
-		return field;
+		return this.configuration.field ?? this.id;
 	}
 	
 	public get agentId(): string {

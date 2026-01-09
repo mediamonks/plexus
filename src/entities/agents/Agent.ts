@@ -1,15 +1,19 @@
 import fs from 'node:fs';
+import { Type } from '@google/genai';
 import IHasInstructions from '../IHasInstructions';
 import Instructions from '../Instructions';
 import Catalog from '../catalog/Catalog';
+import DataSources from '../data-sources/DataSources';
 import DataSourceItem from '../data-sources/origin/DataSourceItem';
+import VectorTargetDataSource from '../data-sources/target/VectorTargetDataSource';
 import CustomError from '../error-handling/CustomError';
+import Console from '../../core/Console';
 import Debug from '../../core/Debug';
 import History from '../../core/History';
 import Profiler from '../../core/Profiler';
 import Status from '../../core/Status';
 import LLM from '../../services/llm/LLM';
-import { JsonField, JsonObject } from '../../types/common';
+import { JsonField, JsonObject, LLMTool } from '../../types/common';
 
 const INPUT_OUTPUT_TEMPLATE = fs
 	.readFileSync('./data/input-output-template.txt', 'utf8')
@@ -20,9 +24,7 @@ export default class Agent implements IHasInstructions {
 	private _baseInstructions: Instructions;
 	private _catalog: Catalog;
 	private readonly _configuration: typeof Agent.Configuration;
-	private readonly _context: Record<string, Promise<void> | JsonField> = {};
-	private _displayName: string;
-	private readonly _files: DataSourceItem<string, unknown>[] = [];
+	private readonly _context: Record<string, JsonField | DataSourceItem<unknown, unknown>[]> = {};
 	private readonly _id: string;
 	private _invocation: Promise<JsonObject>;
 	private _loaded: Promise<void>;
@@ -35,7 +37,10 @@ export default class Agent implements IHasInstructions {
 		readonly required?: readonly string[];
 		readonly useHistory?: boolean;
 		readonly temperature?: number | string;
+		readonly outputTokens?: number;
+		readonly serialize?: string;
 		readonly paginationRule?: string; // TODO not fully implemented
+		readonly dataSources?: string[];
 	};
 	
 	public constructor(id: string, configuration: typeof Agent.Configuration) {
@@ -53,20 +58,15 @@ export default class Agent implements IHasInstructions {
 		return this._configuration as typeof Agent.Configuration;
 	}
 	
-	public get displayName(): string {
-		return this._displayName ??= this.id
-				.split(/[-_\s]+/)
-				.map(word => word.charAt(0).toUpperCase() + word.slice(1))
-				.join('');
-	}
-	
 	private get context(): readonly string[] {
 		return this.configuration.context ?? [];
 	}
 	
 	public get instructions(): string {
 		const inputSchema = {};
-		for (const fieldId of this.context) {
+		for (let fieldId of this.context) {
+			if (this.configuration.serialize && fieldId === this.configuration.serialize[0]) fieldId = this.configuration.serialize[1];
+			
 			const { example } = this.catalog.get(fieldId);
 			if (!example) throw new CustomError(`Missing example for catalog field "${fieldId}"`);
 			inputSchema[fieldId] = example;
@@ -89,26 +89,34 @@ export default class Agent implements IHasInstructions {
 		return this._baseInstructions ??= new Instructions(this);
 	}
 	
-	private async _mapFiles(value: JsonField | DataSourceItem<unknown, unknown>[]): Promise<JsonField> {
-		if (!(value instanceof Array) || !(value[0] instanceof DataSourceItem)) return value as JsonField;
+	private mapFiles(context: Record<string, JsonField | DataSourceItem<string, unknown>[] | DataSourceItem<string, unknown>>): { files: DataSourceItem<string, unknown>[], context: Record<string, JsonField> } {
+		const files = [];
+		context = { ...context };
+		for (const [key, value] of Object.entries(context)) {
+			if (!(value && ((value[0] ?? value) instanceof DataSourceItem))) continue;
+			
+			if (value instanceof Array) {
+				const items = value as DataSourceItem<string, unknown>[];
+				files.push(...items);
+				context[key] = items.map(item => item.fileName);
+				continue;
+			}
+			
+			const item = value as DataSourceItem<string, unknown>;
+			files.push(item);
+			context[key] = item.fileName;
+		}
 		
-		const items = value as DataSourceItem<string, unknown>[];
-		
-		this.files.push(...items);
-		
-		return items.map(item => item.fileName);
+		return { files, context: context as Record<string, JsonField> };
 	}
 	
 	private async _prepareContext(catalog: Catalog): Promise<void> {
 		const { context } = this;
 		
-		await Promise.all(context.map(async contextField =>
-			this._context[contextField] = catalog.get(contextField).getValue()
-				.then(async value => {
-					this._context[contextField] = await this._mapFiles(value);
-					Debug.log(`Prepared context field "${contextField}" for agent "${this._id}"`, 'Agent');
-				})
-		));
+		await Promise.all(context.map(async contextField => {
+			this._context[contextField] = await catalog.get(contextField).getValue();
+			Debug.log(`Prepared context field "${contextField}" for agent "${this._id}"`, 'Agent');
+		}));
 	}
 	
 	private async _determineTemperature(catalog: Catalog): Promise<void> {
@@ -145,37 +153,117 @@ export default class Agent implements IHasInstructions {
 			this._determineTemperature(catalog),
 		]).then(() => {
 			this.isReady = true;
-			Debug.log(`Completed preparation of ${this.id}`, 'Agent');
+			Debug.log(`Completed preparation of agent "${this.id}"`, 'Agent');
 		});
 	}
 	
 	private async _invoke(): Promise<JsonObject> {
-		const { required, useHistory } = this.configuration;
+		const { required, serialize } = this.configuration;
 		
 		await this._ready;
 		
-		Debug.log(`Invoking ${this.id}`, 'Agent');
+		Debug.log(`Invoking agent "${this.id}"`, 'Agent');
 		
 		if (required) for (const requiredField of required)	if (this._context[requiredField] === undefined) return {};
 		
+		Debug.dump(`agent ${this.id} instructions`, this.instructions);
+		
+		let result: JsonObject = {};
+		if (serialize) {
+			const [collectionName, itemName] = serialize;
+			const collection = this._context[collectionName];
+			
+			if (!(collection instanceof Array)) throw new CustomError(`Serialization context field "${this.configuration.serialize}" of agent "${this.id}" is not an array`);
+			
+			let count = 0;
+			Console.progress(count, collection.length, `Serializing agent "${this.id}"`);
+			const results = await Promise.all(collection.map(async item => {
+				const context = { ...this._context };
+				delete context[collectionName];
+				context[itemName] = item;
+				const result = await this.query(context as Record<string, JsonField>);
+				Console.progress(++count, collection.length, `Serializing agent "${this.id}"`);
+				return result;
+			}));
+			Console.done();
+			
+			const keys = Object.keys(results[0]);
+			for (const key of keys) {
+				result[key] = results.map((item: JsonObject) => item[key]);
+				if (result[key][0] instanceof Array) result[key] = result[key].flat();
+			}
+		} else {
+			result = await this.query(this._context as Record<string, JsonField>);
+		}
+
+		// TODO Implement or remove pagination
+		
+		Debug.log(`Completed invocation of agent "${this.id}"`, 'Agent');
+		
+		return result;
+	}
+	
+	public async invoke(): Promise<JsonObject> {
+		return this._invocation ??= this._invoke();
+	}
+	
+	private get tools(): Record<string, LLMTool>{
+		if (!this.configuration.dataSources) return {};
+		
+		const tools = {};
+		for (const dataSourceId of this.configuration.dataSources) {
+			const dataSource = DataSources.get(dataSourceId as string) as VectorTargetDataSource;
+			if (!dataSource) throw new CustomError(`Data source ${dataSourceId} not found`);
+			if (!(dataSource instanceof VectorTargetDataSource)) throw new CustomError(`Data source ${dataSourceId} is not a vector database`);
+			
+			const toolName = `query_datasource_${dataSourceId.replace(/[^a-zA-Z0-9_]/g, '_')}`;
+			
+			tools[toolName] = {
+				description: `Query data source "${dataSourceId}"`,
+				parameters: {
+					type: Type.OBJECT,
+					properties: {
+						query: {
+							type: Type.STRING,
+							description: 'The query'
+						}
+					},
+					required: ['query']
+				},
+				handler: async ({ query }) => {
+					const result = await dataSource.customQuery(query);
+					if (Array.isArray(result) && result.length === 0) {
+						return [{ info: 'No records found matching this query.' }];
+					}
+					return result;
+				}
+			};
+		}
+		
+		return tools;
+	}
+	
+	private async query(context: Record<string, JsonField>): Promise<JsonObject> {
+		const { useHistory, outputTokens } = this.configuration;
 		const instructions = this.instructions;
+		const tools = this.tools;
+		let files: DataSourceItem<string, unknown>[];
 		
-		Debug.dump(`agent ${this.id} instructions`, instructions);
-		Debug.dump(`agent ${this.id} prompt`, this._context);
-		Debug.dump(`agent ${this.id} files`, this.files);
+		({ files, context } = this.mapFiles(context));
 		
-		// TODO pass context as-is, including files as DataSourceItems, let the LLM wrapper figure out what to do with it, so it can i.e. leave gs:// links as is
-		const response = await Status.wrap(`Running ${this.id} agent`, () =>
-			Profiler.run(() =>
-				LLM.query(JSON.stringify(this._context, undefined, 2), {
-					instructions,
-					temperature: this._temperature,
-					history: useHistory && History.instance,
-					structuredResponse: true,
-					files: this.files,
-				}),
-				`invoke agent "${this.id}"`
-			)
+		Debug.dump(`agent ${this.id} prompt`, context);
+		Debug.dump(`agent ${this.id} files`, files);
+		
+		const response = await Status.wrap(`Running agent "${this.id}"`, () =>
+			LLM.query(JSON.stringify(context, undefined, 2), {
+				instructions,
+				temperature: this._temperature,
+				outputTokens,
+				history: useHistory && History.instance,
+				structuredResponse: true,
+				files,
+				tools,
+			})
 		);
 		
 		Debug.dump(`agent ${this.id} response`, response);
@@ -184,21 +272,9 @@ export default class Agent implements IHasInstructions {
 		try {
 			output = JSON.parse(response);
 		} catch (error) {
-			throw new CustomError(`Error: ${this.displayName} agent returned invalid JSON`);
+			throw new CustomError(`Agent "${this.id}" returned invalid JSON`);
 		}
 		
-		// TODO Implement or remove pagination
-		
-		Debug.log(`Completed invocation of ${this.id}`, 'Agent');
-		
 		return output;
-	}
-	
-	public async invoke(): Promise<JsonObject> {
-		return this._invocation ??= this._invoke();
-	}
-	
-	public get files(): DataSourceItem<string, unknown>[] {
-		return this._files;
 	}
 }

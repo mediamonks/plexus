@@ -8,7 +8,7 @@ import DataSourceCatalogField from '../catalog/DataSourceCatalogField';
 import CustomError from '../error-handling/CustomError';
 import UnsupportedError from '../error-handling/UnsupportedError';
 import RequestContext from '../../core/RequestContext';
-import { JsonField, JsonObject, ValueOf } from '../../types/common';
+import { JsonField, ValueOf } from '../../types/common';
 
 export default abstract class DataSource {
 	public constructor(
@@ -82,7 +82,8 @@ export default abstract class DataSource {
 		const { uri } = this.configuration;
 		return this._isDynamic ??= /\{\w+}/.test(uri);
 	}
-
+	
+	// TODO make protected?
 	public get configuration(): typeof DataSource.Configuration {
 		return DataSource.parseConfiguration(this._configuration);
 	}
@@ -102,7 +103,7 @@ export default abstract class DataSource {
 		
 		if (!originClass) throw new UnsupportedError('data source origin', origin, Object.keys(mapping));
 		
-		return this._origin = new originClass(this);
+		return this._origin = new originClass(this, this._configuration);
 	}
 	
 	public abstract query(parameters?: typeof DataSourceCatalogField.QueryParameters): Promise<JsonField | DataSourceItem<unknown, unknown>[]>;

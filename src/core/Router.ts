@@ -57,6 +57,7 @@ export default class Router {
 				
 				if (error) res.status(error instanceof CustomError ? error.status : 500);
 				
+				// TODO unpack result (...result) if it is an object
 				res.send({
 					result,
 					error: error?.toString(),
@@ -81,7 +82,7 @@ export default class Router {
 		
 		if (this.isPreflight(req)) {
 			res.set('Access-Control-Allow-Methods', 'GET, POST');
-			res.set('Access-Control-Allow-Headers', 'Contents-Type, Authorization, X-Api-Key');
+			res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Api-Key');
 			res.set('Access-Control-Max-Age', '3600');
 		}
 	}

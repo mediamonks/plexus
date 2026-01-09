@@ -1,10 +1,5 @@
-import Agent from '../entities/agents/Agent';
-import Catalog from '../entities/catalog/Catalog';
-import DataSources from '../entities/data-sources/DataSources';
-import AzureLLMPlatform from '../services/llm/AzureLLMPlatform';
-import GoogleLLMPlatform from '../services/llm/GoogleLLMPlatform';
-import LLM from '../services/llm/LLM';
-import LocalLLMPlatform from '../services/llm/LocalLLMPlatform';
+import { Type } from '@google/genai';
+import Configuration from './Configuration';
 
 export function staticImplements<TInterface>() {
 	return <TConstructor extends TInterface>(constructor: TConstructor) => constructor;
@@ -25,84 +20,22 @@ export type InvokePayload = {
 	fields?: JsonObject;
 };
 
-export type RouteMethodConfiguration = {
-	summary: string;
+export type VectorDBRecord = JsonObject & {
+	_id: string;
+	_source: string;
+	_vector: number[];
+}
+
+// TODO make more generic
+export type LLMTool = {
 	description: string;
-	handler: string;
-};
-
-export type RouteArrayField = {
-	type: 'array';
-	items: RouteField[];
-};
-
-export type RouteObjectField = {
-	type: 'object';
-	properties: Record<string, RouteField>;
-};
-
-export type RouteStringField = {
-	type: 'string';
-	format?: 'uuid';
-	enum?: string[];
-	default?: string;
-};
-
-export type RouteField = RouteStringField | {
-	type: 'number' | 'boolean';
-	description?: string;
-} | RouteArrayField | RouteObjectField;
-
-export type Configuration = {
-	projectId?: string;
-	location?: string;
-	platform?: string;
-	embeddingPlatform?: string;
-	waitForThreadUpdate?: boolean;
-	tempPath?: string;
-	output?: string[];
-	postback?: {
-		url: string;
-		headers?: Record<string, string>;
-	};
-	instructionsPath?: string;
-	agents?: Record<string, typeof Agent.Configuration>;
-	azure?: typeof AzureLLMPlatform.Configuration;
-	catalog?: typeof Catalog.Configuration;
-	drive?: {
-		tempFolderId: string;
-		tempPath?: string;
-	};
-	'data-sources'?: typeof DataSources.Configuration;
-	firestore?: {
-		databaseId: string;
-		ignoreUndefinedProperties?: boolean;
-	};
-	genai?: typeof GoogleLLMPlatform.Configuration;
-	'input-fields'?: Record<string, { id: string; label: string; description: string; }>;
-	lancedb?: {
-		databaseUri: string;
-		rateLimitDelayMs?: number;
-	};
-	llm?: typeof LLM.Configuration;
-	'local-llm'?: typeof LocalLLMPlatform.Configuration;
-	openai?: {
-		model: string;
-		apiVersion: string;
-		embeddingModel: string;
-	};
-	routes?: Record<string, {
-		parameters?: Record<string, RouteField>;
-		methods: {
-			get?: RouteMethodConfiguration & {
-				response: Record<string, RouteField>;
-			};
-			post?: RouteMethodConfiguration & {
-				payload: Record<string, RouteField>;
-			};
-		}
-	}>;
-	storage?: {
-		bucket: string;
-	};
+	parameters: {
+		type: Type;
+		properties: Record<string, {
+			type: Type;
+			description: string;
+		}>;
+		required: string[];
+	},
+	handler: (query: string) => Promise<JsonObject[]>;
 };

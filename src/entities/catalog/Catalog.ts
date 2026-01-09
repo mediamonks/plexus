@@ -55,7 +55,7 @@ export default class Catalog {
 			
 			if (!fieldConfig.example) throw new CustomError(`Missing example for catalog field "${key}"`);
 			
-			schema[fieldConfig.field] = fieldConfig.example;
+			schema[fieldConfig.field ?? key] = fieldConfig.example;
 		}
 		
 		return schema;

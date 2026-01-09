@@ -1,16 +1,20 @@
 import fs from 'node:fs/promises';
-import { GoogleGenAI, Content, Part } from '@google/genai';
+import { GoogleGenAI, Content, Part, FunctionDeclaration, Type } from '@google/genai';
 import ILLMPlatform, { QueryOptions } from './ILLMPlatform';
-import Config from '../../core/Config';
-import { staticImplements } from '../../types/common';
-import DataSourceItem from '../../entities/data-sources/origin/DataSourceItem';
-import GoogleCloudStorageDataSourceItem from '../../entities/data-sources/origin/GoogleCloudStorageDataSourceItem';
+import LLMPlatform from './LLMPlatform';
+import Debug from '../../core/Debug';
 import Profiler from '../../core/Profiler';
+import DataSourceItem from '../../entities/data-sources/origin/DataSourceItem';
+import CustomError from '../../entities/error-handling/CustomError';
+import GoogleCloudStorageDataSourceItem from '../../entities/data-sources/origin/GoogleCloudStorageDataSourceItem';
+import { staticImplements } from '../../types/common';
 
 const { GOOGLE_GENAI_API_KEY } = process.env;
 
 @staticImplements<ILLMPlatform>()
-export default class GoogleLLMPlatform {
+export default class GoogleLLMPlatform extends LLMPlatform {
+	protected static readonly configModuleName: 'genai' = 'genai';
+	
 	public static readonly supportedMimeTypes: Set<string> = new Set([
 		'application/json',
 		'application/pdf',
@@ -25,6 +29,7 @@ export default class GoogleLLMPlatform {
 		model: string;
 		embeddingLocation: string;
 		embeddingModel: string;
+		outputTokens?: number;
 		quotaDelayMs: number;
 		apiKey: string;
 		useVertexAi: boolean;
@@ -38,11 +43,12 @@ export default class GoogleLLMPlatform {
 	public static async query(query: string, {
 		instructions,
 		history,
-		temperature,
-		maxTokens,
-		structuredResponse,
 		model,
+		temperature,
+		outputTokens,
+		structuredResponse,
 		files = [],
+		tools = {},
 	}: QueryOptions = {}): Promise<string> {
 		const fileParts = await Profiler.run(() => this.createFileParts(files), 'GoogleLLMPlatform.createFileParts');
 		
@@ -56,22 +62,67 @@ export default class GoogleLLMPlatform {
 			{ role: 'user', parts },
 		];
 		
-		model ??= this.configuration.model;
+		model ??= this.model;
+		outputTokens ??= this.outputTokens;
 		
 		await Profiler.run(() => this.quotaDelay(), 'GoogleLLMPlatform.quotaDelay');
+
+		const toolNames = Object.keys(tools);
+		const functionDeclarations = toolNames.map(toolName => ({
+			name: toolName,
+			description: tools[toolName].description,
+			parameters: tools[toolName].parameters,
+		}));
 		
-		const response = await Profiler.run(async () =>  this.client.models.generateContent({
-			model,
-			contents,
-			config: {
-				systemInstruction: instructions,
-				temperature,
-				maxOutputTokens: maxTokens,
-				responseMimeType: structuredResponse && 'application/json',
-			},
-		}), 'GoogleLLMPlatform.query');
+		let response, finalResponse;
+		let loopCount = 0;
+		do {
+			if (loopCount++ > 10) throw new CustomError('Tool loop limit exceeded');
+			
+			Debug.log('Querying model', 'GoogleLLMPlatform');
+			response = await Profiler.run(async () =>  this.client.models.generateContent({
+				model,
+				contents,
+				config: {
+					systemInstruction: instructions,
+					temperature,
+					maxOutputTokens: outputTokens,
+					responseMimeType: structuredResponse ? 'application/json' : undefined,
+					tools: (toolNames.length && [{ functionDeclarations }]) || [],
+				},
+			}), 'GoogleLLMPlatform.query');
+			
+			const candidate = response.candidates[0];
+			const responseParts = candidate.content.parts;
+			const functionCallParts = responseParts.filter(part => part.functionCall);
+			
+			if (functionCallParts.length) {
+				contents.push(candidate.content);
+				
+				const functionResponseParts = await Promise.all(functionCallParts.map(async part => {
+					Debug.dump('tool call', part.functionCall);
+					const { id, name, args } = part.functionCall;
+					if (!tools[name]) throw new CustomError(`Tool "${name}" not found`);
+					Debug.log(`Executing tool "${name}"`, 'GoogleLLMPlatform');
+					
+					try {
+						const toolResult = await tools[name].handler(args);
+						Debug.dump('tool call result', toolResult);
+						return { functionResponse: { id, name: name, response: { output: toolResult } } };
+					} catch (error) {
+						Debug.dump('tool call error', error.toString());
+						return { functionResponse: { id, name: name, response: { error: error.toString() } } };
+					}
+				}));
+				
+				contents.push({ role: 'user', parts: functionResponseParts });
+				Debug.dump('chat contents', contents);
+			} else {
+				finalResponse = responseParts.map(part => part.text).join('');
+			}
+		} while (!finalResponse);
 		
-		return response.candidates[0].content.parts[0].text;
+		return finalResponse;
 	}
 	
 	public static async generateQueryEmbeddings(text: string, model?: string): Promise<number[]> {
@@ -82,12 +133,29 @@ export default class GoogleLLMPlatform {
 		return await this.generateEmbeddings(text, model, 'RETRIEVAL_DOCUMENT');
 	}
 	
-	public static get embeddingModel(): string {
-		return this.configuration.embeddingModel;
+	protected static get configuration(): typeof GoogleLLMPlatform.Configuration {
+		return super.configuration as typeof GoogleLLMPlatform.Configuration;
 	}
 	
-	private static get configuration(): typeof GoogleLLMPlatform.Configuration {
-		return Config.get('genai', { includeGlobal: true });
+	private static get functions(): FunctionDeclaration[] {
+		return [{
+			name: `query_datasource`,
+			description: `Query data source`,
+			parameters: {
+				type: Type.OBJECT,
+				properties: {
+					dataSourceId: {
+						type: Type.STRING,
+						description: 'The data source ID'
+					},
+					query: {
+						type: Type.STRING,
+						description: 'The query'
+					}
+				},
+				required: ['dataSourceId', 'query']
+			}
+		}];
 	}
 	
 	private static async generateEmbeddings(input: string, model?: string, taskType?: string): Promise<number[]> {
@@ -99,11 +167,11 @@ export default class GoogleLLMPlatform {
 		
 		await this.quotaDelay();
 		
-		const result = await this.embeddingClient.models.embedContent({
+		const result = await Profiler.run(() => this.embeddingClient.models.embedContent({
 			model,
 			contents: input,
 			config: { taskType },
-		});
+		}), 'GoogleLLMPlatform.generateEmbeddings');
 		
 		const vector = result.embeddings[0].values;
 		
@@ -146,7 +214,7 @@ export default class GoogleLLMPlatform {
 			useVertexAi,
 		} = this.configuration;
 		
-		if (embeddingLocation === location) return this._embeddingClient = this.client;
+		if (!embeddingLocation || embeddingLocation === location) return this._embeddingClient = this.client;
 		
 		if (useVertexAi) {
 			return this._embeddingClient = new GoogleGenAI({
@@ -161,6 +229,16 @@ export default class GoogleLLMPlatform {
 	
 	private static async createFileParts(files: DataSourceItem<unknown, unknown>[]): Promise<Part[]> {
 		return await Promise.all(files.map(async item => {
+			if (!this.supportedMimeTypes.has(item.mimeType)) {
+				const localFile = await item.toPDF();
+				return {
+					inlineData: {
+						mimeType: 'application/pdf',
+						data: await fs.readFile(localFile, { encoding: 'base64' }),
+					},
+				};
+			}
+			
 			if (item instanceof GoogleCloudStorageDataSourceItem && (await item.size) <= 52428800 * 1024) return {
 				fileData: {
 					fileUri: item.uri,
