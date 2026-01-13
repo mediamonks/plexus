@@ -1,4 +1,5 @@
 {
+	"_instructionsPath": "instructions/bosch",
 	"profiling": true,
 	"vectordb": {
 		"engine": "cloudsql"
@@ -71,24 +72,66 @@
 		},
 		"now": {
 			"type": "input",
-			"field": "now",
 			"required": true,
 			"example": "2025-12-31"
 		},
 		"response": {
 			"type": "output",
 			"agent": "bosch-chatbot",
-			"field": "response",
-			"example": "Your response to the user prompt goes here."
+			"example": "Your response to the user prompt goes here.",
+			"required": true
+		},
+		"table": {
+			"type": "output",
+			"agent": "bosch-chatbot",
+			"example": {
+				"columns": [
+					{
+						"label": "Column Label",
+						"format": "text | number | percentage"
+					}
+				],
+				"rows": [
+					[
+						"value for row 1, column 1",
+						"value for row 1, column 2",
+						123
+					],
+					[
+						"value for row 2, column 1",
+						"value for row 3, column 2",
+						456
+					]
+				]
+			}
+		},
+		"chart": {
+			"type": "output",
+			"agent": "bosch-chatbot",
+			"example": {
+				"type": "bar | line | pie | doughnut",
+				"title": "Chart Title",
+				"data": {
+					"labels": ["Label 1", "Label 2", "Label 3"],
+					"datasets": [
+						{
+							"label": "Dataset 1",
+							"data": [123, 456, 789]
+						},
+						{
+							"label": "Dataset 2",
+							"data": [123, 456, 789]
+						}
+					]
+				}
+			}
 		},
 		"client": {
 			"type": "input",
-			"field": "client",
 			"example": "The currently selected client, if any. If the user refers to \"this client\" or \"the client\", or something similar, this is the one they mean"
 		},
 		"product": {
 			"type": "input",
-			"field": "product",
 			"example": "The currently selected product, if any. If the user refers to \"this product\" or \"the product\", or something similar, this is the one they mean"
 		}
 	},
@@ -137,6 +180,8 @@
 		}
 	},
 	"output": [
-		"response"
+		"response",
+		"table",
+		"chart"
 	]
 }

@@ -55,3 +55,8 @@ Rules:
 - Your queries don't need to be super precise, just make sure you retrieve enough data to answer the question without exceeding your context window.
 - Make sure to use valid PostgreSQL queries.
 - Relative date calculation: You must calculate relative dates (like "last month") based on the `now` field provided in the input. Perform the arithmetic carefully (e.g. if now is 01.2026, last month is 12.2025).
+
+Output:
+- Your text response should go in the `response` field. Try to keep this devoid of formatting (e.g. markdown) and extensive numerical data.
+- In addition to a text response, you can also provide tabular and/or chart data, using the `table` and `chart` fields respectively. Use this to convey numerical information. If you do so, refer to it in your text response.
+- The `table` and `chart` fields are optional. Use them only when you need to convey numerical information. Do not duplicate data in both the `table` and the `chart` field, use whichever one makes the most sense for the data you wish to convey. Only use both if you use them to convey different sets of data or different perspectives of the same data.

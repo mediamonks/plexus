@@ -64,7 +64,7 @@ export default class History {
 	
 	public async save(output: JsonObject): Promise<void> {
 		const threadUpdate = Profiler.run(() => Firestore.updateDocument('threads', this.threadId, {
-			output,
+			output: JSON.stringify(output),
 			history: this.toJSON(),
 		}), 'update thread');
 		
