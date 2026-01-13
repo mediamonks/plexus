@@ -10,6 +10,7 @@ export default class OutputCatalogField extends CatalogField {
 		type: 'output';
 		agent: string;
 		field?: string;
+		required?: boolean;
 	};
 
 	public get configuration(): typeof OutputCatalogField.Configuration {
@@ -35,7 +36,7 @@ export default class OutputCatalogField extends CatalogField {
 		
 		const value = result[this.outputField];
 		
-		if (value === undefined) throw new CustomError(`Agent "${this.agentId}" failed to output field "${this.outputField}"`);
+		if (this.configuration.required && value === undefined) throw new CustomError(`Agent "${this.agentId}" failed to output field "${this.outputField}"`);
 		
 		return value;
 	}

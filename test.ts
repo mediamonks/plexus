@@ -83,9 +83,8 @@ async function ingest(namespace, body) {
 	
 	// await invoke({ config, fields: { prompt: 'What was the best selling product last month?', now: '2025-12-31' } });
 	await invoke({ config, fields: {
-		prompt: 'Based on their current trajectory, how much more revenue does this client need to reach the next bonus band, and what are the specific financial benefits?',
-		now: '2025-12-31',
-		client: 'TOOL DEPOT LIMITED'
+		prompt: 'How does Q4 of 2025 compare to Q4 of 2024 on a product division basis?',
+		now: '2025-12-31'
 	} });
 	// await ingest('import', { config });
 }());
