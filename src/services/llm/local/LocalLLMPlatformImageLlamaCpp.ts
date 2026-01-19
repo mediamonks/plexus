@@ -28,7 +28,7 @@ export default class LocalLLMPlatformImageLlamaCpp implements ILocalLLMPlatformI
 		};
 	}
 	
-	public async createUserContent(query: string, files: DataSourceItem<string, unknown>[]): Promise<OpenAI.Chat.Completions.ChatCompletionContentPart[]> {
+	public async createUserContent(query: string, files: DataSourceItem<string>[]): Promise<OpenAI.Chat.Completions.ChatCompletionContentPart[]> {
 		const fileParts = await LocalLLMPlatform.createFileParts(files);
 		
 		const textParts = fileParts.filter((part): part is OpenAI.Chat.Completions.ChatCompletionContentPartText => part.type === 'text');

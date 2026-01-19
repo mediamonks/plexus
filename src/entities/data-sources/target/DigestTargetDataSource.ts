@@ -4,6 +4,7 @@ import Storage from '../../storage/Storage';
 import StorageFile from '../../storage/StorageFile';
 import IHasInstructions from '../../IHasInstructions';
 import Instructions from '../../Instructions';
+import CustomError from '../../error-handling/CustomError';
 
 export default class DigestTargetDataSource extends DataSource implements IHasInstructions {
 	declare protected readonly _configuration: typeof DigestTargetDataSource.Configuration;
@@ -37,6 +38,14 @@ export default class DigestTargetDataSource extends DataSource implements IHasIn
 		} catch (error) {
 			return await this.read();
 		}
+	}
+	
+	public async getToolCallSchema(): Promise<never> {
+		throw new CustomError('Not implemented');
+	}
+	
+	public async toolCall(): Promise<never> {
+		throw new CustomError('Not implemented');
 	}
 	
 	private async read(): Promise<string> {

@@ -7,10 +7,8 @@ import Config from '../../core/Config';
 import History from '../../core/History';
 import Profiler from '../../core/Profiler';
 import DataSourceItem from '../../entities/data-sources/origin/DataSourceItem';
-import UnknownError from '../../entities/error-handling/UnknownError';
 import UnsupportedError from '../../entities/error-handling/UnsupportedError';
-import { LLMTool } from '../../types/common';
-import EMBEDDING_MODELS from '../../../data/embedding-models.json';
+import { Tool } from '../../types/common';
 
 type QueryOptions = {
 	instructions?: string;
@@ -18,8 +16,8 @@ type QueryOptions = {
 	temperature?: number;
 	outputTokens?: number;
 	structuredResponse?: boolean;
-	files?: DataSourceItem<string, unknown>[];
-	tools?: Record<string, LLMTool>;
+	files?: DataSourceItem<string>[];
+	tools?: Record<string, Tool>;
 };
 
 export default class LLM {
@@ -39,9 +37,8 @@ export default class LLM {
 		outputTokens,
 		structuredResponse,
 		files,
-		tools,
 	}: QueryOptions): Promise<string> {
-		temperature ??= this.configuration.temperature;
+		temperature ??= this.configuration.temperature ?? 0;
 		outputTokens ??= this.configuration.outputTokens;
 		
 		await Profiler.run(async () => await history.ready, 'waiting for history to be ready');
@@ -53,7 +50,6 @@ export default class LLM {
 			history,
 			structuredResponse,
 			files,
-			tools,
 		});
 	}
 	
@@ -67,12 +63,6 @@ export default class LLM {
 	
 	public static get embeddingModel(): string {
 		return this.embeddingPlatform.embeddingModel ?? this.configuration.embeddingModel;
-	}
-	
-	public static get dimensions(): number {
-		if (!EMBEDDING_MODELS[this.embeddingModel]) throw new UnknownError('dimensions for embedding model ', this.embeddingModel, EMBEDDING_MODELS);
-		
-		return EMBEDDING_MODELS[this.embeddingModel].dimensions;
 	}
 	
 	public static get supportedMimeTypes(): Set<string> {
@@ -89,6 +79,10 @@ export default class LLM {
 	
 	private static get embeddingPlatform(): ILLMPlatform {
 		return this.getPlatformClass(this.configuration.embeddingPlatform);
+	}
+	
+	public static async upload(item: DataSourceItem): Promise<void> {
+		return await this.platform.upload(item);
 	}
 	
 	private static getPlatformClass(platform: string): ILLMPlatform {

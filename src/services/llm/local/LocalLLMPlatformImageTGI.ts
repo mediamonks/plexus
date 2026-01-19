@@ -25,7 +25,7 @@ export default class LocalLLMPlatformImageTGI implements ILocalLLMPlatformImage 
 		};
 	}
 	
-	public async createUserContent(query: string, files: DataSourceItem<string, unknown>[]): Promise<OpenAI.Chat.Completions.ChatCompletionContentPart[]> {
+	public async createUserContent(query: string, files: DataSourceItem<string>[]): Promise<OpenAI.Chat.Completions.ChatCompletionContentPart[]> {
 		const fileParts = await LocalLLMPlatform.createFileParts(files);
 		
 		return [{ type: 'text', text: query }, ...fileParts];

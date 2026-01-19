@@ -4,7 +4,7 @@ import IVectorDBEngine from './IVectorDBEngine';
 import GoogleAuthClient from '../google-drive/GoogleAuthClient';
 import Config from '../../core/Config';
 import Profiler from '../../core/Profiler';
-import { JsonObject, JsonPrimitive, staticImplements } from '../../types/common';
+import { JsonObject, JsonPrimitive, ToolCallSchemaProperty, staticImplements } from '../../types/common';
 
 @staticImplements<IVectorDBEngine<string>>()
 export default class CloudSQL {
@@ -15,6 +15,10 @@ export default class CloudSQL {
 		user: string;
 		database: string;
 	};
+	
+	public static readonly Query: string;
+	
+	public static readonly description = 'PostgreSQL+PgVector';
 
 	private static _client: pg.Pool;
 	
@@ -105,12 +109,23 @@ export default class CloudSQL {
 		return new Set(result.rows.map(row => row._id));
 	}
 	
-	public static async query(query: string): Promise<JsonObject[]> {
-		return Profiler.run(async () => {
+	public static async query(query: typeof CloudSQL.Query): Promise<JsonObject[]> {
+		return await Profiler.run(async () => {
 			const client = await this.getClient();
 			const result = await client.query(query);
 			return result.rows;
 		}, 'CloudSQL.query');
+	}
+	
+	public static readonly toolCallQuerySchema: ToolCallSchemaProperty = {
+		type: 'string' as const,
+		description: 'PostgreSQL+PgVector query string',
+	};
+	
+	public static async getSchema(tableName: string): Promise<string> {
+		const client = await this.getClient();
+		const result = await client.query(`SELECT column_name, data_type, is_nullable FROM information_schema.columns WHERE table_name = $1`, [tableName]);
+		return result.rows.map(({ column_name, data_type, is_nullable }) => `${column_name} ${data_type} ${is_nullable === 'YES' ? 'NULL' : 'NOT NULL'}`).join(', ');
 	}
 	
 	private static get instanceConnectionName(): string {

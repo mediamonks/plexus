@@ -30,7 +30,7 @@ export default class InputCatalogField extends CatalogField {
 		return !!this.configuration.required;
 	}
 	
-	protected async populate(): Promise<JsonField | DataSourceItem<unknown, unknown>[]> {
+	protected async populate(): Promise<JsonField | DataSourceItem[]> {
 		Debug.log(`Populating input field "${this.id}"`, 'Catalog');
 		
 		const payload = RequestContext.get('payload') as InvokePayload;

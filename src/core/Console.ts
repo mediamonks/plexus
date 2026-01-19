@@ -36,10 +36,11 @@ export default class Console {
 		process.stderr.write(`\r[${'='.repeat(pips)}${' '.repeat(Math.max(MAX_PIPS - pips, 0))}] ${label}`);
 	}
 	
-	public static activity(value: number, label: string = '') {
+	public static activity(label: string = '', value?: number) {
 		if (process.env['PLEXUS_MODE'] !== 'cli') return;
 		
-		const char = ['|', '/', '-', '\\'][value % 4];
+		const char = value === undefined? ['|', '/', '-', '\\'][value % 4] : '·';
+		
 		process.stderr.write(`\r[${char}] ${label}`);
 	}
 	

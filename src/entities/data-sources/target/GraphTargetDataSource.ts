@@ -22,6 +22,14 @@ export default class GraphTargetDataSource extends DataSource {
 		await Neo4j.createNodes(this.id, this.generator());
 	}
 	
+	public async getToolCallSchema(): Promise<never> {
+		throw new CustomError('Not implemented');
+	}
+	
+	public async toolCall(): Promise<never> {
+		throw new CustomError('Not implemented');
+	}
+	
 	protected async *generator(): AsyncGenerator<JsonObject & { _id: string }> {
 		const items = await this.origin.getItems();
 		

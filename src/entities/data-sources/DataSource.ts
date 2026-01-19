@@ -8,7 +8,7 @@ import DataSourceCatalogField from '../catalog/DataSourceCatalogField';
 import CustomError from '../error-handling/CustomError';
 import UnsupportedError from '../error-handling/UnsupportedError';
 import RequestContext from '../../core/RequestContext';
-import { JsonField, ValueOf } from '../../types/common';
+import { JsonField, ValueOf, ToolCallSchema, ToolCallResult } from '../../types/common';
 
 export default abstract class DataSource {
 	public constructor(
@@ -106,9 +106,13 @@ export default abstract class DataSource {
 		return this._origin = new originClass(this, this._configuration);
 	}
 	
-	public abstract query(parameters?: typeof DataSourceCatalogField.QueryParameters): Promise<JsonField | DataSourceItem<unknown, unknown>[]>;
+	public abstract query(parameters?: typeof DataSourceCatalogField.QueryParameters): Promise<JsonField | DataSourceItem[]>;
 	
 	public abstract ingest(): Promise<void>;
+	
+	public abstract getToolCallSchema(): Promise<ToolCallSchema>;
+	
+	public abstract toolCall(parameters: Record<string, unknown>): Promise<ToolCallResult>;
 	
 	public async getResolvedUri(): Promise<string> {
 		if (this._resolvedUri) return this._resolvedUri;

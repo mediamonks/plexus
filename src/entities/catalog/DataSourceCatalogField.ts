@@ -54,7 +54,7 @@ export default class DataSourceCatalogField extends CatalogField {
 		return DataSources.get(this.dataSourceId);
 	}
 	
-	protected async populate(): Promise<JsonField | DataSourceItem<unknown, unknown>[]> {
+	protected async populate(): Promise<JsonField | DataSourceItem[]> {
 		Debug.log(`Populating data source field "${this.id}"`, 'Catalog');
 		
 		const promises = [];

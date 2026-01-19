@@ -3,7 +3,7 @@ import pg from 'pg';
 import Config from '../../core/Config';
 import Docker, { ContainerOptions } from '../docker/Docker';
 import IVectorDBEngine from './IVectorDBEngine';
-import { JsonObject, JsonPrimitive, staticImplements } from '../../types/common';
+import { JsonObject, JsonPrimitive, ToolCallSchemaProperty, staticImplements } from '../../types/common';
 
 const CONTAINER_PORT = 5432;
 const IMAGE = 'pgvector/pgvector:pg17';
@@ -12,6 +12,10 @@ const IMAGE = 'pgvector/pgvector:pg17';
 export default class PgVector {
 	private static _client: pg.Pool;
 	private static _port: number;
+	
+	public static readonly Query: string;
+	
+	public static readonly description = 'PostgreSQL+PgVector';
 	
 	public static async dropTable(name: string): Promise<void> {
 		const client = await this.getClient();
@@ -101,10 +105,21 @@ export default class PgVector {
 		return new Set(result.rows.map(row => row._id));
 	}
 	
-	public static async query(query: string): Promise<JsonObject[]> {
+	public static async query(query: typeof PgVector.Query): Promise<JsonObject[]> {
 		const client = await this.getClient();
 		const result = await client.query(query);
 		return result.rows;
+	}
+	
+	public static readonly toolCallQuerySchema: ToolCallSchemaProperty = {
+		type: 'string' as const,
+		description: 'PostgreSQL+PgVector query string',
+	};
+	
+	public static async getSchema(tableName: string) {
+		const client = await this.getClient();
+		const result = await client.query(`SELECT column_name, data_type, is_nullable FROM information_schema.columns WHERE table_name = $1`, [tableName]);
+		return result.rows.map(({ column_name, data_type, is_nullable }) => `${column_name} ${data_type} ${is_nullable === 'YES' ? 'NULL' : 'NOT NULL'}`).join(', ');
 	}
 	
 	private static async getClient(): Promise<pg.Pool> {

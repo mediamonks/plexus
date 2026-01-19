@@ -4,7 +4,7 @@ import GoogleDrive from '../../../services/google-drive/GoogleDrive';
 import { JsonField, JsonObject } from '../../../types/common';
 import hash from '../../../utils/hash';
 
-export default class InputDataSourceItem extends DataSourceItem<string, unknown> {
+export default class InputDataSourceItem extends DataSourceItem {
 	constructor(private _fileName: string, private _mimeType: string, private _base64: string) {
 		super(null);
 	}

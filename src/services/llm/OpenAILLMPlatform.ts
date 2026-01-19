@@ -6,6 +6,7 @@ import Profiler from '../../core/Profiler';
 import DataSourceItem from '../../entities/data-sources/origin/DataSourceItem';
 import UnsupportedError from '../../entities/error-handling/UnsupportedError';
 import { staticImplements } from '../../types/common';
+import CustomError from '../../entities/error-handling/CustomError';
 
 @staticImplements<ILLMPlatform>()
 export default class OpenAILLMPlatform extends LLMPlatform {
@@ -39,7 +40,6 @@ export default class OpenAILLMPlatform extends LLMPlatform {
 		outputTokens,
 		structuredResponse,
 		files,
-		tools,
 	}: QueryOptions = {}): Promise<string> {
 		model ??= this.configuration.model;
 		outputTokens ??= this.outputTokens;
@@ -65,6 +65,10 @@ export default class OpenAILLMPlatform extends LLMPlatform {
 	
 	public static async generateDocumentEmbeddings(text: string, model?: string): Promise<number[]> {
 		return await this.generateEmbeddings(text, model);
+	}
+	
+	public static async upload(dataSourceItem: DataSourceItem): Promise<never> {
+		throw new CustomError('Not implemented');
 	}
 	
 	protected static get configuration(): typeof OpenAILLMPlatform.Configuration {
@@ -100,7 +104,7 @@ export default class OpenAILLMPlatform extends LLMPlatform {
 		return vector;
 	}
 	
-	protected static async createMessages(instructions: string, history: History, query: string, files: DataSourceItem<string, unknown>[]): Promise<OpenAI.ChatCompletionMessageParam[]> {
+	protected static async createMessages(instructions: string, history: History, query: string, files: DataSourceItem<string>[]): Promise<OpenAI.ChatCompletionMessageParam[]> {
 		const fileParts = await this.createFileParts(files);
 		
 		const content = [{ type: 'text', text: query }, ...fileParts];
@@ -115,7 +119,7 @@ export default class OpenAILLMPlatform extends LLMPlatform {
 		return messages;
 	}
 	
-	protected static async createFileParts(files: DataSourceItem<string, unknown>[]): Promise<OpenAI.ChatCompletionContentPart[]> {
+	protected static async createFileParts(files: DataSourceItem<string>[]): Promise<OpenAI.ChatCompletionContentPart[]> {
 		const supportedImageTypes = new Set([...this.supportedMimeTypes].filter(type => type.startsWith('image/')));
 		
 		return Promise.all(files.map(async item => {

@@ -40,27 +40,31 @@ export default class Storage {
 		return storageFile;
 	}
 	
-	public static async save(namespace: string, localPath: string, fileName: string): Promise<void> {
-		const uri = `gs://${Config.get('storage.bucket')}/files/${namespace}/${path.basename(localPath)}`;
-		// TODO check if the originalName metadata method is working
-		await CloudStorage.upload(localPath, uri, { originalName: fileName });
+	public static async save(namespace: string, localPath: string, fileName: string, description?: string): Promise<string> {
+		const uri = this.getUri(namespace, path.basename(localPath));
+		return CloudStorage.upload(localPath, uri, { originalName: fileName, description });
 	}
 	
-	public static async getFiles(namespace: string): Promise<{ uri: string; name: string; internalName: string }[]> {
+	public static async getFiles(namespace: string): Promise<{ uri: string; name: string; internalName: string; description: string }[]> {
 		const cachePath = `gs://${Config.get('storage.bucket')}/files/${namespace}`;
 		const files = await CloudStorage.files(cachePath);
 		return Promise.all(files.map(async file => {
 			const [{ metadata }] = await file.getMetadata();
 			return {
-				uri: file.cloudStorageURI.toString(),
+				uri: file.uri,
 				name: metadata.originalName as string,
 				internalName: path.basename(file.name),
+				description: (metadata.description ?? '') as string,
 			};
 		}));
 	}
 	
 	public static async delete(namespace: string, internalName: string): Promise<void> {
-		const uri = `gs://${Config.get('storage.bucket')}/files/${namespace}/${internalName}`;
+		const uri = this.getUri(namespace, internalName);
 		return CloudStorage.delete(uri);
+	}
+	
+	public static getUri(namespace: string, internalName: string): string {
+		return `gs://${Config.get('storage.bucket')}/files/${namespace}/${internalName}`;
 	}
 };

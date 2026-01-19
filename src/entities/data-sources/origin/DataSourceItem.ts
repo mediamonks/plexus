@@ -1,7 +1,7 @@
 import DataSource from '../DataSource';
 import { JsonField } from '../../../types/common';
 
-export default abstract class DataSourceItem<TTextContent, TDataContent> {
+export default abstract class DataSourceItem<TTextContent = unknown, TDataContent = unknown> {
 	private readonly _dataSource: DataSource;
 	
 	protected constructor(dataSource: DataSource) {
