@@ -36,6 +36,7 @@ export type RouteField = RouteStringField | {
 } | RouteArrayField | RouteObjectField;
 
 type Configuration = {
+	inherit?: string;
 	projectId?: string;
 	location?: string;
 	platform?: string;

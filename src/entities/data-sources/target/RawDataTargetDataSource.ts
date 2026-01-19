@@ -5,6 +5,7 @@ import Storage from '../../storage/Storage';
 import StorageFile from '../../storage/StorageFile';
 import { JsonObject } from '../../../types/common';
 import Debug from '../../../core/Debug';
+import CustomError from '../../error-handling/CustomError';
 
 type QueryResult = JsonObject[];
 
@@ -56,5 +57,13 @@ export default class RawDataTargetDataSource extends DataSource {
 		}
 		
 		return result;
+	}
+	
+	public async getToolCallSchema(): Promise<never> {
+		throw new CustomError('Not implemented');
+	}
+	
+	public async toolCall(): Promise<never> {
+		throw new CustomError('Not implemented');
 	}
 };

@@ -76,7 +76,7 @@ export default class LocalLLMPlatform extends LLMPlatform {
 		return result.choices[0].message.content ?? '';
 	}
 	
-	private static async createMessages(query: string, instructions: string, history: History, files: DataSourceItem<string, unknown>[]): Promise<OpenAI.Chat.Completions.ChatCompletionMessageParam[]> {
+	private static async createMessages(query: string, instructions: string, history: History, files: DataSourceItem[]): Promise<OpenAI.Chat.Completions.ChatCompletionMessageParam[]> {
 		const userContent = await this.image.createUserContent(query, files);
 		
 		return [
@@ -120,7 +120,7 @@ export default class LocalLLMPlatform extends LLMPlatform {
 		};
 	}
 	
-	public static async createFileParts(files: DataSourceItem<string, unknown>[]): Promise<OpenAI.Chat.Completions.ChatCompletionContentPart[]> {
+	public static async createFileParts(files: DataSourceItem<string>[]): Promise<OpenAI.Chat.Completions.ChatCompletionContentPart[]> {
 		const supportedImageTypes = new Set([...this.supportedMimeTypes].filter(type => type.startsWith('image/')));
 		
 		return Promise.all(files.map(async item => {
@@ -146,5 +146,9 @@ export default class LocalLLMPlatform extends LLMPlatform {
 			
 			throw new UnsupportedError('mime type', item.mimeType, Array.from(this.supportedMimeTypes));
 		}));
+	}
+	
+	public static async upload(dataSourceItem: DataSourceItem): Promise<never> {
+		throw new CustomError('Not implemented');
 	}
 }

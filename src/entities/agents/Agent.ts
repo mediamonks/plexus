@@ -1,5 +1,3 @@
-import fs from 'node:fs';
-import { Type } from '@google/genai';
 import IHasInstructions from '../IHasInstructions';
 import Instructions from '../Instructions';
 import Catalog from '../catalog/Catalog';
@@ -13,23 +11,34 @@ import History from '../../core/History';
 import Profiler from '../../core/Profiler';
 import Status from '../../core/Status';
 import LLM from '../../services/llm/LLM';
-import { JsonField, JsonObject, LLMTool } from '../../types/common';
+import {
+	JsonField,
+	JsonObject,
+	ToolCall,
+	ToolCallResult,
+	ToolCallSchema
+} from '../../types/common';
+import UnsupportedError from '../error-handling/UnsupportedError';
+import DataSource from '../data-sources/DataSource';
 
-const INPUT_OUTPUT_TEMPLATE = fs
-	.readFileSync('./data/input-output-template.txt', 'utf8')
-	.toString();
+const TOOLS_TEMPLATE = `### **Tools**
+You have access to the following tools. To perform a tool call, use the \`_tool_calls\` field in your response. When performing one or more tool calls, use the \`_status\` field to provide a short description of what you are doing.`;
+const INPUT_TEMPLATE = `### **Input Format (JSON)**`;
+const OUTPUT_TEMPLATE = `### **Output Format (JSON)**
+Output only JSON. Do **not** use markdown.`;
 
 export default class Agent implements IHasInstructions {
 	public isReady: boolean = false;
 	private _baseInstructions: Instructions;
 	private _catalog: Catalog;
 	private readonly _configuration: typeof Agent.Configuration;
-	private readonly _context: Record<string, JsonField | DataSourceItem<unknown, unknown>[]> = {};
+	private readonly _context: Record<string, JsonField | DataSourceItem[]> = {};
 	private readonly _id: string;
 	private _invocation: Promise<JsonObject>;
 	private _loaded: Promise<void>;
 	private _ready: Promise<void>;
 	private _temperature: number  = 0;
+	private _toolCallSchemas: Record<string, ToolCallSchema> = {};
 	
 	static readonly Configuration: {
 		readonly instructions: string;
@@ -47,7 +56,12 @@ export default class Agent implements IHasInstructions {
 		this._id = id;
 		this._configuration = configuration;
 		
-		this._loaded = this._loadBaseInstructions();
+		this._loaded = Promise.all([
+			this.loadBaseInstructions(),
+			this.loadToolCallSchemas(),
+		]).then(() => {
+			Debug.log(`Completed loading agent "${this.id}"`, 'Agent');
+		});
 	}
 	
 	public get id(): string {
@@ -58,12 +72,21 @@ export default class Agent implements IHasInstructions {
 		return this._configuration as typeof Agent.Configuration;
 	}
 	
-	private get context(): readonly string[] {
-		return this.configuration.context ?? [];
-	}
-	
 	public get instructions(): string {
-		const inputSchema = {};
+		const instructions = [this.baseInstructions.toString()];
+		
+		const tools = Object.keys(this._toolCallSchemas).map(toolName => `
+Name: ${toolName}
+Description: ${this._toolCallSchemas[toolName].description}
+Parameters schema:
+${JSON.stringify(this._toolCallSchemas[toolName].parameters, undefined, 2)}`);
+		if (tools.length) {
+			instructions.push(`${TOOLS_TEMPLATE}\n${tools.join('\n\n')}`);
+		}
+		
+		const inputSchema = {
+			_tool_call_results: [],
+		};
 		for (let fieldId of this.context) {
 			if (this.configuration.serialize && fieldId === this.configuration.serialize[0]) fieldId = this.configuration.serialize[1];
 			
@@ -71,14 +94,23 @@ export default class Agent implements IHasInstructions {
 			if (!example) throw new CustomError(`Missing example for catalog field "${fieldId}"`);
 			inputSchema[fieldId] = example;
 		}
+		if (Object.keys(inputSchema).length) {
+			instructions.push(`${INPUT_TEMPLATE}\n${JSON.stringify(inputSchema, undefined, 2)}`);
+		}
 		
-		const outputSchema = this.catalog.getAgentOutputSchema(this.id);
+		const outputSchema = {
+			_tool_calls: [
+				{
+					id: 'some unique id to identify this tool call',
+					toolName: 'some_tool',
+					arguments: { someArg: 'value', anotherArg: 123 }
+				}
+			],
+			...this.catalog.getAgentOutputSchema(this.id),
+		};
+		instructions.push(`${OUTPUT_TEMPLATE}\n${JSON.stringify(outputSchema, undefined, 2)}`);
 		
-		const inputOutput = INPUT_OUTPUT_TEMPLATE
-				.replace(/\{input}/, JSON.stringify(inputSchema, undefined, 2))
-				.replace(/\{output}/, JSON.stringify(outputSchema, undefined, 2));
-	
-		return [this.baseInstructions, this.configuration.paginationRule, inputOutput].join('\n\n');
+		return instructions.join('\n\n');
 	}
 	
 	public get catalog(): Catalog {
@@ -89,28 +121,76 @@ export default class Agent implements IHasInstructions {
 		return this._baseInstructions ??= new Instructions(this);
 	}
 	
-	private mapFiles(context: Record<string, JsonField | DataSourceItem<string, unknown>[] | DataSourceItem<string, unknown>>): { files: DataSourceItem<string, unknown>[], context: Record<string, JsonField> } {
-		const files = [];
-		context = { ...context };
-		for (const [key, value] of Object.entries(context)) {
-			if (!(value && ((value[0] ?? value) instanceof DataSourceItem))) continue;
-			
-			if (value instanceof Array) {
-				const items = value as DataSourceItem<string, unknown>[];
-				files.push(...items);
-				context[key] = items.map(item => item.fileName);
-				continue;
-			}
-			
-			const item = value as DataSourceItem<string, unknown>;
-			files.push(item);
-			context[key] = item.fileName;
-		}
-		
-		return { files, context: context as Record<string, JsonField> };
+	private get context(): readonly string[] {
+		return this.configuration.context ?? [];
 	}
 	
-	private async _prepareContext(catalog: Catalog): Promise<void> {
+	private get dataSources(): DataSource[] {
+		if (!this.configuration.dataSources) return [];
+		
+		return this.configuration.dataSources.map(dataSourceId => {
+			const dataSource = DataSources.get(dataSourceId as string) as VectorTargetDataSource;
+			
+			if (!dataSource) throw new CustomError(`Data source ${dataSourceId} not found`);
+			
+			return dataSource;
+		});
+	}
+	
+	private get tools(): Record<string, DataSource> {
+		const tools = {};
+		for (const dataSource of this.dataSources) {
+			const toolName = `query_datasource_${dataSource.id.replace(/[^a-zA-Z0-9_]/g, '_')}`;
+			tools[toolName] = dataSource;
+		}
+		return tools;
+	}
+	
+	public async prepare(catalog: Catalog): Promise<void> {
+		if (this._catalog === catalog) return;
+		
+		Debug.log(`Preparing agent "${this.id}"`, 'Agent');
+		
+		this._invocation = undefined;
+		
+		this._catalog = catalog;
+		
+		return this._ready = Promise.all([
+			this._loaded,
+			this.prepareContext(catalog),
+			this.determineTemperature(catalog),
+		]).then(() => {
+			this.isReady = true;
+			Debug.log(`Completed preparation of agent "${this.id}"`, 'Agent');
+		});
+	}
+	
+	public async invoke(): Promise<JsonObject> {
+		return this._invocation ??= this._invoke();
+	}
+	
+	private mapFiles(value: any, files: DataSourceItem<string>[] = []): any {
+		if (value instanceof DataSourceItem) {
+			files.push(value);
+			return value.fileName;
+		}
+		
+		if (Array.isArray(value)) {
+			return value.map(item => this.mapFiles(item, files));
+		}
+		
+		if (value !== null && typeof value === 'object') {
+			const result: Record<string, any> = {};
+			for (const [key, val] of Object.entries(value)) {
+				result[key] = this.mapFiles(val, files);
+			}
+			return result;
+		}
+		
+		return value;
+	}
+	
+	private async prepareContext(catalog: Catalog): Promise<void> {
 		const { context } = this;
 		
 		await Promise.all(context.map(async contextField => {
@@ -119,7 +199,7 @@ export default class Agent implements IHasInstructions {
 		}));
 	}
 	
-	private async _determineTemperature(catalog: Catalog): Promise<void> {
+	private async determineTemperature(catalog: Catalog): Promise<void> {
 		const { temperature } = this.configuration;
 		
 		this._temperature = typeof temperature === 'string'
@@ -128,7 +208,7 @@ export default class Agent implements IHasInstructions {
 		;
 	}
 	
-	private async _loadBaseInstructions(): Promise<void> {
+	private async loadBaseInstructions(): Promise<void> {
 		await Profiler.run(async () => {
 			try {
 				await this.baseInstructions.load();
@@ -138,23 +218,17 @@ export default class Agent implements IHasInstructions {
 		}, `load base instructions for agent "${this.id}"`);
 	}
 	
-	public prepare(catalog: Catalog): void {
-		if (this._catalog === catalog) return;
-		
-		Debug.log(`Preparing agent "${this.id}"`, 'Agent');
-		
-		this._invocation = undefined;
-		
-		this._catalog = catalog;
-		
-		this._ready = Promise.all([
-			this._loaded,
-			this._prepareContext(catalog),
-			this._determineTemperature(catalog),
-		]).then(() => {
-			this.isReady = true;
-			Debug.log(`Completed preparation of agent "${this.id}"`, 'Agent');
-		});
+	private async loadToolCallSchemas(): Promise<void> {
+		await Profiler.run(async () => {
+			await Promise.all(Object.keys(this.tools).map(async toolName => {
+				const dataSource = this.tools[toolName];
+				const schema = await dataSource.getToolCallSchema();
+				
+				if (!schema) throw new UnsupportedError('data source target for tool call', dataSource.configuration.target);
+				
+				this._toolCallSchemas[toolName] = schema;
+			}));
+		}, `load tool call schemas for agent "${this.id}"`);
 	}
 	
 	private async _invoke(): Promise<JsonObject> {
@@ -165,8 +239,6 @@ export default class Agent implements IHasInstructions {
 		Debug.log(`Invoking agent "${this.id}"`, 'Agent');
 		
 		if (required) for (const requiredField of required)	if (this._context[requiredField] === undefined) return {};
-		
-		Debug.dump(`agent ${this.id} instructions`, this.instructions);
 		
 		let result: JsonObject = {};
 		if (serialize) {
@@ -195,7 +267,7 @@ export default class Agent implements IHasInstructions {
 		} else {
 			result = await this.query(this._context as Record<string, JsonField>);
 		}
-
+		
 		// TODO Implement or remove pagination
 		
 		Debug.log(`Completed invocation of agent "${this.id}"`, 'Agent');
@@ -203,77 +275,66 @@ export default class Agent implements IHasInstructions {
 		return result;
 	}
 	
-	public async invoke(): Promise<JsonObject> {
-		return this._invocation ??= this._invoke();
-	}
-	
-	private get tools(): Record<string, LLMTool>{
-		if (!this.configuration.dataSources) return {};
-		
-		const tools = {};
-		for (const dataSourceId of this.configuration.dataSources) {
-			const dataSource = DataSources.get(dataSourceId as string) as VectorTargetDataSource;
-			if (!dataSource) throw new CustomError(`Data source ${dataSourceId} not found`);
-			if (!(dataSource instanceof VectorTargetDataSource)) throw new CustomError(`Data source ${dataSourceId} is not a vector database`);
-			
-			const toolName = `query_datasource_${dataSourceId.replace(/[^a-zA-Z0-9_]/g, '_')}`;
-			
-			tools[toolName] = {
-				description: `Query data source "${dataSourceId}"`,
-				parameters: {
-					type: Type.OBJECT,
-					properties: {
-						query: {
-							type: Type.STRING,
-							description: 'The query'
-						}
-					},
-					required: ['query']
-				},
-				handler: async ({ query }) => {
-					const result = await dataSource.customQuery(query);
-					if (Array.isArray(result) && result.length === 0) {
-						return [{ info: 'No records found matching this query.' }];
-					}
-					return result;
-				}
-			};
-		}
-		
-		return tools;
-	}
-	
 	private async query(context: Record<string, JsonField>): Promise<JsonObject> {
 		const { useHistory, outputTokens } = this.configuration;
 		const instructions = this.instructions;
-		const tools = this.tools;
-		let files: DataSourceItem<string, unknown>[];
+		let files: DataSourceItem<string>[] = [];
 		
-		({ files, context } = this.mapFiles(context));
+		const mappedContext = this.mapFiles(context, files);
 		
-		Debug.dump(`agent ${this.id} prompt`, context);
+		Debug.dump(`agent ${this.id} instructions`, instructions);
+		Debug.dump(`agent ${this.id} context`, mappedContext);
 		Debug.dump(`agent ${this.id} files`, files);
+		Debug.log(`Querying model for agent "${this.id}`, 'Agent');
 		
-		const response = await Status.wrap(`Running agent "${this.id}"`, () =>
-			LLM.query(JSON.stringify(context, undefined, 2), {
-				instructions,
-				temperature: this._temperature,
-				outputTokens,
-				history: useHistory && History.instance,
-				structuredResponse: true,
-				files,
-				tools,
-			})
-		);
-		
-		Debug.dump(`agent ${this.id} response`, response);
-		
-		let output: JsonObject;
-		try {
-			output = JSON.parse(response);
-		} catch (error) {
-			throw new CustomError(`Agent "${this.id}" returned invalid JSON`);
-		}
+		let response: string, hasToolCalls: boolean, toolCallResults: ToolCallResult[] = [], output: JsonObject;
+		let history = useHistory ? History.instance : new History(); // TODO use a local copy of history, we should not modify the global history
+		let prompt = JSON.stringify(mappedContext, undefined, 2);
+		do {
+			response = await Status.wrap(`Running agent "${this.id}"`, () =>
+				LLM.query(prompt, {
+					instructions,
+					temperature: this._temperature,
+					outputTokens,
+					history,
+					structuredResponse: true,
+					files,
+				})
+			);
+			
+			Debug.dump(`agent ${this.id} response`, response);
+			
+			try {
+				output = JSON.parse(response);
+			} catch (error) {
+				throw new CustomError(`Agent "${this.id}" returned invalid JSON`);
+			}
+			
+			const toolCalls = output._tool_calls as ToolCall[];
+			hasToolCalls = Boolean(Array.isArray(toolCalls) && toolCalls.length);
+			
+			if (hasToolCalls) {
+				if (output._status) {
+					Status.send(output._status as string);
+				}
+				
+				toolCallResults = await Promise.all(toolCalls.map(async toolCall => {
+					Debug.log(`Calling tool "${toolCall.toolName}" for agent "${this.id}"`, 'Agent');
+					const result = await this.tools[toolCall.toolName].toolCall(toolCall.arguments);
+					Debug.dump(`agent ${this.id} tool call result`, result);
+					return result;
+				}));
+				
+				history.add('user', prompt);
+				history.add('model', response);
+				const mappedToolCallResults = this.mapFiles(toolCallResults, files = []);
+				
+				prompt = JSON.stringify({ _tool_call_results: mappedToolCallResults }, undefined, 2);
+				
+				Debug.dump(`agent ${this.id} history`, history);
+			}
+			
+		} while (hasToolCalls);
 		
 		return output;
 	}

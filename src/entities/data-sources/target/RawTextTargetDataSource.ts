@@ -1,6 +1,8 @@
 import DataSource from '../DataSource';
 import Storage from '../../storage/Storage';
 import StorageFile from '../../storage/StorageFile';
+import UnsupportedError from '../../error-handling/UnsupportedError';
+import CustomError from '../../error-handling/CustomError';
 
 export default class RawTextTargetDataSource extends DataSource {
 	public async ingest(): Promise<void> {
@@ -15,5 +17,13 @@ export default class RawTextTargetDataSource extends DataSource {
 		} catch (error) {
 			return await this.origin.getText();
 		}
+	}
+	
+	public async getToolCallSchema(): Promise<never> {
+		throw new CustomError('Not implemented');
+	}
+	
+	public async toolCall(): Promise<never> {
+		throw new CustomError('Not implemented');
 	}
 };

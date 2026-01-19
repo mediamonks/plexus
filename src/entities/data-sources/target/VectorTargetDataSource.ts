@@ -1,9 +1,16 @@
 import DataSource from '../DataSource';
-import Debug from '../../../core/Debug';
 import Console from '../../../core/Console';
-import VectorDB from '../../../services/vector-db/VectorDB';
+import Debug from '../../../core/Debug';
 import Firestore from '../../../services/google-cloud/Firestore';
-import { JsonObject, VectorDBRecord } from '../../../types/common';
+import LanceDB from '../../../services/vector-db/LanceDB';
+import VectorDB from '../../../services/vector-db/VectorDB';
+import {
+	JsonObject,
+	ToolCallParameters, ToolCallResult,
+	ToolCallSchema,
+	VectorDBRecord
+} from '../../../types/common';
+import CustomError from '../../error-handling/CustomError';
 
 export default abstract class VectorTargetDataSource extends DataSource {
 	declare protected readonly _configuration: typeof VectorTargetDataSource.Configuration;
@@ -11,6 +18,30 @@ export default abstract class VectorTargetDataSource extends DataSource {
 	public static readonly Configuration: typeof DataSource.Configuration & {
 		incremental?: boolean;
 		externalIngestionTracking?: boolean;
+	}
+	
+	private get engine(): typeof VectorDB.engine {
+		// TODO local engine config
+		
+		return VectorDB.engine;
+	}
+	
+	public async getToolCallSchema(): Promise<ToolCallSchema> {
+		const tableName = VectorDB.getInternalTableName(this.id);
+		const schema = await this.engine.getSchema(tableName);
+		const engineDescription = this.engine.description;
+		const description = `Query ${engineDescription} database. It contains one table, called "${tableName}", with the following schema:\n${schema}`;
+		
+		return {
+			description,
+			parameters: {
+				type: 'object',
+				properties: {
+					query: this.engine.toolCallQuerySchema,
+				},
+				required: ['query'],
+			}
+		};
 	}
 	
 	public get configuration(): typeof VectorTargetDataSource.Configuration {
@@ -33,8 +64,20 @@ export default abstract class VectorTargetDataSource extends DataSource {
 		await VectorDB.create(this.id, this.withActivity(this.generator()));
 	}
 	
-	public async customQuery(query: string | JsonObject): Promise<JsonObject[]> {
-		return await VectorDB.query(query);
+	public async toolCall({ query }: ToolCallParameters): Promise<ToolCallResult> {
+		if (!query) throw new CustomError('Missing parameter "query" for vector target data source tool call');
+		
+		if (this.engine === LanceDB) {
+			(query as typeof LanceDB.Query).tableName = this.id;
+		}
+		
+		const data = await VectorDB.query(query as typeof VectorDB.Query);
+		
+		if (Array.isArray(data) && !data.length) {
+			return { message: 'No records found matching this query.' };
+		}
+		
+		return { data };
 	}
 	
 	protected abstract vectorFields: string[];
@@ -43,9 +86,9 @@ export default abstract class VectorTargetDataSource extends DataSource {
 	
 	private async *withActivity(generator: AsyncGenerator<VectorDBRecord>): AsyncGenerator<VectorDBRecord> {
 		let count = 0;
-		Console.activity(count, `Ingesting vector target data source "${this.id}"`);
+		Console.activity(`Ingesting vector target data source "${this.id}"`);
 		for await (const item of generator) {
-			Console.activity(++count, `Ingesting vector target data source "${this.id}"`);
+			Console.activity(`Ingesting vector target data source "${this.id}"`, count++);
 			yield item;
 		}
 		Console.done();

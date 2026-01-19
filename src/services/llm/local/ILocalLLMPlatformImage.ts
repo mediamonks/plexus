@@ -18,5 +18,5 @@ export default interface ILocalLLMPlatformImage {
 	readonly cacheBindPath: string;
 	
 	getContainerOptions(configuration: ContainerConfiguration): ContainerOptions;
-	createUserContent(query: string, files: DataSourceItem<string, unknown>[]): Promise<string | OpenAI.Chat.Completions.ChatCompletionContentPart[]>;
+	createUserContent(query: string, files: DataSourceItem[]): Promise<string | OpenAI.Chat.Completions.ChatCompletionContentPart[]>;
 }

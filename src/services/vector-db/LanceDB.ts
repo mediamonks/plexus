@@ -2,7 +2,8 @@ import { performance } from 'node:perf_hooks';
 import lancedb, { Connection, SchemaLike, Table } from '@lancedb/lancedb';
 import Config from '../../core/Config';
 import IVectorDBEngine from './IVectorDBEngine';
-import { JsonObject, JsonPrimitive, staticImplements } from '../../types/common';
+import { JsonObject, JsonPrimitive, ToolCallSchemaProperty, staticImplements } from '../../types/common';
+import { Schema } from '@lancedb/lancedb/dist/arrow';
 
 const _tables: Record<string, Table> = {};
 const lastTableWrites: Record<string, number> = {};
@@ -15,6 +16,16 @@ export default class LanceDB {
 		databaseUri?: string;
 		rateLimitDelayMs?: number;
 	};
+	
+	public static readonly Query: {
+		tableName: string;
+		vector: number[];
+		where?: string;
+		select?: string[];
+		limit?: number;
+	};
+	
+	public static readonly description = 'LanceDB';
 	
 	private static _connection: Connection;
 	
@@ -109,10 +120,27 @@ export default class LanceDB {
 		return new Set(records.map(item => item._id));
 	}
 	
-	public static async query(query: JsonObject): Promise<JsonObject[]> {
-		const { tableName, vector, where, select, limit } = query as any;
+	public static async query(query: typeof LanceDB.Query): Promise<JsonObject[]> {
+		const { tableName, vector, where, select, limit } = query;
 		const table = await this.getTable(tableName);
 		return table.vectorSearch(vector).where(where).select(select).limit(limit).toArray();
+	}
+	
+	public static readonly toolCallQuerySchema: ToolCallSchemaProperty = {
+		type: 'object' as const,
+		properties: {
+			vector: { type: 'array' as const, items: { type: 'number' as const, description: 'Vector dimension' }, description: 'Query vector' },
+			where: { type: 'string' as const, description: 'SQL WHERE clause filter' },
+			select: { type: 'array' as const, items: { type: 'string' as const, description: 'Field name' }, description: 'Fields to select' },
+			limit: { type: 'integer' as const, description: 'Maximum number of results' },
+		},
+		required: ['vector'],
+	};
+	
+	public static async getSchema(tableName: string): Promise<string> {
+		const table = await this.getTable(tableName);
+		const schema = await table.schema();
+		return JSON.stringify(schema);
 	}
 	
 	private static async getConnection(): Promise<Connection> {

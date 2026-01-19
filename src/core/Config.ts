@@ -84,12 +84,25 @@ export default class Config {
 	}
 	
 	private static get requestConfig(): Configuration {
-		const config = (RequestContext.store?.payload as InvokePayload)?.config;
+		let config: Configuration | string = RequestContext.get('config');
 		
-		// TODO cache config in requestcontext.config. or not? because require() already caches
-		if (typeof config === 'string') return this.loadCustomConfig(config);
+		if (config) return config;
 		
-		return config ?? {} as Configuration;
+		config = (RequestContext.get('payload') as InvokePayload)?.config;
+		
+		if (typeof config === 'string') config = this.loadCustomConfig(config);
+		
+		if (config.inherit) {
+			const inherit = this.loadCustomConfig(config.inherit);
+			delete config.inherit;
+			config = (this.merge(inherit, config) ?? {}) as Configuration;
+		}
+		
+		config ??= {};
+		
+		RequestContext.set('config', config);
+		
+		return config;
 	}
 	
 	private static get staticGlobalConfig(): Configuration {

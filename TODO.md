@@ -48,3 +48,8 @@
 
 ## Ingestion
 - Fix incremental ingestion for vector dbs
+
+## Performance
+- LocalFS class
+- Generic Cache class
+- WebOrigin class (crawl4ai)

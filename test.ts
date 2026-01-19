@@ -1,6 +1,3 @@
-import fs from 'node:fs/promises';
-
-require('dotenv/config');
 const Router = require('./src/core/Router.ts').default;
 const gcs = require('./src/services/google-cloud/CloudStorage.ts').default;
 // const payload = require('./config/test/copydesk.json');
@@ -10,7 +7,8 @@ const gcs = require('./src/services/google-cloud/CloudStorage.ts').default;
 // const config = require('./config/test/bosch.json');
 const config = require('./config/custom/bosch.json');
 
-process.env.PLEXUS_OUTPUT = 'debug';
+require('dotenv/config');
+process.env.PLEXUS_MODE = 'debug';
 
 async function authentication() {
 	console.log('Warming up GCS authentication...');
@@ -79,12 +77,25 @@ async function ingest(namespace, body) {
 	
 	// await invoke({ config });
 	
-	// await ingest('bosch-chat', { config });
+	// await ingest('sales-plays', { config });
 	
 	// await invoke({ config, fields: { prompt: 'What was the best selling product last month?', now: '2025-12-31' } });
-	await invoke({ config, fields: {
-		prompt: 'How does Q4 of 2025 compare to Q4 of 2024 on a product division basis?',
-		now: '2025-12-31'
-	} });
+	// await invoke({ config, fields: {
+	// 	prompt: 'How does Q4 of 2025 compare to Q4 of 2024 on a product division basis?',
+	// 	now: '2025-12-31'
+	// } });
 	// await ingest('import', { config });
+	
+	await invoke({
+		'config': {
+			'inherit': 'bosch',
+			'instructionsPath': 'data/instructions/agent',
+			'profiling': true
+		},
+		'fields': {
+			'prompt': 'I am about to visit this customer, what should I focus on for my visit?',
+			'now': 'Fri Jan 16 2026 11:48:28 GMT+0100 (Central European Standard Time)',
+			'customer_id': '8307334'
+		}
+	});
 }());

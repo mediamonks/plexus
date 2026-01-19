@@ -1,3 +1,6 @@
+require('dotenv').config();
+process.env.PLEXUS_MODE = 'cli';
+
 const minimist = require('minimist');
 const fs = require('node:fs');
 const Console = require('./dist/core/Console').default;
@@ -77,6 +80,14 @@ async function authentication() {
 	clearInterval(interval);
 }
 
+function formatTime(ms) {
+	const hours = Math.floor(ms / 1000 / 60 / 60);
+	const minutes = Math.floor((ms / 1000 / 60) % 60);
+	const seconds = Math.floor((ms / 1000) % 60);
+	const milliseconds = Math.floor(ms % 1000);
+	return `${hours}h ${minutes}m ${seconds}s ${milliseconds}ms`;
+}
+
 if (!COMMANDS[command] || !configName) sendHelp();
 
 const configPath = `./config/custom/${configName}.json`;
@@ -98,8 +109,6 @@ config.dataDumps = argv.dump ?? argv.d ?? false;
 
 const { fn, fields } = COMMANDS[command]();
 
-process.env.PLEXUS_MODE = 'cli';
-
 (async function () {
 	await RequestContext.create({ payload: { config, fields } }, async () => {
 		ErrorHandler.initialize();
@@ -109,8 +118,9 @@ process.env.PLEXUS_MODE = 'cli';
 		try {
 			const startTime = performance.now();
 			const result = await fn();
+			const time = Math.floor(performance.now() - startTime);
 			if (result) console.log(JSON.stringify(result, null, 2));
-			console.error(`\n${command} operation completed in ${Math.floor(performance.now() - startTime)}ms`);
+			console.error(`\n${command} operation completed in ${formatTime(time)}ms`);
 		} catch (error) {
 			ErrorHandler.log(error);
 		}

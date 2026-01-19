@@ -1,5 +1,6 @@
-import { Type } from '@google/genai';
 import Configuration from './Configuration';
+import DataSource from '../entities/data-sources/DataSource';
+import DataSourceItem from '../entities/data-sources/origin/DataSourceItem';
 
 export function staticImplements<TInterface>() {
 	return <TConstructor extends TInterface>(constructor: TConstructor) => constructor;
@@ -24,18 +25,45 @@ export type VectorDBRecord = JsonObject & {
 	_id: string;
 	_source: string;
 	_vector: number[];
-}
+};
 
-// TODO make more generic
-export type LLMTool = {
+type ToolCallSchemaPrimitive = {
+	type: 'string' | 'number' | 'integer' | 'boolean';
 	description: string;
-	parameters: {
-		type: Type;
-		properties: Record<string, {
-			type: Type;
-			description: string;
-		}>;
-		required: string[];
-	},
-	handler: (query: string) => Promise<JsonObject[]>;
+};
+
+type ToolCallSchemaObject = {
+	type: 'object';
+	properties: Record<string, ToolCallSchemaProperty>;
+	required: string[];
+	description?: string;
+};
+
+type ToolCallSchemArray = {
+	type: 'array';
+	items: ToolCallSchemaProperty;
+	description?: string;
+};
+
+export type ToolCallSchemaProperty = ToolCallSchemaPrimitive | ToolCallSchemaObject | ToolCallSchemArray;
+
+export type ToolCallSchema = {
+	description: string;
+	parameters: ToolCallSchemaObject;
+};
+
+export type Tool = DataSource;
+
+export type ToolCall = {
+	id: string;
+	toolName: string;
+	arguments: Record<string, unknown>;
+};
+
+export type ToolCallParameters = Record<string, JsonField>;
+
+export type ToolCallResult = {
+	message?: string;
+	data?: JsonObject[];
+	files?: DataSourceItem<string>[];
 };

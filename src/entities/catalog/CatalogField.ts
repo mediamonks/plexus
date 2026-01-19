@@ -11,7 +11,7 @@ export default class CatalogField {
 	private readonly _id: string;
 	private readonly _catalog: Catalog;
 	private _configuration: typeof CatalogField.Configuration;
-	protected _value: Promise<JsonField | DataSourceItem<unknown, unknown>[]>;
+	protected _value: Promise<JsonField | DataSourceItem[]>;
 
 	static readonly BaseConfiguration: {
 		type: 'input' | 'output' | 'data',
@@ -59,11 +59,11 @@ export default class CatalogField {
 		return this.configuration.example;
 	}
 	
-	protected async populate(): Promise<JsonField | DataSourceItem<unknown, unknown>[]> {
+	protected async populate(): Promise<JsonField | DataSourceItem[]> {
 		throw new CustomError('Cannot create instance of CatalogField');
 	}
 	
-	public async getValue(): Promise<JsonField | DataSourceItem<unknown, unknown>[]> {
+	public async getValue(): Promise<JsonField | DataSourceItem[]> {
 		return this._value ??= this.populate();
 	}
 	

@@ -8,6 +8,10 @@ import Profiler from '../../core/Profiler';
 import CustomError from '../../entities/error-handling/CustomError';
 import { staticImplements } from '../../types/common';
 
+class CloudStorageFile extends File {
+	public uri: string
+}
+
 const GS_URI_PATTERN = /gs:\/\/([^/]+)\/?(.*)/;
 
 @staticImplements<IHasLocalFileCache<string>>()
@@ -38,7 +42,7 @@ export default class CloudStorage {
 	
 	public static async list(uri: string): Promise<string[]> {
 		const files = await this.files(uri);
-		return files.map(file => file.cloudStorageURI.toString());
+		return files.map(file => file.uri);
 	}
 	
 	public static async download(uri: string, destination?: string): Promise<string> {
@@ -57,7 +61,7 @@ export default class CloudStorage {
 	public static async downloadAll(uri: string, destination?: string): Promise<void> {
 		const files = await this.files(uri);
 		await Promise.all(files.map(file => this.download(
-			file.cloudStorageURI.toString(),
+			file.uri,
 			destination && path.join(destination, file.name),
 		)));
 	}
@@ -73,7 +77,7 @@ export default class CloudStorage {
 	public static async cacheAll(uri: string, destination?: string): Promise<string[]> {
 		const files = await this.files(uri);
 		return Promise.all(files.map(file => this.cache(
-			file.cloudStorageURI.toString(),
+			file.uri,
 			destination && path.join(destination, file.name),
 		)));
 	}
@@ -82,13 +86,24 @@ export default class CloudStorage {
 		return uri.endsWith('/');
 	}
 	
-	public static async files(uri: string): Promise<File[]> {
+	public static async files(uri: string): Promise<CloudStorageFile[]> {
 		return Profiler.run(async () => {
 			const prefix = this.uri(uri).path;
 			
-			const [files] = await this.bucket(uri).getFiles({ prefix });
+			let [files] = await this.bucket(uri).getFiles({ prefix });
 			
-			return files.filter(file => file.name !== `${prefix}/`);
+			files = files.filter(file => file.name !== `${prefix}/`);
+			
+			const result: CloudStorageFile[] = [];
+			
+			for (const file of files) {
+				if (file.name === `${prefix}/`) continue;
+				const cloudStorageFile = file as CloudStorageFile;
+				cloudStorageFile.uri = decodeURIComponent(file.cloudStorageURI.toString());
+				result.push(cloudStorageFile);
+			}
+			
+			return result;
 		}, `gcs.files "${uri}"`);
 	}
 	

@@ -29,7 +29,7 @@ export default class OutputCatalogField extends CatalogField {
 		return agent;
 	}
 	
-	protected async populate(): Promise<JsonField | DataSourceItem<unknown, unknown>[]> {
+	protected async populate(): Promise<JsonField | DataSourceItem[]> {
 		Debug.log(`Populating output field "${this.id}"`, 'Catalog');
 		
 		const result = await Agents.get(this.agentId, this.catalog).invoke() as Record<string, JsonField>;

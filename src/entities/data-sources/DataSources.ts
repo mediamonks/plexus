@@ -32,24 +32,22 @@ export default class DataSources {
 	}
 	
 	public static get(id: string): DataSource {
-		Debug.log(`Requesting data source "${id}"`, 'DataSources');
+		// Debug.log(`Requesting data source "${id}"`, 'DataSources');
 		
-		if (this.dataSources[id]) {
-			Debug.log(`Returning data source "${id}" from request cache`, 'DataSources');
-			return this.dataSources[id];
-		}
+		// if (this.dataSources[id]) {
+		// 	Debug.log(`Returning data source "${id}" from request cache`, 'DataSources');
+		// 	return this.dataSources[id];
+		// }
 		
 		const dataSourceConfiguration = this.configuration[id];
 		
 		if (!dataSourceConfiguration) throw new UnknownError('data source', id, this.configuration);
 		
-		Debug.dump(`Data source "${id}" configuration`, dataSourceConfiguration);
-		
 		const key = hash(id, JSON.stringify(dataSourceConfiguration));
 		
-		if (this._dataSources[key]) {
-			Debug.log(`Returning data source "${id}" from memory cache`, 'DataSources');
-		}
+		// if (this._dataSources[key]) {
+		// 	Debug.log(`Returning data source "${id}" from memory cache`, 'DataSources');
+		// }
 		
 		this.dataSources[id] = this._dataSources[key] ?? this.create(id, dataSourceConfiguration);
 		

@@ -1,6 +1,6 @@
 import History from '../../core/History';
 import DataSourceItem from '../../entities/data-sources/origin/DataSourceItem';
-import { LLMTool } from '../../types/common';
+import { Tool } from '../../types/common';
 
 export type QueryOptions = {
 	instructions?: string;
@@ -9,8 +9,8 @@ export type QueryOptions = {
 	outputTokens?: number;
 	structuredResponse?: boolean;
 	model?: string;
-	files?: DataSourceItem<string, unknown>[];
-	tools?: Record<string, LLMTool>;
+	files?: DataSourceItem<string>[];
+	tools?: Record<string, Tool>;
 };
 
 export default interface ILLMPlatform {
@@ -19,4 +19,5 @@ export default interface ILLMPlatform {
 	generateQueryEmbeddings(query: string, model?: string): Promise<number[]>;
 	generateDocumentEmbeddings(document: string, model?: string): Promise<number[]>;
 	embeddingModel: string;
+	upload(item: DataSourceItem): Promise<void>;
 };
