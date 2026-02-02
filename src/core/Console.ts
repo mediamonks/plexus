@@ -1,6 +1,42 @@
+import { v4 as uuidv4 } from 'uuid';
 import Config from './Config';
 
+const MAX_PIPS = 20;
+
+class Activity {
+	constructor(private label: string, private max?: number) {}
+	
+	public id: string = uuidv4();
+	private value?: number = 0;
+	
+	public get output(): string {
+		let progress: string;
+		if (this.max) {
+			const pips: number = Math.round((this.value / this.max) * MAX_PIPS);
+			progress = '='.repeat(pips) + ' '.repeat(Math.max(MAX_PIPS - pips, 0));
+		} else {
+			progress = this.value ? ['|', '/', '-', '\\'][this.value % 4] : '·';
+		}
+		
+		return `[${progress}] ${this.label}`;
+	}
+	
+	public progress(value?: number): void {
+		if (value !== undefined) this.value = value;
+		else this.value = (this.value ?? 0) + 1;
+		
+		Console.outputActivity();
+	}
+	
+	public done(): void {
+		Console.stop(this.id);
+	}
+}
+
 export default class Console {
+	private static _activities: Activity[] = [];
+	private static _lastOutputLines: number = 0;
+	
 	public static OUTPUT_TYPE = {
 		STATUS: 'STATUS',
 		DUMP: 'DUMP',
@@ -27,24 +63,31 @@ export default class Console {
 		}
 	}
 	
-	public static progress(value: number, max: number, label: string = '') {
-		if (process.env['PLEXUS_MODE'] !== 'cli') return;
+	public static start(label: string, max?: number): Activity {
+		const activity = new Activity(label, max);
 		
-		const MAX_PIPS = 20;
+		this._activities.push(activity);
 		
-		const pips = Math.round((value / max) * MAX_PIPS);
-		process.stderr.write(`\r[${'='.repeat(pips)}${' '.repeat(Math.max(MAX_PIPS - pips, 0))}] ${label}`);
+		this.outputActivity();
+		
+		return activity;
 	}
 	
-	public static activity(label: string = '', value?: number) {
-		if (process.env['PLEXUS_MODE'] !== 'cli') return;
+	public static stop(id: string): void {
+		this._activities = this._activities.filter(activity => activity.id !== id);
 		
-		const char = value === undefined? ['|', '/', '-', '\\'][value % 4] : '·';
-		
-		process.stderr.write(`\r[${char}] ${label}`);
+		this.outputActivity();
 	}
 	
-	public static done() {
-		if (process.env['PLEXUS_MODE'] === 'cli') process.stderr.write('\r\n');
+	public static outputActivity(): void {
+		if (process.env['PLEXUS_MODE'] !== 'cli') return;
+		
+		if (this._lastOutputLines) {
+			process.stderr.write(`\x1b[${this._lastOutputLines}A\r`);
+		}
+		
+		this._lastOutputLines = this._activities.length;
+		
+		for (const activity of this._activities) process.stderr.write(activity.output + '\n');
 	}
 }

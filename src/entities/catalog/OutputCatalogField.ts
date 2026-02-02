@@ -11,6 +11,7 @@ export default class OutputCatalogField extends CatalogField {
 		agent: string;
 		field?: string;
 		required?: boolean;
+		description?: string;
 	};
 
 	public get configuration(): typeof OutputCatalogField.Configuration {

@@ -1,6 +1,6 @@
 import Config from './Config';
-import Configuration from '../types/Configuration';
 import Console from './Console';
+import Configuration from '../types/Configuration';
 
 export default class Status {
 	public static send(message: string, isRunning?: boolean): void {
@@ -20,7 +20,6 @@ export default class Status {
 			case 'cli':
 			default:
 				if (isRunning === undefined) Console.output(Console.OUTPUT_TYPE.STATUS,message);
-				else isRunning ? Console.activity(message) : Console.done();
 				break;
 		}
 	}
@@ -30,9 +29,13 @@ export default class Status {
 		
 		if (!fn) return;
 		
+		const activity = Console.start(message);
+		
 		const result = await fn();
 		
 		this.send(message, false);
+		
+		activity.done();
 		
 		return result;
 	}

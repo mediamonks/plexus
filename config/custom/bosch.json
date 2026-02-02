@@ -22,7 +22,8 @@
 			],
 			"dataSources": [
 				"sales-data",
-				"sales-plays"
+				"sales-plays",
+				"crm-data"
 			],
 			"statusField": "response",
 			"useHistory": true
@@ -81,8 +82,8 @@
 		"response": {
 			"type": "output",
 			"agent": "bosch-chatbot",
-			"example": "Your response to the user prompt goes here.",
-			"required": true
+			"example": "Your text response to the user prompt goes here.",
+			"required": false
 		},
 		"table": {
 			"type": "output",
@@ -155,6 +156,14 @@
 			"dataType": "data",
 			"folder": false,
 			"vectorFields": ["customer_name", "city", "sku_desc", "division_display_name"]
+		},
+		"crm-data": {
+			"namespace": "crm-data",
+			"uri": "gs://bosch-pt-sales-agent-data/SAPAnalyticsReport(Z70BC0D94A145676C299BE9).xlsx.csv",
+			"target": "vector",
+			"dataType": "data",
+			"folder": false,
+			"vectorFields": ["account_role", "account_from_visit", "organizer_party", "subject_of_visit", "visit_category", "visit_type", "notes"]
 		},
 		"sales-plays": {
 			"namespace": "sales-plays",

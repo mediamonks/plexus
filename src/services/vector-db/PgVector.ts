@@ -3,7 +3,7 @@ import pg from 'pg';
 import Config from '../../core/Config';
 import Docker, { ContainerOptions } from '../docker/Docker';
 import IVectorDBEngine from './IVectorDBEngine';
-import { JsonObject, JsonPrimitive, ToolCallSchemaProperty, staticImplements } from '../../types/common';
+import { JsonObject, JsonPrimitive, SchemaProperty, staticImplements } from '../../types/common';
 
 const CONTAINER_PORT = 5432;
 const IMAGE = 'pgvector/pgvector:pg17';
@@ -111,9 +111,9 @@ export default class PgVector {
 		return result.rows;
 	}
 	
-	public static readonly toolCallQuerySchema: ToolCallSchemaProperty = {
+	public static readonly toolCallQuerySchema: SchemaProperty = {
 		type: 'string' as const,
-		description: 'PostgreSQL+PgVector query string',
+		description: 'PostgreSQL query string. Use PostgreSQL syntax only (NOT SQLite).',
 	};
 	
 	public static async getSchema(tableName: string) {

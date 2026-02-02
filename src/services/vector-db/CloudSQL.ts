@@ -1,10 +1,11 @@
 import pg from 'pg';
 import { Connector, IpAddressTypes, AuthTypes } from '@google-cloud/cloud-sql-connector';
+import * as chrono from 'chrono-node';
 import IVectorDBEngine from './IVectorDBEngine';
 import GoogleAuthClient from '../google-drive/GoogleAuthClient';
 import Config from '../../core/Config';
 import Profiler from '../../core/Profiler';
-import { JsonObject, JsonPrimitive, ToolCallSchemaProperty, staticImplements } from '../../types/common';
+import { JsonObject, JsonPrimitive, SchemaProperty, staticImplements } from '../../types/common';
 
 @staticImplements<IVectorDBEngine<string>>()
 export default class CloudSQL {
@@ -32,21 +33,36 @@ export default class CloudSQL {
 	}
 	
 	public static async createTable(name: string, records: AsyncGenerator<JsonObject>): Promise<void> {
-		const client = await this.getClient();
+		const buffer: JsonObject[] = [];
+		const fieldTypes = new Map<string, string>();
+		let allFields: string[];
 		
-		const firstRecord = await records.next();
-		
-		if (firstRecord.done) return;
-		
-		const columns = this.inferColumns(firstRecord.value);
-		await client.query(`CREATE TABLE "${name}" (${columns})`);
-		
-		async function* prependFirst(): AsyncGenerator<JsonObject> {
-			yield firstRecord.value;
-			for await (const record of records) yield record;
+		while (true) {
+			const { value, done } = await records.next();
+			if (done) break;
+			
+			buffer.push(value);
+			allFields ??= Object.keys(value);
+			
+			for (const [key, val] of Object.entries(value)) {
+				if (!fieldTypes.has(key) && this.isValidValue(val)) {
+					const type = this.inferFieldType(key, val);
+					if (type) fieldTypes.set(key, type);
+				}
+			}
+			
+			if (fieldTypes.size === allFields.length) break;
 		}
 		
-		await this.append(name, prependFirst());
+		if (buffer.length === 0) return;
+		
+		const columns = this.buildColumnsFromTypes(fieldTypes);
+		const client = await this.getClient();
+		await client.query(`CREATE TABLE "${name}" (${columns})`);
+		
+		await this.executeBatchInsert(name, buffer);
+		
+		await this.append(name, records);
 	}
 	
 	public static async append(tableName: string, records: AsyncGenerator<JsonObject>): Promise<void> {
@@ -61,9 +77,7 @@ export default class CloudSQL {
 			}
 		}
 		
-		if (batch.length > 0) {
-			await this.executeBatchInsert(tableName, batch);
-		}
+		if (batch.length > 0) await this.executeBatchInsert(tableName, batch);
 	}
 	
 	public static async search(
@@ -117,15 +131,25 @@ export default class CloudSQL {
 		}, 'CloudSQL.query');
 	}
 	
-	public static readonly toolCallQuerySchema: ToolCallSchemaProperty = {
+	public static readonly toolCallQuerySchema: SchemaProperty = {
 		type: 'string' as const,
-		description: 'PostgreSQL+PgVector query string',
+		description: 'PostgreSQL query string. Use PostgreSQL syntax only (NOT SQLite).',
 	};
 	
 	public static async getSchema(tableName: string): Promise<string> {
+		const columns = await this.getColumnTypes(tableName);
+		return columns
+			.map(({ column_name, data_type, is_nullable }) => `${column_name} ${data_type} ${is_nullable === 'YES' ? 'NULL' : 'NOT NULL'}`)
+			.join(', ');
+	}
+	
+	private static async getColumnTypes(tableName: string): Promise<{ column_name: string; data_type: string; is_nullable: string }[]> {
 		const client = await this.getClient();
-		const result = await client.query(`SELECT column_name, data_type, is_nullable FROM information_schema.columns WHERE table_name = $1`, [tableName]);
-		return result.rows.map(({ column_name, data_type, is_nullable }) => `${column_name} ${data_type} ${is_nullable === 'YES' ? 'NULL' : 'NOT NULL'}`).join(', ');
+		const result = await client.query(
+			`SELECT column_name, data_type, is_nullable FROM information_schema.columns WHERE table_name = $1`,
+			[tableName]
+		);
+		return result.rows;
 	}
 	
 	private static get instanceConnectionName(): string {
@@ -158,54 +182,99 @@ export default class CloudSQL {
 		return this._client;
 	}
 	
+	private static isValidValue(value: unknown): boolean {
+		return value !== null && value !== undefined && value !== '';
+	}
+	
 	private static async executeBatchInsert(tableName: string, records: JsonObject[]): Promise<void> {
 		if (records.length === 0) return;
 		
 		const client = await this.getClient();
-		const columns = Object.keys(records[0]);
+		const columnTypes = await this.getColumnTypes(tableName);
+		const columnNames = columnTypes
+			.map(c => c.column_name)
+			.filter(name => name !== '__id');
 		
-		const placeholders = records.map((_, i) =>
-			`(${columns.map((_, j) => `$${i * columns.length + j + 1}`).join(', ')})`
+		const placeholders = records.map((_, recordIndex) =>
+			`(${columnNames.map((_, columnIndex) => `$${recordIndex * columnNames.length + columnIndex + 1}`).join(', ')})`
 		).join(', ');
 		
 		const values = records.flatMap(record =>
-			columns.map(col => {
-				const val = record[col];
-				if (col === '_vector' && Array.isArray(val)) return JSON.stringify(val);
-				return val;
+			columnNames.map(columnName => {
+				let val = record[columnName];
+				
+				if (columnName === '_vector' && Array.isArray(val)) return JSON.stringify(val);
+				
+				const columnType = columnTypes.find(({ column_name }) => column_name === columnName)?.data_type;
+				
+				if (typeof val === 'string' && val.trim() === '' && columnType !== 'text') {
+					return null;
+				}
+				
+				if (columnType?.includes('timestamp') && typeof val === 'string') {
+					return this.parseDate(val);
+				}
+				
+				return val ?? null;
 			})
 		);
 		
 		await client.query(
-			`INSERT INTO "${tableName}" (${columns.map(c => `"${c}"`).join(', ')}) VALUES ${placeholders}`,
+			`INSERT INTO "${tableName}" (${columnNames.map(c => `"${c}"`).join(', ')}) VALUES ${placeholders}`,
 			values
 		);
 	}
 	
-	private static inferColumns(record: JsonObject): string {
-		const typeOf = (key, value) => {
-			if (key === '_vector') {
-				const dimensions = Array.isArray(value) ? value.length : 0;
-				if (!dimensions) throw new Error('Vector field must be a non-empty array');
-				
-				return `vector(${dimensions})`;
+	private static parseDate(dateString: string): string | null {
+		if (!dateString || !dateString.trim()) return null;
+		const parsed = chrono.parseDate(dateString);
+		return parsed ? parsed.toISOString() : null;
+	}
+	
+	private static inferFieldType(key: string, value: unknown): string | null {
+		if (value === null || value === undefined) return null;
+		
+		if (key === '_vector') {
+			const dimensions = Array.isArray(value) ? value.length : 0;
+			if (!dimensions) throw new Error('Vector field must be a non-empty array');
+			
+			return `vector(${dimensions})`;
+		}
+		
+		if (typeof value === 'number') {
+			if (Number.isInteger(value)) return 'BIGINT';
+			return 'DOUBLE PRECISION';
+		}
+		
+		if (typeof value === 'boolean') return 'BOOLEAN';
+		
+		if (typeof value === 'string') {
+			const trimmed = value.trim();
+			
+			if (!trimmed) return null;
+			
+			if (trimmed.toLowerCase() === 'true' || trimmed.toLowerCase() === 'false') {
+				return 'BOOLEAN';
 			}
 			
-			
-			if (typeof value === 'number') {
-				if (key.endsWith('_id')) return 'BIGINT';
-				
+			if (!isNaN(Number(trimmed))) {
+				const num = Number(trimmed);
+				if (Number.isInteger(num)) return 'BIGINT';
 				return 'DOUBLE PRECISION';
 			}
 			
-			if (typeof value === 'boolean') return 'BOOLEAN';
+			if (/\bdate(time)?\b/i.test(key)) return 'TIMESTAMP';
 			
-			return 'TEXT';
+			if (chrono.parseDate(trimmed)) return 'TIMESTAMP';
 		}
 		
+		return 'TEXT';
+	}
+	
+	private static buildColumnsFromTypes(fieldTypes: Map<string, string>): string {
 		return [
 			'__id SERIAL PRIMARY KEY',
-			...Object.entries(record).map(([key, value]) => `"${key}" ${typeOf(key, value)}`)
+			...Array.from(fieldTypes.entries()).map(([key, type]) => `"${key}" ${type}`)
 		].join(', ');
 	}
 }

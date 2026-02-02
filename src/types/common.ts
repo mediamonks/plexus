@@ -6,12 +6,12 @@ export function staticImplements<TInterface>() {
 	return <TConstructor extends TInterface>(constructor: TConstructor) => constructor;
 }
 
+export type ValueOf<T> = T[keyof T];
+
 export type JsonPrimitive = string | number | boolean | null;
 export type JsonArray = JsonField[];
 export type JsonField = JsonPrimitive | JsonArray | JsonObject;
 export type JsonObject = { [key: string]: JsonField };
-
-export type ValueOf<T> = T[keyof T];
 
 export type SpreadSheetData = { sheets: { title: string; rows: any[] }[] };
 
@@ -27,38 +27,32 @@ export type VectorDBRecord = JsonObject & {
 	_vector: number[];
 };
 
-type ToolCallSchemaPrimitive = {
+type SchemaPrimitive = {
 	type: 'string' | 'number' | 'integer' | 'boolean';
-	description: string;
+	description?: string;
 };
 
-type ToolCallSchemaObject = {
+type SchemaObject = {
 	type: 'object';
-	properties: Record<string, ToolCallSchemaProperty>;
-	required: string[];
+	properties?: Record<string, SchemaProperty>;
+	required?: string[];
 	description?: string;
 };
 
-type ToolCallSchemArray = {
+type SchemaArray = {
 	type: 'array';
-	items: ToolCallSchemaProperty;
+	items: SchemaProperty;
 	description?: string;
 };
 
-export type ToolCallSchemaProperty = ToolCallSchemaPrimitive | ToolCallSchemaObject | ToolCallSchemArray;
+export type SchemaProperty = SchemaPrimitive | SchemaObject | SchemaArray;
 
 export type ToolCallSchema = {
 	description: string;
-	parameters: ToolCallSchemaObject;
+	parameters: SchemaObject;
 };
 
 export type Tool = DataSource;
-
-export type ToolCall = {
-	id: string;
-	toolName: string;
-	arguments: Record<string, unknown>;
-};
 
 export type ToolCallParameters = Record<string, JsonField>;
 

@@ -64,19 +64,21 @@ async function authentication() {
 	if (argv['no-warmup'] ?? argv['W']) return;
 	
 	const startTime = performance.now();
+	const activity = Console.start('Warming up GCS authentication...', 15000);
 	const interval = setInterval(
-		() => Console.progress(performance.now() - startTime, 15000, 'Warming up GCS authentication...'),
+		() => activity.progress(performance.now() - startTime),
 		100
 	);
 	
 	try {
 		await CloudStorage.list('gs://monks-plexus');
-		Console.done();
-		
+		activity.done();
 		console.error(`GCS authentication warmup completed in ${Math.floor(performance.now() - startTime)}ms`);
 	} catch (error) {
+		activity.done();
 		console.error('GCS authentication failed:', error.message);
 	}
+
 	clearInterval(interval);
 }
 

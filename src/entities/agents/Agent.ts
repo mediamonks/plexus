@@ -1,10 +1,12 @@
 import IHasInstructions from '../IHasInstructions';
 import Instructions from '../Instructions';
 import Catalog from '../catalog/Catalog';
+import DataSource from '../data-sources/DataSource';
 import DataSources from '../data-sources/DataSources';
 import DataSourceItem from '../data-sources/origin/DataSourceItem';
 import VectorTargetDataSource from '../data-sources/target/VectorTargetDataSource';
 import CustomError from '../error-handling/CustomError';
+import UnsupportedError from '../error-handling/UnsupportedError';
 import Console from '../../core/Console';
 import Debug from '../../core/Debug';
 import History from '../../core/History';
@@ -14,12 +16,15 @@ import LLM from '../../services/llm/LLM';
 import {
 	JsonField,
 	JsonObject,
-	ToolCall,
 	ToolCallResult,
 	ToolCallSchema
 } from '../../types/common';
-import UnsupportedError from '../error-handling/UnsupportedError';
-import DataSource from '../data-sources/DataSource';
+
+type ToolCall = {
+	id: string;
+	toolName: string;
+	arguments: Record<string, unknown>;
+};
 
 const TOOLS_TEMPLATE = `### **Tools**
 You have access to the following tools. To perform a tool call, use the \`_tool_calls\` field in your response. When performing one or more tool calls, use the \`_status\` field to provide a short description of what you are doing.`;
@@ -98,16 +103,34 @@ ${JSON.stringify(this._toolCallSchemas[toolName].parameters, undefined, 2)}`);
 			instructions.push(`${INPUT_TEMPLATE}\n${JSON.stringify(inputSchema, undefined, 2)}`);
 		}
 		
-		const outputSchema = {
-			_tool_calls: [
-				{
-					id: 'some unique id to identify this tool call',
-					toolName: 'some_tool',
-					arguments: { someArg: 'value', anotherArg: 123 }
-				}
-			],
-			...this.catalog.getAgentOutputSchema(this.id),
-		};
+		const outputSchema = this.catalog.getAgentOutputSchema(this.id);
+		if (tools.length) {
+			outputSchema.properties._tool_calls = {
+				type: 'array',
+				description: 'tool calls go here',
+				items: {
+					type: 'object',
+					properties: {
+						id: { type: 'string', description: 'unique id to identify this tool call' },
+						toolName: { type: 'string', description: 'name of the tool to call' },
+						arguments: { type: 'object', description: 'arguments to pass to the tool' },
+					},
+				},
+				example: [
+					{
+						id: 'some_unique_id',
+						toolName: 'some_tool',
+						arguments: { someArg: 'value', anotherArg: 123 }
+					}
+				]
+			}
+			outputSchema.properties._status = {
+				type: 'string',
+				description: 'short description of what the agent is doing',
+				example: 'Looking up relevant documents'
+			};
+		}
+		
 		instructions.push(`${OUTPUT_TEMPLATE}\n${JSON.stringify(outputSchema, undefined, 2)}`);
 		
 		return instructions.join('\n\n');
@@ -247,17 +270,16 @@ ${JSON.stringify(this._toolCallSchemas[toolName].parameters, undefined, 2)}`);
 			
 			if (!(collection instanceof Array)) throw new CustomError(`Serialization context field "${this.configuration.serialize}" of agent "${this.id}" is not an array`);
 			
-			let count = 0;
-			Console.progress(count, collection.length, `Serializing agent "${this.id}"`);
+			const activity = Console.start(`Serializing agent "${this.id}"`, collection.length);
 			const results = await Promise.all(collection.map(async item => {
 				const context = { ...this._context };
 				delete context[collectionName];
 				context[itemName] = item;
 				const result = await this.query(context as Record<string, JsonField>);
-				Console.progress(++count, collection.length, `Serializing agent "${this.id}"`);
+				activity.progress();
 				return result;
 			}));
-			Console.done();
+			activity.done();
 			
 			const keys = Object.keys(results[0]);
 			for (const key of keys) {
@@ -314,9 +336,7 @@ ${JSON.stringify(this._toolCallSchemas[toolName].parameters, undefined, 2)}`);
 			hasToolCalls = Boolean(Array.isArray(toolCalls) && toolCalls.length);
 			
 			if (hasToolCalls) {
-				if (output._status) {
-					Status.send(output._status as string);
-				}
+				if (output._status) Status.send(output._status as string);
 				
 				toolCallResults = await Promise.all(toolCalls.map(async toolCall => {
 					Debug.log(`Calling tool "${toolCall.toolName}" for agent "${this.id}"`, 'Agent');

@@ -1,12 +1,12 @@
+import path from 'node:path';
 import DataSource from '../DataSource';
 import DataSourceItem from '../origin/DataSourceItem';
 import GoogleCloudStorageDataSourceItem from '../origin/GoogleCloudStorageDataSourceItem';
+import CustomError from '../../error-handling/CustomError';
 import Storage from '../../storage/Storage';
+import Console from '../../../core/Console';
 import LLM from '../../../services/llm/LLM';
 import { ToolCallResult, ToolCallSchema } from '../../../types/common';
-import Console from '../../../core/Console';
-import CustomError from '../../error-handling/CustomError';
-import path from 'node:path';
 
 export default class FileTargetDataSource extends DataSource {
 	declare protected readonly _configuration: typeof FileTargetDataSource.Configuration;
@@ -50,14 +50,12 @@ export default class FileTargetDataSource extends DataSource {
 		const items = await this.origin.getItems();
 		const prompt = this.configuration.summaryPrompt ?? 'Describe the contents of this file. Use no more than 100 words.';
 		
-		Console.activity(`Ingesting file target data source "${this.id}"`);
+		const activity = Console.start(`Ingesting file target data source "${this.id}"`);
 		await Promise.all(items.map(async (item, index) => {
 			const localPath = await item.getLocalFile();
 			const uri = Storage.getUri(this.id, path.basename(localPath));
 			
 			item = new GoogleCloudStorageDataSourceItem(this, uri, item.fileName);
-			
-			await LLM.upload(item);
 			
 			let description: string;
 			if (this.configuration.enableToolCalling) {
@@ -66,9 +64,9 @@ export default class FileTargetDataSource extends DataSource {
 			
 			await Storage.save(this.id, localPath, item.fileName, description);
 			
-			Console.activity(`Ingesting file target data source "${this.id}"`, index);
+			activity.progress();
 		}));
-		Console.done();
+		activity.done();
 		
 		if (this.configuration.incremental) return;
 		
@@ -103,6 +101,6 @@ export default class FileTargetDataSource extends DataSource {
 	
 	private async getFileIndex(): Promise<string> {
 		const files = await Storage.getFiles(this.id);
-		return files.map(file => [file.name, file.description].join(': ')).join('\n');
+		return files.map(file => ['- ' + file.name, file.description].join(': ')).join('\n');
 	}
 };

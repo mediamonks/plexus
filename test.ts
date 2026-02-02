@@ -93,9 +93,14 @@ async function ingest(namespace, body) {
 			'profiling': true
 		},
 		'fields': {
-			'prompt': 'I am about to visit this customer, what should I focus on for my visit?',
+			// 'prompt': 'I am about to visit this customer, what should I focus on for my visit? Please consider the notes from any previous visits.',
+			// 'prompt': 'Have you considered the notes from any previous visits? And can you refresh my memory?',
+			// 'prompt': 'Can you show me a month to month chart for the best selling product of 2025?',
+			'prompt': 'I\'m visiting this dealer in 30 minutes. Give me a full executive summary for the visit.',
 			'now': 'Fri Jan 16 2026 11:48:28 GMT+0100 (Central European Standard Time)',
-			'customer_id': '8307334'
-		}
+			'customer_id': '8307334',
+			'customer_name': 'A1 TOOLS & FIXINGS L'
+		},
+		// 'threadId': 'c7b32df1-8211-458e-b2b5-0326c8208ac5'
 	});
 }());

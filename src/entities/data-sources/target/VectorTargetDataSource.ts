@@ -85,13 +85,12 @@ export default abstract class VectorTargetDataSource extends DataSource {
 	protected abstract generator(): AsyncGenerator<VectorDBRecord>;
 	
 	private async *withActivity(generator: AsyncGenerator<VectorDBRecord>): AsyncGenerator<VectorDBRecord> {
-		let count = 0;
-		Console.activity(`Ingesting vector target data source "${this.id}"`);
+		const activity = Console.start(`Ingesting vector target data source "${this.id}"`);
 		for await (const item of generator) {
-			Console.activity(`Ingesting vector target data source "${this.id}"`, count++);
+			activity.progress();
 			yield item;
 		}
-		Console.done();
+		activity.done();
 	}
 	
 	// TODO this doesn't work, it should be _source for the source file (item.id) and a hash of record for the record _id

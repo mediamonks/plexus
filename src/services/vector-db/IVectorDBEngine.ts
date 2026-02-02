@@ -1,9 +1,9 @@
-import { JsonObject, JsonPrimitive, ToolCallSchemaProperty } from '../../types/common';
+import { JsonObject, JsonPrimitive, SchemaProperty } from '../../types/common';
 
 // TODO refactor method signatures
 export default interface IVectorDBEngine<TQuery> {
 	Query: TQuery;
-	toolCallQuerySchema: ToolCallSchemaProperty;
+	toolCallQuerySchema: SchemaProperty;
 	description: string;
 	dropTable(name: string): Promise<void>;
 	createTable(name: string, records: AsyncGenerator<JsonObject>): Promise<void>;
