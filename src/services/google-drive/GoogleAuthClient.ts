@@ -9,6 +9,7 @@ export default class GoogleAuthClient {
 		
 		const authOptions: GoogleAuthOptions = {
 			credentials,
+			projectId: 'monks-plexus',
 			scopes: [
 				'https://www.googleapis.com/auth/drive',
 				'https://www.googleapis.com/auth/spreadsheets',

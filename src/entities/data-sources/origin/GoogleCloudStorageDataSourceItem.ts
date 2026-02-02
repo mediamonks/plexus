@@ -46,7 +46,7 @@ export default class GoogleCloudStorageDataSourceItem extends DataSourceItem<str
 		return mimeType;
 	}
 	
-	// TODO code smell?
+	// TODO code smell? async getter
 	public get size(): Promise<number> {
 		return this._size ??= CloudStorage.getSize(this.uri);
 	}
@@ -99,6 +99,10 @@ export default class GoogleCloudStorageDataSourceItem extends DataSourceItem<str
 		const localPath = this.allowCache ? await CloudStorage.cache(this.uri) : await CloudStorage.download(this.uri);
 		
 		return await GoogleDrive.convertToPdf(localPath);
+	}
+	
+	public async getSignedUrl(): Promise<string> {
+		return CloudStorage.getSignedUrl(this.uri);
 	}
 	
 	private detectDataType(): ValueOf<typeof DataSource.DATA_TYPE> {

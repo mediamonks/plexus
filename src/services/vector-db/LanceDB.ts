@@ -2,7 +2,7 @@ import { performance } from 'node:perf_hooks';
 import lancedb, { Connection, SchemaLike, Table } from '@lancedb/lancedb';
 import Config from '../../core/Config';
 import IVectorDBEngine from './IVectorDBEngine';
-import { JsonObject, JsonPrimitive, ToolCallSchemaProperty, staticImplements } from '../../types/common';
+import { JsonObject, JsonPrimitive, SchemaProperty, staticImplements } from '../../types/common';
 import { Schema } from '@lancedb/lancedb/dist/arrow';
 
 const _tables: Record<string, Table> = {};
@@ -126,7 +126,7 @@ export default class LanceDB {
 		return table.vectorSearch(vector).where(where).select(select).limit(limit).toArray();
 	}
 	
-	public static readonly toolCallQuerySchema: ToolCallSchemaProperty = {
+	public static readonly toolCallQuerySchema: SchemaProperty = {
 		type: 'object' as const,
 		properties: {
 			vector: { type: 'array' as const, items: { type: 'number' as const, description: 'Vector dimension' }, description: 'Query vector' },

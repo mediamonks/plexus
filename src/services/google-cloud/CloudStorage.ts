@@ -7,6 +7,7 @@ import Config from '../../core/Config';
 import Profiler from '../../core/Profiler';
 import CustomError from '../../entities/error-handling/CustomError';
 import { staticImplements } from '../../types/common';
+import credentials from '../../../auth/plexus.json';
 
 class CloudStorageFile extends File {
 	public uri: string
@@ -121,6 +122,20 @@ export default class CloudStorage {
 	
 	public static async delete(uri: string): Promise<void> {
 		await this.file(uri).delete();
+	}
+	
+	public static async getSignedUrl(uri: string): Promise<string> {
+		const client = new Storage({ credentials });
+		
+		const [url] = await client.bucket(this.uri(uri).bucket)
+			.file(this.uri(uri).path)
+			.getSignedUrl({
+				version: 'v4',
+				action: 'read',
+				expires: Date.now() + 15 * 60 * 1000,
+			});
+		
+		return url;
 	}
 	
 	private static get client(): Storage {

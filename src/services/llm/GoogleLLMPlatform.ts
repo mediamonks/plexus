@@ -1,13 +1,12 @@
 import fs from 'node:fs/promises';
-import { GoogleGenAI, Content, Part, FunctionDeclaration, Type } from '@google/genai';
+import { GoogleGenAI, Content, Part } from '@google/genai';
 import ILLMPlatform, { QueryOptions } from './ILLMPlatform';
 import LLMPlatform from './LLMPlatform';
+import Debug from '../../core/Debug';
 import Profiler from '../../core/Profiler';
 import DataSourceItem from '../../entities/data-sources/origin/DataSourceItem';
 import GoogleCloudStorageDataSourceItem from '../../entities/data-sources/origin/GoogleCloudStorageDataSourceItem';
 import { staticImplements } from '../../types/common';
-import Debug from '../../core/Debug';
-import CustomError from '../../entities/error-handling/CustomError';
 
 const { GOOGLE_GENAI_API_KEY } = process.env;
 
@@ -39,7 +38,6 @@ export default class GoogleLLMPlatform extends LLMPlatform {
 	private static _embeddingClient: GoogleGenAI;
 	private static _lastQuery: number;
 	private static _cachedEmbeddings: Record<string, Record<string, Record<string, number[]>>> = {};
-	private static _uploadedFiles: Map<string, { name: string; uri: string; mimeType: string }> = new Map();
 	
 	public static async query(query: string, {
 		instructions,
@@ -197,23 +195,15 @@ export default class GoogleLLMPlatform extends LLMPlatform {
 				};
 			}
 			
-			if (!this.configuration.useVertexAi) {
-				const { uri, mimeType } = await this.client.files.get({ name: item.id });
-				// TODO catch doesn't exist: not ingested
+			if (item instanceof GoogleCloudStorageDataSourceItem && (await item.size) <= 52428800 * 1024) {
+				const fileUri = this.configuration.useVertexAi ? item.uri : await item.getSignedUrl();
 				return {
 					fileData: {
-						fileUri: uri,
-						mimeType,
+						mimeType: item.mimeType,
+						fileUri,
 					}
 				};
 			}
-			
-			if (item instanceof GoogleCloudStorageDataSourceItem && (await item.size) <= 52428800 * 1024) return {
-				fileData: {
-					fileUri: item.uri,
-					mimeType: item.mimeType,
-				}
-			};
 			
 			return {
 				inlineData: {

@@ -2,12 +2,23 @@ import CatalogField from './CatalogField';
 import DataSourceCatalogField from './DataSourceCatalogField';
 import InputCatalogField from './InputCatalogField';
 import OutputCatalogField from './OutputCatalogField';
+import CustomError from '../error-handling/CustomError';
 import UnknownError from '../error-handling/UnknownError';
 import UnsupportedError from '../error-handling/UnsupportedError';
 import Config from '../../core/Config';
 import RequestContext from '../../core/RequestContext';
-import { JsonObject } from '../../types/common';
-import CustomError from '../error-handling/CustomError';
+import { JsonField, SchemaProperty } from '../../types/common';
+
+type AgentOutputSchemaProperty = SchemaProperty & {
+	example: JsonField;
+};
+
+type AgentOutputSchema = {
+	type: 'object';
+	properties: Record<string, AgentOutputSchemaProperty>;
+	required: string[];
+	additionalProperties: boolean;
+};
 
 export default class Catalog {
 	private readonly _fields: Record<string, CatalogField> = {};
@@ -45,8 +56,13 @@ export default class Catalog {
 		return this._fields[fieldId] ??= this.createField(fieldId);
 	}
 	
-	public getAgentOutputSchema(agentId: string): JsonObject {
-		const schema = {};
+	public getAgentOutputSchema(agentId: string): AgentOutputSchema {
+		const schema = {
+			type: 'object' as const,
+			properties: {},
+			required: [],
+			additionalProperties: false,
+		};
 		
 		for (const key in this.configuration) {
 			const fieldConfig = this.configuration[key] as typeof CatalogField.Configuration;
@@ -55,7 +71,14 @@ export default class Catalog {
 			
 			if (!fieldConfig.example) throw new CustomError(`Missing example for catalog field "${key}"`);
 			
-			schema[fieldConfig.field ?? key] = fieldConfig.example;
+			const fieldName = fieldConfig.field ?? key;
+			schema.properties[fieldName] = {
+				type: typeof fieldConfig.example, // TODO: type: [ <type>, null ] for optional
+				description: fieldConfig.description,
+				example: fieldConfig.example,
+			};
+			
+			if (fieldConfig.required) schema.required.push(fieldName); // TODO: always required & strict: true
 		}
 		
 		return schema;
