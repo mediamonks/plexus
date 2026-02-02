@@ -141,10 +141,15 @@ export default class CloudStorage {
 	
 	private static async getCredentials(): Promise<JWTInput> {
 		const { GOOGLE_APPLICATION_CREDENTIALS } = process.env;
+		if (GOOGLE_APPLICATION_CREDENTIALS) return JSON.parse(GOOGLE_APPLICATION_CREDENTIALS.trim());
 		
-		if (GOOGLE_APPLICATION_CREDENTIALS) return JSON.parse(GOOGLE_APPLICATION_CREDENTIALS);
-		
-		return await import('../../../auth/plexus.json');
+		try {
+			const fallbackPath = path.resolve(process.cwd(), 'auth', 'plexus.json');
+			const json = await fs.readFile(fallbackPath, 'utf8');
+			return JSON.parse(json);
+		} catch {
+			return undefined;
+		}
 	}
 	
 	private static get client(): Storage {

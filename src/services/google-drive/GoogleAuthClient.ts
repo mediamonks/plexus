@@ -1,3 +1,5 @@
+import fs from 'node:fs/promises';
+import path from 'node:path';
 import { GoogleAuth, GoogleAuthOptions } from 'google-auth-library';
 import { JWTInput } from 'google-auth-library/build/src/auth/credentials';
 
@@ -24,9 +26,14 @@ export default class GoogleAuthClient {
 	
 	private static async getCredentials(): Promise<JWTInput> {
 		const { GOOGLE_APPLICATION_CREDENTIALS } = process.env;
+		if (GOOGLE_APPLICATION_CREDENTIALS) return JSON.parse(GOOGLE_APPLICATION_CREDENTIALS.trim());
 		
-		if (GOOGLE_APPLICATION_CREDENTIALS) return JSON.parse(GOOGLE_APPLICATION_CREDENTIALS);
-		
-		return await import('../../../auth/plexus.json');
+		try {
+			const fallbackPath = path.resolve(process.cwd(), 'auth', 'plexus.json');
+			const json = await fs.readFile(fallbackPath, 'utf8');
+			return JSON.parse(json);
+		} catch {
+			return undefined;
+		}
 	}
 };
