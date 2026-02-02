@@ -1,13 +1,13 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { Storage, File, Bucket } from '@google-cloud/storage';
+import { JWTInput } from 'google-auth-library/build/src/auth/credentials';
 import IHasLocalFileCache from '../IHasLocalFileCache';
 import LocalFileCache from '../LocalFileCache';
 import Config from '../../core/Config';
 import Profiler from '../../core/Profiler';
 import CustomError from '../../entities/error-handling/CustomError';
 import { staticImplements } from '../../types/common';
-import credentials from '../../../auth/plexus.json';
 
 class CloudStorageFile extends File {
 	public uri: string
@@ -18,6 +18,7 @@ const GS_URI_PATTERN = /gs:\/\/([^/]+)\/?(.*)/;
 @staticImplements<IHasLocalFileCache<string>>()
 export default class CloudStorage {
 	private static _client: Storage;
+	private static _signingClient: Storage;
 	
 	public static async read(uri: string): Promise<string> {
 		const [buffer] = await this.file(uri).download();
@@ -125,7 +126,7 @@ export default class CloudStorage {
 	}
 	
 	public static async getSignedUrl(uri: string): Promise<string> {
-		const client = new Storage({ credentials });
+		const client = this._signingClient ??= new Storage({ credentials: await this.getCredentials() });
 		
 		const [url] = await client.bucket(this.uri(uri).bucket)
 			.file(this.uri(uri).path)
@@ -136,6 +137,14 @@ export default class CloudStorage {
 			});
 		
 		return url;
+	}
+	
+	private static async getCredentials(): Promise<JWTInput> {
+		const { GOOGLE_APPLICATION_CREDENTIALS } = process.env;
+		
+		if (GOOGLE_APPLICATION_CREDENTIALS) return JSON.parse(GOOGLE_APPLICATION_CREDENTIALS);
+		
+		return await import('../../../auth/plexus.json');
 	}
 	
 	private static get client(): Storage {

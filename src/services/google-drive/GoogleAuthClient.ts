@@ -1,5 +1,5 @@
 import { GoogleAuth, GoogleAuthOptions } from 'google-auth-library';
-import credentials from '../../../auth/plexus.json';
+import { JWTInput } from 'google-auth-library/build/src/auth/credentials';
 
 export default class GoogleAuthClient {
 	private static _client: GoogleAuth;
@@ -8,7 +8,7 @@ export default class GoogleAuthClient {
 		if (this._client) return this._client;
 		
 		const authOptions: GoogleAuthOptions = {
-			credentials,
+			credentials: await this.getCredentials(),
 			projectId: 'monks-plexus',
 			scopes: [
 				'https://www.googleapis.com/auth/drive',
@@ -20,5 +20,13 @@ export default class GoogleAuthClient {
 		};
 		
 		return this._client = new GoogleAuth(authOptions);
+	}
+	
+	private static async getCredentials(): Promise<JWTInput> {
+		const { GOOGLE_APPLICATION_CREDENTIALS } = process.env;
+		
+		if (GOOGLE_APPLICATION_CREDENTIALS) return JSON.parse(GOOGLE_APPLICATION_CREDENTIALS);
+		
+		return await import('../../../auth/plexus.json');
 	}
 };
