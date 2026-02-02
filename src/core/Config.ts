@@ -4,6 +4,7 @@ import Configuration from '../types/Configuration';
 import { InvokePayload, ValueOf } from '../types/common';
 import global from '../../config/global.json';
 import Profiler from './Profiler';
+import Plexus from '../Plexus';
 
 const MODULES = [
 	'agents',
@@ -69,26 +70,20 @@ export default class Config {
 	private static get staticConfig(): Configuration {
 		if (this._staticConfig) return this._staticConfig;
 		
-		// return Profiler.run(() => {
-			const config = { ...global };
-			for (const module of MODULES) {
-				config[module] = this.loadModuleConfig(module);
-				if (module in global) {
-					if (typeof global[module] === 'object' && typeof config[module] === 'object') config[module] = { ...config[module], ...global[module] };
-					else throw new CustomError(`Configuration conflict: module "${module}" and global key "${module}"`);
-				}
+		const config = { ...global };
+		for (const module of MODULES) {
+			config[module] = this.loadModuleConfig(module);
+			if (module in global) {
+				if (typeof global[module] === 'object' && typeof config[module] === 'object') config[module] = { ...config[module], ...global[module] };
+				else throw new CustomError(`Configuration conflict: module "${module}" and global key "${module}"`);
 			}
-			
-			return this._staticConfig = config;
-		// }, 'Config.staticConfig');
+		}
+		
+		return this._staticConfig = config;
 	}
 	
 	private static get requestConfig(): Configuration {
-		let config: Configuration | string = RequestContext.get('config');
-		
-		if (config) return config;
-		
-		config = (RequestContext.get('payload') as InvokePayload)?.config;
+		let config: Configuration | string = Plexus.instance.config;
 		
 		if (typeof config === 'string') config = this.loadCustomConfig(config);
 		
@@ -99,8 +94,6 @@ export default class Config {
 		}
 		
 		config ??= {};
-		
-		RequestContext.set('config', config);
 		
 		return config;
 	}

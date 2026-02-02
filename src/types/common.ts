@@ -17,7 +17,7 @@ export type SpreadSheetData = { sheets: { title: string; rows: any[] }[] };
 
 export type InvokePayload = {
 	threadId?: string;
-	config?: Configuration;
+	config?: Configuration | string;
 	fields?: JsonObject;
 };
 

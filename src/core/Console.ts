@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import Config from './Config';
+import Plexus from '../Plexus';
 
 const MAX_PIPS = 20;
 
@@ -49,8 +50,10 @@ export default class Console {
 		
 		switch (process.env['PLEXUS_MODE']) {
 			case 'service':
-			case 'sdk':
 				console.debug(`[${type}]`, ...args);
+				break;
+			case 'sdk':
+				Plexus.instance?.emit('message', { type, args });
 				break;
 			case 'cli':
 				process.stderr.write(`[${type}] ${args.map(arg =>

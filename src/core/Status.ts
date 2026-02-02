@@ -1,6 +1,7 @@
 import Config from './Config';
 import Console from './Console';
 import Configuration from '../types/Configuration';
+import Plexus from '../Plexus';
 
 export default class Status {
 	public static send(message: string, isRunning?: boolean): void {
@@ -16,6 +17,7 @@ export default class Status {
 				}).catch(() => undefined);
 				break;
 			case 'sdk':
+				Plexus.instance?.emit('status', { message, isRunning });
 				break;
 			case 'cli':
 			default:

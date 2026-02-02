@@ -9,6 +9,7 @@ import ErrorHandler from '../entities/error-handling/ErrorHandler';
 import { JsonField, JsonObject, InvokePayload } from '../types/common';
 import ROUTES from '../../config/routes.json';
 import Config from './Config';
+import Plexus from '../Plexus';
 
 type Handler = (variables: JsonObject, payload: InvokePayload) => Promise<JsonField | undefined>;
 
@@ -42,9 +43,9 @@ export default class Router {
 			
 			const payload = this.getPayload(req);
 			
-			await RequestContext.create({ payload }, async () => {
-				ErrorHandler.initialize();
-				
+			const plexus = new Plexus(payload.config);
+			
+			await RequestContext.create({ plexus }, async () => {
 				let result: JsonField;
 				
 				try {

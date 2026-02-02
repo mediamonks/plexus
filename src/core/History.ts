@@ -5,6 +5,7 @@ import RequestContext from './RequestContext';
 import CustomError from '../entities/error-handling/CustomError';
 import Firestore from '../services/google-cloud/Firestore';
 import { JsonObject } from '../types/common';
+import Thread from './Thread';
 
 type HistoryItem = {
 	role: 'user' | 'model';
@@ -24,7 +25,7 @@ export default class History {
 	private _threadId: string;
 	
 	public static get instance(): History {
-		return RequestContext.get('history') as History;
+		return (RequestContext.get('thread') as Thread)?.history;
 	}
 	
 	public static create(threadId?: string): History {

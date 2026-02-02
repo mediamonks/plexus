@@ -1,14 +1,23 @@
 {
 	"name": "plexus",
-	"version": "1.5.0",
-	"description": "Plexus Agentic Engine",
-	"main": "index.js",
+	"version": "1.6.0",
+	"description": "Plexus Agent Engine",
+	"main": "sdk.js",
+	"types": "dist/Plexus.d.ts",
+	"exports": {
+		".": {
+			"require": "./sdk.js",
+			"types": "./dist/Plexus.d.ts"
+		},
+		"./service": "./index.js"
+	},
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/mediamonks/plexus.git"
 	},
 	"files": [
 		"dist/",
+		"sdk.js",
 		"index.js",
 		"config/",
 		"README.md",
