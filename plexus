@@ -1,2 +1,2 @@
-#!/bin/sh
-node cli.cjs "$@"
+#!/usr/bin/env node
+require('./cli.cjs');

@@ -1,6 +1,5 @@
 {
 	"instanceId": "plexus",
 	"user": "plexus@monks-plexus.iam",
-	"database": "postgres",
-	"ipType": "PUBLIC"
+	"database": "postgres"
 }

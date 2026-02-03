@@ -67,4 +67,8 @@ export default class Storage {
 	public static getUri(namespace: string, internalName: string): string {
 		return `gs://${Config.get('storage.bucket')}/files/${namespace}/${internalName}`;
 	}
+	
+	public static async warmUp(): Promise<void> {
+		await CloudStorage.files(`gs://${Config.get('storage.bucket')}`);
+	}
 };

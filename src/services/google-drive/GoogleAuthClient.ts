@@ -2,6 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { GoogleAuth, GoogleAuthOptions } from 'google-auth-library';
 import { JWTInput } from 'google-auth-library/build/src/auth/credentials';
+import Config from '../../core/Config';
 
 export default class GoogleAuthClient {
 	private static _client: GoogleAuth;
@@ -11,7 +12,7 @@ export default class GoogleAuthClient {
 		
 		const authOptions: GoogleAuthOptions = {
 			credentials: await this.getCredentials(),
-			projectId: 'monks-plexus',
+			projectId: Config.get('projectId'),
 			scopes: [
 				'https://www.googleapis.com/auth/drive',
 				'https://www.googleapis.com/auth/spreadsheets',

@@ -1,28 +1,25 @@
 require('dotenv').config();
 process.env.PLEXUS_MODE = 'cli';
 
-const minimist = require('minimist');
 const fs = require('node:fs');
+const minimist = require('minimist');
+const Plexus = require('./dist/Plexus').default;
 const Console = require('./dist/core/Console').default;
-const RequestContext = require('./dist/core/RequestContext').default;
 const ErrorHandler = require('./dist/entities/error-handling/ErrorHandler').default;
-const ingestHandler = require('./dist/handlers/ingest').default;
-const invokeHandler = require('./dist/handlers/invoke').default;
-const CloudStorage = require('./dist/services/google-cloud/CloudStorage').default;
+const Storage = require('./dist/entities/storage/Storage').default;
 
 const argv = minimist(process.argv.slice(2));
 
 const [command, configName, ...args] = argv._;
 
 const COMMANDS = {
-	ingest: () => {
+	ingest: plexus => {
 		const [namespace] = args;
-		const fn = ingestHandler.bind(null, { namespace });
-		return { fn };
+		return plexus.ingest(namespace);
 	},
-	invoke: () => {
+	invoke: plexus => {
 		const [fieldsJson, threadId] = args;
-		const fn = invokeHandler.bind(null, null, { threadId });
+		
 		let fields = {};
 		if (fieldsJson) {
 			try {
@@ -32,14 +29,15 @@ const COMMANDS = {
 				sendHelp();
 			}
 		}
-		return { fields, fn };
+		
+		return plexus.invoke(threadId, fields);
 	},
 };
 
 function sendHelp() {
 	const help = `Usage: plexus <COMMAND> <CONFIG> [ARGUMENTS] [OPTIONS]'
 
-Commands:
+Command:
   ingest    Ingest data from a set of data sources
             arguments:
               - namespace (optional)
@@ -50,6 +48,9 @@ Commands:
               - JSON input fields object (optional)
               - thread ID (optional)
             example: \`plexus invoke myconfig '{"userInput": "Hello, how are you?"}' 0a0a0a0a-0a0a-0a0a-0a0a-0a0a0a0a0a0a\`
+
+Config:
+  Relative configuration file path and name. .json extension should be omitted. E.g. "config/myconfig"
 
 Options:
   --profile, -p    Enable profiling
@@ -71,7 +72,7 @@ async function authentication() {
 	);
 	
 	try {
-		await CloudStorage.list('gs://monks-plexus');
+		await Storage.warmUp();
 		activity.done();
 		console.error(`GCS authentication warmup completed in ${Math.floor(performance.now() - startTime)}ms`);
 	} catch (error) {
@@ -92,7 +93,7 @@ function formatTime(ms) {
 
 if (!COMMANDS[command] || !configName) sendHelp();
 
-const configPath = `./config/custom/${configName}.json`;
+const configPath = `./${configName}.json`;
 
 if (!fs.existsSync(configPath)) {
 	console.error(`Configuration "${configPath}" not found.\n`);
@@ -109,23 +110,21 @@ try {
 config.profiling = argv.profile ?? argv.p ?? false;
 config.dataDumps = argv.dump ?? argv.d ?? false;
 
-const { fn, fields } = COMMANDS[command]();
+const plexus = new Plexus(config);
 
 (async function () {
-	await RequestContext.create({ payload: { config, fields } }, async () => {
-		ErrorHandler.initialize();
-
-		await authentication();
+	await authentication();
 	
-		try {
-			const startTime = performance.now();
-			const result = await fn();
-			const time = Math.floor(performance.now() - startTime);
-			if (result) console.log(JSON.stringify(result, null, 2));
-			console.error(`\n${command} operation completed in ${formatTime(time)}ms`);
-		} catch (error) {
-			ErrorHandler.log(error);
-		}
-		process.exit(0);
-	});
+	COMMANDS[command](plexus);
+	
+	try {
+		const startTime = performance.now();
+		const result = await fn();
+		const time = Math.floor(performance.now() - startTime);
+		if (result) console.log(JSON.stringify(result, null, 2));
+		console.error(`\n${command} operation completed in ${formatTime(time)}ms`);
+	} catch (error) {
+		ErrorHandler.log(error);
+	}
+	process.exit(0);
 }());
