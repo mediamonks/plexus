@@ -12,7 +12,7 @@
 		"./service": "./index.js"
 	},
 	"bin": {
-		"plexus": "./cli.cjs"
+		"plexus": "./plexus"
 	},
 	"repository": {
 		"type": "git",
@@ -23,6 +23,7 @@
 		"sdk.js",
 		"index.js",
 		"cli.cjs",
+		"plexus",
 		"config/",
 		"README.md",
 		"LICENSE"
