@@ -2,14 +2,13 @@
 	"name": "plexus",
 	"version": "1.7.1",
 	"description": "An SDK for building LLM-based agent pipelines",
-	"main": "sdk.js",
+	"main": "index.js",
 	"types": "dist/Plexus.d.ts",
 	"exports": {
 		".": {
 			"require": "./sdk.js",
 			"types": "./dist/Plexus.d.ts"
-		},
-		"./service": "./index.js"
+		}
 	},
 	"bin": {
 		"plexus": "./plexus"
@@ -32,19 +31,19 @@
 		"auth": "bash tools/auth.sh",
 		"build": "tsc",
 		"prepare": "npm run build",
-		"start": "npm run build && functions-framework --target=api --source=. --port=8080",
+		"start": "npm run build && functions-framework --target=api --source=index.js --port=8080",
 		"test": "jest",
 		"test:watch": "jest --watch",
 		"test:coverage": "jest --coverage",
 		"gateway": "npm run generate-openapi --env=dev; node tools/deploy.cjs --env=dev --gateway",
-		"deploy": "gsutil -m cp -r data/instructions/* gs://monks-plexus/instructions; node tools/deploy.cjs --env=dev --functions --secrets",
+		"deploy": "npm run build && gsutil -m cp -r data/instructions/* gs://monks-plexus/instructions && node tools/deploy.cjs --env=dev --functions --secrets",
 		"generate-openapi": "node tools/generate-openapi.js $npm_config_env gateway > config/openapi.yaml; node tools/generate-openapi.js $npm_config_env > public/openapi.yaml",
-		"release": "git push github v$(node -p \"require('./package.json').version\")"
+		"release": "git push github main && git push github v$(node -p \"require('./package.json').version\")"
 	},
 	"author": "Richard Heuser <richard.heuser@monks.com>",
 	"license": "Apache-2.0",
 	"engines": {
-		"node": ">=24.0.0"
+		"node": ">=22.0.0"
 	},
 	"dependencies": {
 		"@azure/msal-node": "^3.8.4",
