@@ -1,10 +1,8 @@
 import RequestContext from './RequestContext';
 import CustomError from '../entities/error-handling/CustomError';
 import Configuration from '../types/Configuration';
-import { InvokePayload, ValueOf } from '../types/common';
+import { ValueOf } from '../types/common';
 import global from '../../config/global.json';
-import Profiler from './Profiler';
-import Plexus from '../Plexus';
 
 const MODULES = [
 	'agents',
@@ -97,7 +95,7 @@ export default class Config {
 	}
 	
 	private static get requestConfig(): Configuration {
-		return Plexus.instance.config;
+		return RequestContext.get('config');
 	}
 	
 	private static get staticGlobalConfig(): Configuration {

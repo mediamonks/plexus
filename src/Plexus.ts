@@ -26,7 +26,7 @@ export default class Plexus extends EventEmitter {
 	}
 	
 	public thread(threadId?: string): Thread {
-		return this._threads[threadId] ??= new Thread(threadId);
+		return this._threads[threadId] ??= new Thread(this, threadId);
 	}
 	
 	public async invoke(fields: JsonObject): Promise<{
@@ -38,7 +38,7 @@ export default class Plexus extends EventEmitter {
 	}
 	
 	public async ingest(namespace?: string): Promise<void> {
-		return RequestContext.create({ plexus: this }, () => {
+		return RequestContext.create({ plexus: this, config: this.config }, () => {
 			ErrorHandler.initialize();
 			return DataSources.ingest(namespace);
 		});
