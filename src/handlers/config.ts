@@ -1,4 +1,6 @@
-import Config from '../core/Config';
+import Plexus from '../Plexus';
 import Configuration from '../types/Configuration';
 
-export default async (): Promise<Configuration> => Config.get();
+export default async (_: void, { config }: { config: Configuration }): Promise<Configuration> => {
+	return new Plexus(config).config;
+}

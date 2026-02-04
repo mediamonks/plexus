@@ -1,15 +1,9 @@
 import fs from 'node:fs';
 import mime from 'mime-types';
 import { Request, Response } from '@google-cloud/functions-framework';
-import Debug from './Debug';
-import Profiler from './Profiler';
-import RequestContext from './RequestContext';
 import CustomError from '../entities/error-handling/CustomError';
-import ErrorHandler from '../entities/error-handling/ErrorHandler';
 import { JsonField, JsonObject, InvokePayload } from '../types/common';
 import ROUTES from '../../config/routes.json';
-import Config from './Config';
-import Plexus from '../Plexus';
 
 type Handler = (variables: JsonObject, payload: InvokePayload) => Promise<JsonField | undefined>;
 
@@ -43,28 +37,21 @@ export default class Router {
 			
 			const payload = this.getPayload(req);
 			
-			const plexus = new Plexus(payload.config);
+			let result: JsonField;
+			let error: Error;
 			
-			await RequestContext.create({ plexus }, async () => {
-				let result: JsonField;
-				
-				try {
-					result = (await handler(variables, payload)) ?? 'OK';
-				} catch (error) {
-					ErrorHandler.log(error);
-				}
-				
-				const error = ErrorHandler.get();
-				
-				if (error) res.status(error instanceof CustomError ? error.status : 500);
-				
-				// TODO unpack result (...result) if it is an object
-				res.send({
-					result,
-					error: error?.toString(),
-					performance: Config.get('profiling') && Profiler.getReport(),
-					debug: Config.get('debug') && Debug.get(),
-				});
+			try {
+				result = (await handler(variables, payload)) ?? 'OK';
+			} catch (e) {
+				error = e;
+			}
+			
+			if (error) res.status(error instanceof CustomError ? error.status : 500);
+			
+			// TODO unpack result (...result) if it is an object
+			res.send({
+				result,
+				error: error?.toString(),
 			});
 		} catch (error) {
 			res.status(500);

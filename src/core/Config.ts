@@ -67,6 +67,20 @@ export default class Config {
 		}
 	}
 	
+	public static parse(config: Configuration | string): Configuration {
+		if (typeof config === 'string') config = this.loadCustomConfig(config);
+		
+		if (config.inherit) {
+			const inherit = this.loadCustomConfig(config.inherit);
+			delete config.inherit;
+			config = (this.merge(inherit, config) ?? {}) as Configuration;
+		}
+		
+		config ??= {};
+		
+		return config;
+	}
+	
 	private static get staticConfig(): Configuration {
 		if (this._staticConfig) return this._staticConfig;
 		
@@ -83,19 +97,7 @@ export default class Config {
 	}
 	
 	private static get requestConfig(): Configuration {
-		let config: Configuration | string = Plexus.instance.config;
-		
-		if (typeof config === 'string') config = this.loadCustomConfig(config);
-		
-		if (config.inherit) {
-			const inherit = this.loadCustomConfig(config.inherit);
-			delete config.inherit;
-			config = (this.merge(inherit, config) ?? {}) as Configuration;
-		}
-		
-		config ??= {};
-		
-		return config;
+		return Plexus.instance.config;
 	}
 	
 	private static get staticGlobalConfig(): Configuration {

@@ -1,30 +1,27 @@
 import EventEmitter from 'node:events';
+import Config from './core/Config';
 import Thread from './core/Thread';
+import RequestContext from './core/RequestContext';
 import DataSources from './entities/data-sources/DataSources';
-import CustomError from './entities/error-handling/CustomError';
 import ErrorHandler from './entities/error-handling/ErrorHandler';
 import { JsonObject } from './types/common';
 import Configuration from './types/Configuration';
-import RequestContext from './core/RequestContext';
 
 export default class Plexus extends EventEmitter {
+	private _config: Configuration;
 	private _threads: Thread[] = [];
 	
 	public static get instance(): Plexus {
 		return RequestContext.get('plexus') as Plexus;
 	}
 	
-	public constructor(private _config?: Configuration | string) {
+	public constructor(config?: Configuration | string) {
 		super();
 		
-		if (Plexus.instance) throw new CustomError('Only one instance of Plexus can be created. Use Plexus.instance to access the existing instance.');
-		
-		ErrorHandler.initialize();
-		
-		RequestContext.set('plexus', this);
+		this._config = Config.parse(config);
 	}
 	
-	public get config(): Configuration | string {
+	public get config(): Configuration {
 		return this._config;
 	}
 	
@@ -37,10 +34,17 @@ export default class Plexus extends EventEmitter {
 		threadId: string;
 		fields: JsonObject;
 	}> {
-		return this.thread().invoke(fields);
+		return this.run(() => this.thread().invoke(fields));
 	}
 	
 	public async ingest(namespace?: string): Promise<void> {
-		return DataSources.ingest(namespace);
+		return this.run(() => DataSources.ingest(namespace));
+	}
+	
+	private run<T>(fn: () => T): T {
+		return RequestContext.create({ plexus: this }, () => {
+			ErrorHandler.initialize();
+			return fn();
+		});
 	}
 }

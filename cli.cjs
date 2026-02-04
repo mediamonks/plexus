@@ -30,7 +30,7 @@ const COMMANDS = {
 			}
 		}
 		
-		return plexus.invoke(threadId, fields);
+		return plexus.thread(threadId).invoke(fields);
 	},
 };
 
@@ -115,11 +115,9 @@ const plexus = new Plexus(config);
 (async function () {
 	await authentication();
 	
-	COMMANDS[command](plexus);
-	
 	try {
 		const startTime = performance.now();
-		const result = await fn();
+		const result = await COMMANDS[command](plexus);
 		const time = Math.floor(performance.now() - startTime);
 		if (result) console.log(JSON.stringify(result, null, 2));
 		console.error(`\n${command} operation completed in ${formatTime(time)}ms`);
