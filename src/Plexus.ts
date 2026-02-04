@@ -43,4 +43,8 @@ export default class Plexus extends EventEmitter {
 			return DataSources.ingest(namespace);
 		});
 	}
+	
+	public context<T>(fn: () => T): T {
+		return RequestContext.create({ plexus: this, config: this.config }, fn);
+	}
 }

@@ -112,7 +112,7 @@ config.dataDumps = argv.dump ?? argv.d ?? false;
 
 const plexus = new Plexus(config);
 
-(async function () {
+plexus.context(async () => {
 	await authentication();
 	
 	try {
@@ -125,4 +125,4 @@ const plexus = new Plexus(config);
 		ErrorHandler.log(error);
 	}
 	process.exit(0);
-}());
+});

@@ -53,3 +53,6 @@
 - LocalFS class
 - Generic Cache class
 - WebOrigin class (crawl4ai)
+
+## Errorhandling
+- Replace CustomError with UserError (400) or Error (500)
