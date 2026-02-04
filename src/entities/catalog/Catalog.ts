@@ -27,7 +27,12 @@ export default class Catalog {
 	public static readonly Configuration: Record<string, typeof CatalogField.Configuration>;
 	
 	static get instance(): Catalog {
-		return (RequestContext.store.catalog as Catalog) ??= new this();
+		let catalog = RequestContext.get('catalog') as Catalog;
+		if (!catalog) {
+			catalog = new this();
+			RequestContext.set('catalog', catalog);
+		}
+		return catalog;
 	}
 	
 	public get configuration(): typeof Catalog.Configuration {

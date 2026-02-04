@@ -21,7 +21,9 @@ export default class Thread {
 		threadId: string;
 		fields: JsonObject;
 	}> {
-		return RequestContext.create({ plexus: this._plexus, config: this._plexus.config }, async () => {
+		const plexus = this._plexus;
+		const config = this._plexus.config;
+		return RequestContext.create({ plexus, config, fields }, async () => {
 			ErrorHandler.initialize();
 			
 			const output = {};

@@ -6,7 +6,7 @@ import Config from '../../core/Config';
 import Debug from '../../core/Debug';
 import RequestContext from '../../core/RequestContext';
 import Configuration from '../../types/Configuration';
-import { JsonField, InvokePayload } from '../../types/common';
+import { JsonField, InvokePayload, JsonObject } from '../../types/common';
 import InputDataSourceItem from '../data-sources/origin/InputDataSourceItem';
 
 export default class InputCatalogField extends CatalogField {
@@ -33,7 +33,7 @@ export default class InputCatalogField extends CatalogField {
 	protected async populate(): Promise<JsonField | DataSourceItem[]> {
 		Debug.log(`Populating input field "${this.id}"`, 'Catalog');
 		
-		const payload = RequestContext.get('payload') as InvokePayload;
+		const payload = RequestContext.get('fields') as JsonObject;
 		
 		let value = payload.fields?.[this.payloadField] as string;
 		

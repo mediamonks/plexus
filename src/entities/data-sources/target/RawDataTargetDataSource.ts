@@ -1,11 +1,12 @@
 import DataSource from '../DataSource';
 import Catalog from '../../catalog/Catalog';
 import DataSourceCatalogField from '../../catalog/DataSourceCatalogField';
+import CustomError from '../../error-handling/CustomError';
 import Storage from '../../storage/Storage';
 import StorageFile from '../../storage/StorageFile';
-import { JsonObject } from '../../../types/common';
 import Debug from '../../../core/Debug';
-import CustomError from '../../error-handling/CustomError';
+import RequestContext from '../../../core/RequestContext';
+import { JsonObject } from '../../../types/common';
 
 type QueryResult = JsonObject[];
 
@@ -29,12 +30,13 @@ export default class RawDataTargetDataSource extends DataSource {
 		if (!filter && !limit && !fields && !sort) return await Array.fromAsync(data);
 		
 		const result = [];
+		const catalog = RequestContext.get('catalog') as Catalog;
 		for await (let item of data) {
 			let include = true;
 			
 			if (filter) {
 				for (const key in filter) {
-					const value = await Catalog.instance.get(filter[key]).getValue();
+					const value = await catalog.get(filter[key]).getValue();
 					include = include && (item[key] === value);
 					if (!include) break;
 				}
