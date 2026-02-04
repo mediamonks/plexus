@@ -1,0 +1,166 @@
+swagger: "2.0"
+info:
+  title: plexus
+  description: An SDK for building AI agent pipelines
+  version: 1.7.0
+schemes:
+  - https
+produces:
+  - application/json
+x-google-backend:
+  address: https://europe-west1-monks-plexus.cloudfunctions.net/api
+  path_translation: APPEND_PATH_TO_ADDRESS
+  protocol: h2
+  deadline: 300
+  jwt_audience: https://europe-west1-monks-plexus.cloudfunctions.net/api
+paths:
+  /api/invoke:
+    post:
+      summary: Invokes an agent pipeline
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              threadId:
+                type: string
+                description: The ID of the conversation thread to continue
+              config:
+                type: object
+                description: Runtime configuration overrides.
+              fields:
+                type: object
+                description: Values for the pipeline's input fields
+      responses:
+        "200":
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              result:
+                type: object
+                description: The result of the pipeline execution
+                properties:
+                  output:
+                    type: object
+                    description: Generated values for the pipeline's output fields
+                  threadId:
+                    type: string
+                    format: uuid
+                    description: Unique identifier for the thread.
+                  fields:
+                    type: object
+                    description: Values of the pipeline's input fields
+              error:
+                type: string
+                description: Error message if applicable, otherwise null.
+              performance:
+                type: array
+                description: Performance metrics for the pipeline
+                items:
+                  type: object
+              debug:
+                type: array
+                description: Debug information for the pipeline
+                items:
+                  type: object
+      security:
+        - api_key: []
+  /api/fields/{field}:
+    parameters:
+      - description: The name of the field
+        type: string
+        name: field
+        in: path
+        required: true
+    get:
+      summary: Retrieve Field Options
+      description: Returns available options for a given field
+      responses:
+        "200":
+          description: Successful response
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: Field ID
+                label:
+                  type: string
+                  description: Field label
+                description:
+                  type: string
+                  description: Field description
+      security:
+        - api_key: []
+  /api/thread/{threadId}:
+    parameters:
+      - description: The ID of the thread to retrieve
+        type: string
+        name: threadId
+        in: path
+        required: true
+    get:
+      summary: Retrieve Conversation Thread
+      description: Retrieves a thread containing its conversation history and input
+        and output of the last interaction
+      responses:
+        "200":
+          description: Successful response
+          schema:
+            type: object
+            properties:
+              history:
+                type: array
+                description: The conversation history.
+              output:
+                type: object
+                description: Output of the last interaction.
+      security:
+        - api_key: []
+  /api/ingest/{namespace}:
+    parameters:
+      - description: The namespace for which to ingest data
+        type: string
+        name: namespace
+        in: path
+        required: true
+    post:
+      summary: Ingest data sources
+      description: Ingest all static data sources for the given namespace
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              config:
+                type: object
+                description: Runtime configuration overrides.
+      responses:
+        "200":
+          description: Successful response
+      security:
+        - api_key: []
+  /api/config:
+    get:
+      summary: Retrieve Default Config
+      description: Returns default configuration
+      responses:
+        "200":
+          description: Successful response
+          schema:
+            type: object
+      security:
+        - api_key: []
+securityDefinitions:
+  api_key:
+    type: apiKey
+    name: x-api-key
+    in: header
+

@@ -68,13 +68,13 @@ export default class Config {
 	public static parse(config: Configuration | string): Configuration {
 		if (typeof config === 'string') config = this.loadCustomConfig(config);
 		
+		config ??= {};
+		
 		if (config.inherit) {
 			const inherit = this.loadCustomConfig(config.inherit);
 			delete config.inherit;
 			config = (this.merge(inherit, config) ?? {}) as Configuration;
 		}
-		
-		config ??= {};
 		
 		return config;
 	}

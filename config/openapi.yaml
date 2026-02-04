@@ -1,8 +1,8 @@
 swagger: "2.0"
 info:
   title: plexus
-  description: Plexus Agentic Engine
-  version: 1.4.0
+  description: An SDK for building AI agent pipelines
+  version: 1.7.0
 schemes:
   - https
 produces:
@@ -66,12 +66,15 @@ paths:
                 description: Debug information for the pipeline
                 items:
                   type: object
+      security:
+        - api_key: []
       operationId: POST /invoke
     options:
       summary: CORS preflight for /invoke
       responses:
         "204":
           $ref: "#/responses/corsPreflightResponse"
+      security: []
       operationId: OPTIONS /invoke
   /api/fields/{field}:
     parameters:
@@ -100,12 +103,15 @@ paths:
                 description:
                   type: string
                   description: Field description
+      security:
+        - api_key: []
       operationId: GET /fields/{field}
     options:
       summary: CORS preflight for /fields/{field}
       responses:
         "204":
           $ref: "#/responses/corsPreflightResponse"
+      security: []
       operationId: OPTIONS /fields/{field}
   /api/thread/{threadId}:
     parameters:
@@ -130,12 +136,15 @@ paths:
               output:
                 type: object
                 description: Output of the last interaction.
+      security:
+        - api_key: []
       operationId: GET /thread/{threadId}
     options:
       summary: CORS preflight for /thread/{threadId}
       responses:
         "204":
           $ref: "#/responses/corsPreflightResponse"
+      security: []
       operationId: OPTIONS /thread/{threadId}
   /api/ingest/{namespace}:
     parameters:
@@ -160,12 +169,15 @@ paths:
       responses:
         "200":
           description: Successful response
+      security:
+        - api_key: []
       operationId: POST /ingest/{namespace}
     options:
       summary: CORS preflight for /ingest/{namespace}
       responses:
         "204":
           $ref: "#/responses/corsPreflightResponse"
+      security: []
       operationId: OPTIONS /ingest/{namespace}
   /api/config:
     get:
@@ -176,12 +188,15 @@ paths:
           description: Successful response
           schema:
             type: object
+      security:
+        - api_key: []
       operationId: GET /config
     options:
       summary: CORS preflight for /config
       responses:
         "204":
           $ref: "#/responses/corsPreflightResponse"
+      security: []
       operationId: OPTIONS /config
   /api:
     get:
@@ -189,12 +204,15 @@ paths:
       responses:
         "200":
           description: Successful response
+      security:
+        - api_key: []
       operationId: "GET "
     options:
       summary: "CORS preflight for "
       responses:
         "204":
           $ref: "#/responses/corsPreflightResponse"
+      security: []
       operationId: "OPTIONS "
 responses:
   corsPreflightResponse:

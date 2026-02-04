@@ -90,7 +90,8 @@ function getMethods(routeConfig) {
 			summary: methodConfig.summary,
 			description: methodConfig.description,
 			parameters: getParameters(methodConfig),
-			responses: getResponse(methodConfig)
+			responses: getResponse(methodConfig),
+			security: [{ api_key: [] }]
 		};
 	}
 	
@@ -104,7 +105,8 @@ function getOptions(endpoint) {
 			204: {
 				'$ref': '#/responses/corsPreflightResponse'
 			}
-		}
+		},
+		security: []
 	};
 }
 
