@@ -33,9 +33,9 @@ export default class InputCatalogField extends CatalogField {
 	protected async populate(): Promise<JsonField | DataSourceItem[]> {
 		Debug.log(`Populating input field "${this.id}"`, 'Catalog');
 		
-		const payload = RequestContext.get('fields') as JsonObject;
+		const fields = RequestContext.get('fields') as JsonObject;
 		
-		let value = payload.fields?.[this.payloadField] as string;
+		let value = fields?.[this.payloadField] as string;
 		
 		if (value === undefined) {
 			if (this.required) throw new CustomError(`Field "${this.payloadField}" must be provided in payload`);
