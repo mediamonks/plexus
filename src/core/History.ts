@@ -25,7 +25,7 @@ export default class History {
 	private _threadId: string;
 	
 	public static get instance(): History {
-		return (RequestContext.get('thread') as Thread)?.history;
+		return RequestContext.get('history') as History;
 	}
 	
 	public static create(threadId?: string): History {

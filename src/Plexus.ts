@@ -34,17 +34,13 @@ export default class Plexus extends EventEmitter {
 		threadId: string;
 		fields: JsonObject;
 	}> {
-		return this.run(() => this.thread().invoke(fields));
+		return this.thread().invoke(fields);
 	}
 	
 	public async ingest(namespace?: string): Promise<void> {
-		return this.run(() => DataSources.ingest(namespace));
-	}
-	
-	private run<T>(fn: () => T): T {
 		return RequestContext.create({ plexus: this }, () => {
 			ErrorHandler.initialize();
-			return fn();
+			return DataSources.ingest(namespace);
 		});
 	}
 }
