@@ -2,6 +2,7 @@ require('dotenv').config();
 process.env.PLEXUS_MODE = 'cli';
 
 const fs = require('node:fs');
+const path = require('node:path');
 const minimist = require('minimist');
 const Plexus = require('./dist/Plexus').default;
 const Console = require('./dist/core/Console').default;
@@ -91,7 +92,8 @@ function formatTime(ms) {
 
 if (!COMMANDS[command]) sendHelp();
 
-const configPath = argv.config ?? argv.c ?? './config.json';
+const configFile = argv.config ?? argv.c ?? './config.json';
+const configPath = path.resolve(process.cwd(), configFile);
 
 if (!fs.existsSync(configPath)) {
 	console.error(`Configuration "${configPath}" not found.\n`);
