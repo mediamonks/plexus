@@ -10,7 +10,7 @@ const Storage = require('./dist/entities/storage/Storage').default;
 
 const argv = minimist(process.argv.slice(2));
 
-const [command, configName, ...args] = argv._;
+const [command, ...args] = argv._;
 
 const COMMANDS = {
 	ingest: plexus => {
@@ -35,24 +35,22 @@ const COMMANDS = {
 };
 
 function sendHelp() {
-	const help = `Usage: plexus <COMMAND> <CONFIG> [ARGUMENTS] [OPTIONS]'
+	const help = `Usage: plexus [OPTIONS] <COMMAND> [ARGUMENTS]'
 
 Command:
   ingest    Ingest data from a set of data sources
             arguments:
               - namespace (optional)
-            example: \`plexus ingest myconfig mynamespace\`
+            example: \`plexus ingest mynamespace\`
     
   invoke    Invoke the pipeline
             arguments:
               - JSON input fields object (optional)
               - thread ID (optional)
-            example: \`plexus invoke myconfig '{"userInput": "Hello, how are you?"}' 0a0a0a0a-0a0a-0a0a-0a0a-0a0a0a0a0a0a\`
-
-Config:
-  Relative configuration file path and name. .json extension should be omitted. E.g. "config/myconfig"
+            example: \`plexus invoke '{"userInput": "Hello, how are you?"}' 0a0a0a0a-0a0a-0a0a-0a0a-0a0a0a0a0a0a\`
 
 Options:
+  --config, -c     Configuration file path and name, "./config.json" is used if omitted
   --profile, -p    Enable profiling
   --dump, -d       Enable data dumps
   --no-warmup, -W  Skip GCS authentication warmup
@@ -91,9 +89,9 @@ function formatTime(ms) {
 	return `${hours}h ${minutes}m ${seconds}s ${milliseconds}ms`;
 }
 
-if (!COMMANDS[command] || !configName) sendHelp();
+if (!COMMANDS[command]) sendHelp();
 
-const configPath = `./${configName}.json`;
+const configPath = argv.config ?? argv.c ?? './config.json';
 
 if (!fs.existsSync(configPath)) {
 	console.error(`Configuration "${configPath}" not found.\n`);
