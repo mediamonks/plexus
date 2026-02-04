@@ -1,6 +1,6 @@
 {
 	"name": "plexus",
-	"version": "1.6.6",
+	"version": "1.7.0",
 	"description": "An SDK for building AI agent pipelines",
 	"main": "sdk.js",
 	"types": "dist/Plexus.d.ts",
