@@ -1,6 +1,6 @@
 {
 	"name": "plexus",
-	"version": "1.6.4",
+	"version": "1.6.5",
 	"description": "Plexus Agent Engine",
 	"main": "sdk.js",
 	"types": "dist/Plexus.d.ts",
