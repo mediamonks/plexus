@@ -1,7 +1,7 @@
 {
 	"name": "plexus",
 	"version": "1.6.6",
-	"description": "Plexus Agent Engine",
+	"description": "An SDK for building AI agent pipelines",
 	"main": "sdk.js",
 	"types": "dist/Plexus.d.ts",
 	"exports": {
@@ -38,7 +38,8 @@
 		"test:coverage": "jest --coverage",
 		"gateway": "npm run generate-openapi --env=dev; node tools/deploy.cjs --env=dev --gateway",
 		"deploy": "gsutil -m cp -r data/instructions/* gs://monks-plexus/instructions; node tools/deploy.cjs --env=dev --functions --secrets",
-		"generate-openapi": "node tools/generate-openapi.js $npm_config_env gateway > config/openapi.yaml; node tools/generate-openapi.js $npm_config_env > public/openapi.yaml"
+		"generate-openapi": "node tools/generate-openapi.js $npm_config_env gateway > config/openapi.yaml; node tools/generate-openapi.js $npm_config_env > public/openapi.yaml",
+		"release": "VERSION=v$(node -p \"require('./package.json').version\") && git tag $VERSION && git push github $VERSION"
 	},
 	"author": "Richard Heuser <richard.heuser@monks.com>",
 	"license": "Apache-2.0",
