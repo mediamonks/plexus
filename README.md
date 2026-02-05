@@ -8,6 +8,21 @@ Plexus employs a multi-agent architecture where different AI agents can be confi
 One of its key features is being able to ingest data from online resources - like Google Drive, Google Cloud Storage, or APIs - process it, and store it in a vector database or other processed state, which can then be used to power agents.
 Additionally, it enforces a strict structure to help separate instructions from data, which aids in LLM performance and output quality, as well as helps protect against injection attacks.
 
+## Getting Started
+
+See [`config/example.json`](config/example.json) for a minimal working configuration that demonstrates the core features of Plexus. This example includes:
+
+- **A two-agent pipeline**: a `researcher` agent that retrieves and compiles information, followed by a `summarizer` agent that creates a concise response
+- **A data source** pointing to documents in Google Cloud Storage, processed as vector embeddings
+- **A catalog** with an input field, a data field for RAG retrieval, and output fields that chain the agents together
+
+To use this example:
+1. Update the `uri` in the data source to point to your documents
+2. Run `plexus ingest` to process and index the documents
+3. Run `plexus invoke '{"prompt": "Your question here"}'` to query the assistant
+
+See the [Usage Modes](#usage-modes) section for details on running Plexus as a service, SDK, or CLI, and the [Configuration](#configuration) section for the full list of options.
+
 ## How it Works
 
 Plexus consists of 3 core entities: Agents, Data Sources, and the Catalog.

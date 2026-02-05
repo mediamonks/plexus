@@ -1,0 +1,48 @@
+{
+  "agents": {
+    "researcher": {
+      "instructions": "You are a research assistant. Based on the user's question and the provided knowledge base, compile a detailed answer with all relevant information. Include specific details, quotes, and references where applicable.",
+      "context": ["userPrompt", "knowledgeBase"]
+    },
+    "summarizer": {
+      "instructions": "You are a summarization expert. Take the detailed research provided and create a clear, concise summary that directly answers the user's original question. Keep it brief but informative.",
+      "context": ["userPrompt", "detailedResponse"]
+    }
+  },
+  "catalog": {
+    "userPrompt": {
+      "type": "input",
+      "field": "prompt",
+      "example": "What are the main features of this product?"
+    },
+    "knowledgeBase": {
+      "type": "data",
+      "source": "documents",
+      "example": ["Document chunk 1...", "Document chunk 2..."],
+      "query": {
+        "input": "userPrompt",
+        "limit": 5
+      }
+    },
+    "detailedResponse": {
+      "type": "output",
+      "agent": "researcher",
+      "field": "response",
+      "example": "Based on the documentation, here is a comprehensive overview of the main features: Feature 1 does X, Feature 2 provides Y..."
+    },
+    "summary": {
+      "type": "output",
+      "agent": "summarizer",
+      "field": "summary",
+      "example": "The main features are: 1) X, 2) Y, 3) Z."
+    }
+  },
+  "data-sources": {
+    "documents": {
+      "uri": "gs://your-bucket/documents/",
+      "dataType": "text",
+      "target": "vector"
+    }
+  },
+  "output": ["summary"]
+}
