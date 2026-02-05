@@ -238,6 +238,37 @@ Retrieves the default configuration for the service.
 **Response Fields:**
 - Returns the complete default configuration object as defined in the service
 
+### Plexus SDK
+
+Plexus can be used as an SDK in your Node.js application:
+
+```javascript
+const Plexus = require('plexus');
+const config = require('./config.json');
+
+const plexus = new Plexus(config);
+
+// Invoke the pipeline
+const result = await plexus.invoke({ userInput: 'Hello' });
+console.log(result.output);
+
+// Continue a conversation thread
+const thread = plexus.thread(result.threadId);
+const followUp = await thread.invoke({ userInput: 'Tell me more' });
+console.log(followUp.output);
+```
+
+**Installation:**
+```bash
+npm install github:mediamonks/plexus
+```
+
+**API:**
+- **`new Plexus(config)`** - Create a new Plexus instance with a configuration object.
+- **`plexus.invoke(fields)`** - Invoke the pipeline with the given input fields. Returns `{ output, threadId, fields }`.
+- **`plexus.ingest(namespace?)`** - Ingest data sources, optionally filtered by namespace.
+- **`plexus.thread(threadId?)`** - Get or create a conversation thread.
+
 ### Plexus CLI
 
 In order to use Plexus as a CLI, follow these steps:
