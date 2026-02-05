@@ -1,8 +1,16 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { GoogleAuth, GoogleAuthOptions } from 'google-auth-library';
+import { GoogleAuth, GoogleAuthOptions, Impersonated } from 'google-auth-library';
 import { JWTInput } from 'google-auth-library/build/src/auth/credentials';
 import Config from '../../core/Config';
+
+const SCOPES = [
+	'https://www.googleapis.com/auth/drive',
+	'https://www.googleapis.com/auth/spreadsheets',
+	'https://www.googleapis.com/auth/documents',
+	'https://www.googleapis.com/auth/cloud-platform',
+	'https://www.googleapis.com/auth/sqlservice.login'
+];
 
 export default class GoogleAuthClient {
 	private static _client: GoogleAuth;
@@ -10,19 +18,32 @@ export default class GoogleAuthClient {
 	public static async get(): Promise<GoogleAuth> {
 		if (this._client) return this._client;
 		
+		const credentials = await this.getCredentials();
+		const impersonateServiceAccount = process.env.GOOGLE_IMPERSONATE_SERVICE_ACCOUNT;
+		
 		const authOptions: GoogleAuthOptions = {
-			credentials: await this.getCredentials(),
+			credentials,
 			projectId: Config.get('projectId'),
-			scopes: [
-				'https://www.googleapis.com/auth/drive',
-				'https://www.googleapis.com/auth/spreadsheets',
-				'https://www.googleapis.com/auth/documents',
-				'https://www.googleapis.com/auth/cloud-platform',
-				'https://www.googleapis.com/auth/sqlservice.login'
-			],
+			scopes: SCOPES,
 		};
 		
-		return this._client = new GoogleAuth(authOptions);
+		const auth = new GoogleAuth(authOptions);
+		
+		if (impersonateServiceAccount && !credentials) {
+			const sourceClient = await auth.getClient();
+			const impersonatedClient = new Impersonated({
+				sourceClient,
+				targetPrincipal: impersonateServiceAccount,
+				targetScopes: SCOPES,
+				lifetime: 3600,
+			});
+			
+			this._client = new GoogleAuth({ authClient: impersonatedClient });
+		} else {
+			this._client = auth;
+		}
+		
+		return this._client;
 	}
 	
 	private static async getCredentials(): Promise<JWTInput> {
