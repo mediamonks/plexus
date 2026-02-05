@@ -5,6 +5,7 @@ import IVectorDBEngine from './IVectorDBEngine';
 import GoogleAuthClient from '../google-drive/GoogleAuthClient';
 import Config from '../../core/Config';
 import Profiler from '../../core/Profiler';
+import ErrorHandler from '../../entities/error-handling/ErrorHandler';
 import { JsonObject, JsonPrimitive, SchemaProperty, staticImplements } from '../../types/common';
 
 @staticImplements<IVectorDBEngine<string>>()
@@ -177,6 +178,10 @@ export default class CloudSQL {
 			...clientOptions,
 			user,
 			database,
+		});
+		
+		this._client.on('error', (err) => {
+			ErrorHandler.log(err);
 		});
 		
 		return this._client;

@@ -45,6 +45,10 @@ export default class Storage {
 		return CloudStorage.upload(localPath, uri, { originalName: fileName, description });
 	}
 	
+	public static async setDescription(uri: string, description: string): Promise<void> {
+		return CloudStorage.setMetadata(uri, { description });
+	}
+	
 	public static async getFiles(namespace: string): Promise<{ uri: string; name: string; internalName: string; description: string }[]> {
 		const cachePath = `gs://${Config.get('storage.bucket')}/files/${namespace}`;
 		const files = await CloudStorage.files(cachePath);

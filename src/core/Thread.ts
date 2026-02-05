@@ -1,9 +1,7 @@
 import Config from './Config';
 import History from './History';
-import RequestContext from './RequestContext';
 import Plexus from '../Plexus';
 import CustomError from '../entities/error-handling/CustomError';
-import ErrorHandler from '../entities/error-handling/ErrorHandler';
 import Catalog from '../entities/catalog/Catalog';
 import { JsonObject } from '../types/common';
 
@@ -21,11 +19,7 @@ export default class Thread {
 		threadId: string;
 		fields: JsonObject;
 	}> {
-		const plexus = this._plexus;
-		const config = this._plexus.config;
-		return RequestContext.create({ plexus, config, fields }, async () => {
-			ErrorHandler.initialize();
-			
+		return this._plexus.context(async () => {
 			const output = {};
 			
 			this._history = History.create(this._threadId);

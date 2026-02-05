@@ -38,8 +38,12 @@ export default class CloudStorage {
 	public static async upload(filePath: string, uri: string, metadata?: Record<string, string>): Promise<string> {
 		const destination = this.uri(uri).path;
 		await this.bucket(uri).upload(filePath, { destination });
-		if (metadata) await this.file(uri).setMetadata({ metadata });
+		if (metadata) await this.setMetadata(uri, metadata);
 		return uri;
+	}
+	
+	public static async setMetadata(uri: string, metadata: Record<string, string>): Promise<void> {
+		await this.file(uri).setMetadata({ metadata });
 	}
 	
 	public static async list(uri: string): Promise<string[]> {

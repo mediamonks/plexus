@@ -54,16 +54,15 @@ export default class FileTargetDataSource extends DataSource {
 		const activity = Console.start(`Ingesting file target data source "${this.id}"`);
 		await Promise.all(items.map(async (item, index) => {
 			const localPath = await item.getLocalFile();
-			const uri = Storage.getUri(this.id, path.basename(localPath));
+			const uri = await Storage.save(this.id, localPath, item.fileName);
 			
 			item = new GoogleCloudStorageDataSourceItem(this, uri, item.fileName);
 			
 			let description: string;
 			if (this.configuration.enableToolCalling) {
 				description = await LLM.query(prompt, { files: [item] });
+				await Storage.setDescription(uri, description);
 			}
-			
-			await Storage.save(this.id, localPath, item.fileName, description);
 			
 			activity.progress();
 		}));

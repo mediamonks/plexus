@@ -1,16 +1,17 @@
 import RequestContext from '../../core/RequestContext';
 
 export default class ErrorHandler {
-	private static initialized = false;
+	private static _errors: Error[] = [];
+	private static _initialized = false;
 	
-	private static get _log(): Error[] {
-		return RequestContext.get('errors', []) as Error[];
+	private static get _log(): Error[] | null {
+		return RequestContext.exists() ? RequestContext.get('errors', []) as Error[] : [];
 	}
 	
 	public static initialize() {
 		if (process.env.NODE_ENV === 'dev') return;
 		
-		if (this.initialized) return;
+		if (this._initialized) return;
 		
 		process.on('uncaughtException', (error: Error) => {
 			this.log(error);
@@ -21,19 +22,28 @@ export default class ErrorHandler {
 			this.log(error);
 		});
 		
-		this.initialized = true;
+		this._initialized = true;
 	}
 	
 	public static log(error: Error) {
-		this._log.push(error);
 		console.error(error);
+		
+		if (RequestContext.exists()) {
+			const errors = RequestContext.get('errors', []) as Error[];
+			errors.push(error);
+			RequestContext.set('errors', errors);
+			return;
+		}
+		
+		this._errors.push(error);
 	}
 	
 	public static getAll(): Error[] {
-		return this._log;
+		return [ ...this._log, ...this._errors ];
 	}
 	
 	public static get(): Error | undefined {
-		return this._log[this._log.length - 1];
+		const errors = this.getAll();
+		return errors[errors.length - 1];
 	}
 };

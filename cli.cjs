@@ -51,7 +51,7 @@ Command:
             example: \`plexus invoke '{"userInput": "Hello, how are you?"}' 0a0a0a0a-0a0a-0a0a-0a0a-0a0a0a0a0a0a\`
 
 Options:
-  --config, -c     Configuration file path and name, "./config.json" is used if omitted
+  --config, -c     Path to configuration file, "./config.json" is used if omitted
   --profile, -p    Enable profiling
   --dump, -d       Enable data dumps
   --no-warmup, -W  Skip GCS authentication warmup

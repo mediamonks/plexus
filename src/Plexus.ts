@@ -38,13 +38,15 @@ export default class Plexus extends EventEmitter {
 	}
 	
 	public async ingest(namespace?: string): Promise<void> {
-		return RequestContext.create({ plexus: this, config: this.config }, () => {
-			ErrorHandler.initialize();
-			return DataSources.ingest(namespace);
-		});
+		return this.context(() => DataSources.ingest(namespace));
 	}
 	
 	public context<T>(fn: () => T): T {
-		return RequestContext.create({ plexus: this, config: this.config }, fn);
+		if (RequestContext.exists()) return fn();
+		
+		return RequestContext.create({ plexus: this, config: this.config }, () => {
+			ErrorHandler.initialize();
+			return fn();
+		});
 	}
 }

@@ -29,4 +29,8 @@ export default class RequestContext {
 	public static set(key: string, value: unknown): void {
 		this.store[key] = value;
 	}
+	
+	public static exists(): boolean {
+		return !!this.asyncLocalStorage.getStore();
+	}
 }
