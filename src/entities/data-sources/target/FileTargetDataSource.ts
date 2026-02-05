@@ -16,6 +16,7 @@ export default class FileTargetDataSource extends DataSource {
 		enableToolCalling?: boolean;
 		summaryPrompt?: string;
 	}
+	// TODO option to store file index in vector db for large collections
 	
 	public get configuration(): typeof FileTargetDataSource.Configuration {
 		return {

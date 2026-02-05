@@ -4,8 +4,9 @@ Plexus is a flexible AI platform for orchestrating multi-agent LLM workflows. It
 
 ## Overview
 
-Plexus employs a multi-agent architecture where different AI agents can be configured to handle specific aspects of any LLM-based workflow. The platform is designed to be completely configurable, allowing you to define custom agents, data sources, and processing pipelines for your specific use case.
+Plexus employs a multi-agent architecture where different AI agents can be configured to handle specific aspects of any LLM-based workflow. The platform is designed to be highly flexible, allowing you to define custom agents, data sources, and processing pipelines for your specific use case.
 One of its key features is being able to ingest data from online resources - like Google Drive, Google Cloud Storage, or APIs - process it, and store it in a vector database or other processed state, which can then be used to power agents.
+Additionally, it enforces a strict structure to help separate instructions from data, which aids in LLM performance and output quality, as well as helps protect against injection attacks.
 
 ## How it Works
 
@@ -13,22 +14,22 @@ Plexus consists of 3 core entities: Agents, Data Sources, and the Catalog.
 
 The Catalog is a definition of all data fields that exist in your system. These fields can function as context for agents, or as output of the process.
 
-Catalog fields come in 3 types: input, output and data. Input fields are automatically populated by values passed in the request payload. Output fields are fields that are populated by agents. And data fields are populated by the content of data sources.
+Catalog fields come in 3 types: input, output and data. Input fields are automatically populated by values passed into the workflow. Output fields are fields that are populated by agents. And data fields are populated by the content of data sources.
 
-Agents consists of instructions (the system prompt), and a set of context fields. An agent's input consists of these instructions, and a JSON object containing the runtime values for all context fields, as populated by the Catalog.
+Agents consist of instructions (the system prompt), and a set of context fields. An agent's input consists of these instructions, and a JSON object containing the runtime values for all context fields, as populated by the Catalog. Agents can also have access to data sources via tool calling.
 
-When a workflow is invoked, the Catalog will first start to populate the fields defined by the workflow's `output` configuration. For output fields, this means an Agent will need to be invoked. This Agent will in turn require certain fields for its context, which causes the Catalog to start populating those fields, and so on.
-This means the workflow is essentially built backwards, at runtime.
-When a data type field value is requested, the corresponding data source will be queried. More on this in the Data Sources section. 
+When a workflow is invoked, the Catalog will start to populate the fields defined by the workflow's `output` configuration. For output fields, this means an Agent will need to be invoked. This Agent will in turn require certain fields for its context, which causes the Catalog to start populating those fields, and so on.
+This ensures that the workflow is constructed in a way that all necessary operations are executed in the right order, without unnecessary steps, and as soon as possible, ensuring optimal performance.
+When a data type field value is requested, the corresponding data source is queried, as explained in the Data Sources section.
 
 ## Data Sources
-Data sources point to a specific online resource. This can be a Google Drive file or folder, a Google Cloud Storage Bucket object or folder, or an API.
+Data sources point to a specific online resource. This can be a Google Drive file or folder, a Google Cloud Storage Bucket object or folder, or an API endpoint.
 
 ### Ingesting
 Data sources can be ingested using the `/ingest` endpoint. This is necessary for `vector`-target data sources and recommended for all data sources that are not dynamic.
 
 ### Dynamic data sources
-Dynamic data sources are data sources that can use a different location on each invocation, based on input fields. These kind of data sources can not be ingested.
+Dynamic data sources are data sources that can vary in exact URI on each invocation, based on input fields. These kind of data sources can not be ingested.
 A data source becomes dynamic by using any amount of catalog field placeholders in its `uri` property, of the form `{fieldName}`. E.g. `gs://my-bucket/{folderName}/{fileName}.pdf`.
 
 ### Targets
@@ -36,13 +37,13 @@ Data sources can be processed in several ways, determined by their `target` prop
 #### Raw (structured/unstructured): `raw`
 The data source will be ingested as plain text or jsonl data, which can be fed as such directly into an agent.
 #### Vector embeddings (unstructured): `vector`
-Vector embeddings will be generated for distinct chunks of each document in the data source. These embeddings are then stored alongside their source text in a vector database, which can be queried as part of a catalog field's query configuration. The catalog field represents the resulting set of text chunks which can then be used by an agent. This option requires ingestion prior to invocation.
+Vector embeddings will be generated for distinct chunks of each document in the data source. These embeddings are then stored alongside their source text in a vector database, which can be queried as part of a catalog field's query configuration, or via a tool call. The catalog field represents the resulting set of text chunks which can then be used by an agent. This option requires ingestion prior to invocation.
 #### Vector embeddings (structured): `vector`
-The data will be converted to JSONL and vector embeddings will be generated for each record based on a specific field in the data set, determined by the `searchField` property of the data source configuration. These embeddings are then stored alongside their source record in a vector database, which can be queried as part of a catalog field's query configuration. The catalog field represents the resulting set of records which can then be used by an agent. This option requires ingestion prior to invocation.
+The data will be converted to JSONL and vector embeddings will be generated for each record based on a specific set of fields in the data set, determined by the `vectorFields` property of the data source configuration. These embeddings are then stored alongside their source record in a vector database, which can be queried as part of a catalog field's query configuration, or via a tool call. The catalog field represents the resulting set of records which can then be used by an agent. This option requires ingestion prior to invocation.
 #### Digest (unstructured only): `digest`
 The combined text of the data source will be run through an LLM to generate a digest or summary. `instructions` can be provided as part of the data source configuration to instruct the LLM how to summarize. If omitted, a basic summarization prompt is used. The resulting digest can then be used by an agent.
-#### File (Google GenAI only): `file`
-The files in the data source will be converted to a mime type supported by the selected LLM if necessary, and when used by an agent, will be passed as-is to the LLM, including its original file name for context.
+#### File: `file`
+The files in the data source will be converted to a mime type supported by the selected LLM, and when used by an agent, will be passed as-is to the LLM, including its original file name for context. If used for tool calling, the files will be indexed and summarized.
 
 ### Data Types
 Most targets require you to specify whether the data source should be processed as unstructured data (text) or structured data (data).
@@ -57,18 +58,19 @@ The following table shows which combinations of file type and target or data typ
 | PDF             | Yes            | No             | Yes          |
 | TXT             | Yes            | No             | Yes          |
 | JSON            | No             | No             | Yes          |
-| JSONL           | No             | Yes*           | No           |
+| JSONL           | No             | Yes\*          | No           |
 | DOCX            | Yes            | No             | Yes          |
-| XLSX            | No             | Yes**          | Yes          |
+| XLSX            | No             | Yes\**         | Yes          |
 | PPTX            | No             | No             | Yes          |
-| Google Doc      | Yes**          | No             | Yes**        |
-| Google Sheet    | No             | Yes**          | Yes**        | 
-| Google Slides   | No             | No             | Yes**        |
+| Google Doc      | Yes\**         | No             | Yes\**       |
+| Google Sheet    | No             | Yes\**         | Yes\**       | 
+| Google Slides   | No             | No             | Yes\**       |
 | PNG             | No             | No             | Yes          |
 | JPEG            | No             | No             | Yes          |
-*: `gcs` origin only
 
-**: `drive` origin only
+\* Applies to `gcs` origin only.
+
+\** Applies to `drive` origin only.
 
 ## Usage Modes
 Plexus can be used in three different ways: as a service, as a CLI, or as an SDK.
@@ -93,7 +95,7 @@ Invokes an agent workflow.
     // Input fields as defined in your catalog configuration
   },
   "config": {
-    // Runtime configuration overrides
+    // Configuration
   }
 }
 ```
@@ -101,27 +103,27 @@ Invokes an agent workflow.
 **Payload Fields:**
 - **`threadId`** (string, optional): ID of existing conversation thread to continue
 - **`fields`** (object, optional): Any input fields defined in your catalog configuration
-- **`config`** (object, optional): Runtime configuration overrides
+- **`config`** (object, optional): The configuration object
 
 **Response:**
 ```json
 {
-	"result": {
-		"output": {
-			// Output field values as defined in your output configuration
-		},
-		"threadId": "uuid-string",
-		"fields": {
-			// Field values as provided in the request payload
-		}
-	},
-	"debug": {
-		// Debug information
-	},
-	"performance": {
-		// Performance metrics
-	},
-	"error": null // Error message if applicable
+  "result": {
+    "output": {
+      // Output field values as defined in your output configuration
+    },
+    "threadId": "uuid-string",
+    "fields": {
+      // Field values as provided in the request payload
+    }
+  },
+  "debug": {
+    // Debug information
+  },
+  "performance": {
+    // Performance metrics
+  },
+  "error": null // Error message if applicable
 }
 ```
 
@@ -140,20 +142,20 @@ Retrieves available options for a specific input field.
 **Response:**
 ```json
 {
-	"result": [
-		{
-			"id": "option-id",
-			"label": "Option Label",
-			"description": "Option description"
-		}
-	],
-	"debug": {
-		// Debug information
-	},
-	"performance": {
-		// Performance metrics
-	},
-	"error": null // Error message if applicable
+  "result": [
+    {
+      "id": "option-id",
+      "label": "Option Label",
+      "description": "Option description"
+    }
+  ],
+  "debug": {
+    // Debug information
+  },
+  "performance": {
+    // Performance metrics
+  },
+  "error": null // Error message if applicable
 }
 ```
 
@@ -172,21 +174,21 @@ Retrieves a conversation thread with its history and last interaction details.
 **Response:**
 ```json
 {
-	"result": {
-		"history": [
-			// Array of conversation history items
-		],
-		"output": {
-			// Generated output from last interaction
-		}
-	},
-	"debug": {
-		// Debug information
-	},
-	"performance": {
-		// Performance metrics
-	},
-	"error": null // Error message if applicable
+  "result": {
+    "history": [
+      // Array of conversation history items
+    ],
+    "output": {
+      // Generated output from last interaction
+    }
+  },
+  "debug": {
+    // Debug information
+  },
+  "performance": {
+    // Performance metrics
+  },
+  "error": null // Error message if applicable
 }
 ```
 
@@ -205,7 +207,7 @@ Ingests all static data sources for a given namespace.
 ```json
 {
   "config": {
-    // Runtime configuration overrides
+    // Configuration
   }
 }
 ```
@@ -220,16 +222,16 @@ Retrieves the default configuration for the service.
 **Response:**
 ```json
 {
-  "result":  {
-		// Complete configuration object
-	},
-	"debug": {
-		// Debug information
-	},
-	"performance": {
-		// Performance metrics
-	},
-	"error": null // Error message if applicable
+  "result": {
+    // Complete configuration object
+  },
+  "debug": {
+    // Debug information
+  },
+  "performance": {
+    // Performance metrics
+  },
+  "error": null // Error message if applicable
 }
 ```
 
@@ -239,65 +241,49 @@ Retrieves the default configuration for the service.
 ### Plexus CLI
 
 In order to use Plexus as a CLI, follow these steps:
-- Install node.js v20 or higher and npm
-- Clone the [repository](https://bitbucket.org/mediamonks/s-4-capital-mediamonks-met-applied-250351484-plexus/src/master/)
-- Install dependencies: `npm i`
-- Build: `npm run build`
-- Create a `.json` configuration file in the `config/` folder. See the [Configuration](#configuration) section for more information.
-- Run your configuration: `./plexus <command> <config-file-name> <arguments> <options>`
+- Install node.js v22 or higher and npm
+- Install Plexus: `npm install -g github:mediamonks/plexus`
+- Create a `config.json` configuration file. See the [Configuration](#configuration) section for more information.
+- Run your configuration: `plexus [OPTIONS] <command> [arguments]`
+
+Alternatively, run without global installation using `npx plexus` from a directory where Plexus is installed as a dependency.
 
 ## Configuration
 
-Plexus uses a flexible, hierarchical configuration system that supports multiple deployment patterns:
-
-- **Static Configuration**: JSON files in the `config/` directory for base configuration
-- **Runtime Configuration**: Dynamic overrides passed as request parameters
-- **Flexible Structure**: Configuration can be provided as one large object or divided across multiple files
-- **Merge Strategy**: Static and runtime configurations are automatically merged to determine the final runtime configuration
-
-### Configuration Structure
-
-The configuration object has the following top-level structure. All fields are optional and will fall back to service defaults if not provided:
+The configuration object has the following top-level structure. When using Plexus as a service, all top-level fields are optional and will fall back to service defaults if not provided:
 
 ```json
 {
   "projectId": "your-gcp-project",
   "location": "europe-west1",
-  "platform": "google",
-  "embeddingPlatform": "google",
-  "waitForThreadUpdate": false,
   "tempPath": "./temp/",
-	"instructionsPath": "gs://my-bucket/instructions",
+  "instructionsPath": "gs://my-bucket/instructions",
+  "profiling": true,
+  "dataDumps": false,
+  "debug": true,
+  "waitForThreadUpdate": false,
   "output": ["field1", "field2"],
-	"profiling": true,
-	"dataDumps": false,
-	"debug": true,
-  "postback": {
-    "url": "https://your-callback-url.com",
-    "headers": {
-      "Authorization": "Bearer token"
-    }
-  },
   "agents": { /* agent configurations */ },
-	"catalog": { /* field definitions */ },
-	"data-sources": { /* data source configurations */ },
-	"input-fields": { /* input field options */ },
-	"llm": { /* LLM settings */ },
-	"azure": { /* Azure OpenAI settings */ },
-	"genai": { /* Google GenAI settings */ },
-	"openai": { /* OpenAI settings */ },
-	"local-llm": { /* Local LLM settings */ },
-	"drive": { /* Google Drive settings */ },
-	"firestore": { /* Firestore settings */ },
-	"lancedb": { /* vector database settings */ },
-  "storage": { /* internal file storage settings */ }
+  "catalog": { /* field definitions */ },
+  "data-sources": { /* data source configurations */ },
+  "input-fields": { /* input field options */ },
+  "llm": { /* LLM settings */ },
+  "azure": { /* Azure OpenAI settings */ },
+  "genai": { /* Google GenAI settings */ },
+  "openai": { /* OpenAI settings */ },
+  "local-llm": { /* Local LLM settings */ },
+  "drive": { /* Google Drive settings */ },
+  "firestore": { /* Firestore settings */ },
+  "lancedb": { /* LanceDB settings */ },
+  "vectordb": { /* vector database settings */ },
+  "storage": { /* internal file storage settings */ },
+  "postback": { /* postback configuration */ }
 }
 ```
 
 ## Global Settings
 
 Top-level configuration options that apply across the entire platform:
-
 - **`platform`** (string): Primary AI platform ("google", "azure", "openai", "local")
 - **`embeddingPlatform`** (string): AI platform for text embeddings ("google", "azure", "openai")
 - **`waitForThreadUpdate`** (boolean): Whether to wait for the conversation thread to be updated before returning a response. Enabling this will increase response time, but will guarantee conversation consistency in scenarios where the `invoke` endpoint is called in quick succession.
@@ -306,16 +292,11 @@ Top-level configuration options that apply across the entire platform:
 - **`profiling`** (boolean): Whether to output performance metrics
 - **`debug`** (boolean): Whether to output debug information
 - **`dataDumps`** (boolean): Whether to output data dumps for debugging
-- **`postback`** (object): The webhook for receiving status messages during invocation. It will receive POST requests with a payload of the following format: `{ "status": "Some operation", "isRunning": true }`.
-	- **`url`** (string): URL
-	- **`headers`** (object): Additional HTTP headers, e.g. for authentication
 
-The following top-level configuration options are only relevant when using Plexus as a CLI:
-- **`tempPath`** (string): Path for temporary files
-
-The following top-level configuration options are only relevant when using Plexus as an SDK:
+The following top-level configuration options are only relevant when using Plexus as a CLI or SDK:
 - **`projectId`** (string): Google Cloud Project ID
 - **`location`** (string): Default Google Cloud region
+- **`tempPath`** (string): Path for temporary files
 
 ## Entities
 
@@ -334,7 +315,9 @@ Defines behavior and context for each AI agent in your workflow. Each agent is i
       "temperature": 0.7,
       "useHistory": true,
       "required": ["requiredField"],
-      "outputTokens": 1024
+      "outputTokens": 1024,
+      "dataSources": ["data-source-id"],
+      "serialize": ["collectionField", "itemField"]
     }
   }
 }
@@ -347,6 +330,8 @@ Defines behavior and context for each AI agent in your workflow. Each agent is i
 - **`useHistory`** (boolean, optional): Whether to provide the agent with the conversation history.
 - **`required`** (array, optional): Required (typically `input`-type) context fields for the agent. If a required field is left empty, the agent will not run and will simply return an empty response object, but the workflow will continue as normal.
 - **`outputTokens`** (number): Maximum output tokens for this agent
+- **`dataSources`** (array, optional): List of data source IDs to make available to the agent via tool calling.
+- **`serialize`** (array, optional): Enables serialized invocation over a collection. Expects a tuple of `[collectionFieldName, itemFieldName]`. The agent will be invoked once for each item in the collection field, with the item available as the specified item field name.
 
 ### `catalog`
 
@@ -374,10 +359,10 @@ Defines all fields that exist in the workflow and maps them to input parameters,
         { "name": "John", "age": 30 }
       ],
       "query": {
-				"input": "someInputField",
+        "input": "someInputField",
         "filter": { "age": "targetAge" },
         "limit": 5,
-				"fields": ["name", "age"],
+        "fields": ["name", "age"],
         "sort": "name"
       }
     }
@@ -405,13 +390,15 @@ These take their value directly from the request payload.
 These take their value from the output object of an agent.
 - **`agent`** (string): Agent name
 - **`field`** (string): Name of the field in the output object
+- **`description`** (string, optional): Description of the field, used in the output schema provided to the agent.
+- **`required`** (boolean, optional): Whether the field is required in the agent's output. If `true`, the workflow will error if the agent fails to produce this field.
 
 **Data Fields:**
 These take their value from a data source.
 - **`source`** (string): Data source identifier, points to a data source defined in the `data-sources` section
 - **`query`** (object, optional): Properties that determine if and how the data from the data source should be queried. If not specified, the source data will always be used in its entirety (after `target`-based processing applies).
-	- **`input`** (string, optional): Performs a text search against an unstructured data source, using the value of the given catalog field as input.
-	- **`filter`** (object, optional): Filter criteria for queries against a structured data source, should consist of key-value pairs, where the key is the field name in the source data set, and the value is the name of a catalog field, which value will be used as the filter value.
+  - **`input`** (string, optional): Performs a text search against an unstructured data source, using the value of the given catalog field as input.
+  - **`filter`** (object, optional): Filter criteria for queries against a structured data source, should consist of key-value pairs, where the key is the field name in the source data set, and the value is the name of a catalog field, which value will be used as the filter value.
   - **`limit`** (number, optional): Maximum number of results for any type of query.
   - **`fields`** (array, optional): Specific fields to retrieve when querying a structured data source.
   - **`sort`** (string, optional): Which field to sort by when querying a structured data source.
@@ -444,7 +431,10 @@ Defines available data sources and their properties:
 - **`isFolder`** (boolean, optional): Whether the `gcs` or `drive` origin data source is a folder. Will be detected if not specified, at a slight performance hit. 
 - **`allowCache`** (boolean, optional): Whether to allow caching of the data source, defaults to true. Set this to `false` for data sources of which the content can change between invocations.
 - **`instructions`** (string, optional): Processing instructions for a `digest`-type data source.
-- **`searchField`** (string, optional): Name of the field against which to perform vector searches for a `data`-type, `vector`-target data source.
+- **`vectorFields`** (array, optional): List of field names to use for generating vector embeddings for a `data`-type, `vector`-target data source.
+- **`incremental`** (boolean, optional): For `vector` and `file` targets, whether to append new records/files during ingestion instead of replacing all data.
+- **`enableToolCalling`** (boolean, optional): For `file` target, whether to enable tool calling for this data source. When enabled, files will be indexed and summarized during ingestion.
+- **`summaryPrompt`** (string, optional): For `file` target with `enableToolCalling`, custom prompt for generating file summaries during ingestion.
 
 ### `input-fields`
 
@@ -471,6 +461,7 @@ This also restricts allowed input values to the defined options.
 **Option Properties:**
 - **`id`** (string): Unique identifier
 - **`label`** (string): Display label
+- **`description`** (string, optional): Description of the option, used as the actual value for inference if provided.
 
 ## LLM
 
@@ -483,12 +474,12 @@ Configuration for the LLM. Can also be set at the global level.
 ```json
 {
   "llm": {
-		"platform": "google",
-		"model": "gemini-2.5-flash-lite",
-		"embeddingPlatform": "google",
-		"embeddingModel": "gemini-embedding-001",
+    "platform": "google",
+    "model": "gemini-2.5-flash-lite",
+    "embeddingPlatform": "google",
+    "embeddingModel": "gemini-embedding-001",
     "temperature": 0.7,
-		"outputTokens": 1024
+    "outputTokens": 1024
   }
 }
 ```
@@ -507,12 +498,12 @@ Configuration for Azure OpenAI services:
 ```json
 {
   "azure": {
-		"model": "gpt-4o-mini",
-		"embeddingModel": "text-embedding-ada-002",
-		"baseUrl": "https://your-resource.openai.azure.com/",
-		"apiVersion": "2025-01-01-preview",
-		"embeddingApiVersion": "2023-05-15",
-		"outputTokens": 1024
+    "model": "gpt-4o-mini",
+    "embeddingModel": "text-embedding-ada-002",
+    "baseUrl": "https://your-resource.openai.azure.com/",
+    "apiVersion": "2025-01-01-preview",
+    "embeddingApiVersion": "2023-05-15",
+    "outputTokens": 1024
   }
 }
 ```
@@ -531,15 +522,15 @@ Google Generative AI (Gemini) configuration:
 ```json
 {
   "genai": {
-		"model": "gemini-2.5-flash-lite",
-		"embeddingModel": "gemini-embedding-001",
-		"quotaDelayMs": 500,
-		"useVertexAi": true,
-		"projectId": "your-project-id",
-		"location": "your-location",
-		"embeddingLocation": "europe-west1",
-		"apiKey": "your-api-key",
-		"outputTokens": 1024
+    "model": "gemini-2.5-flash-lite",
+    "embeddingModel": "gemini-embedding-001",
+    "quotaDelayMs": 500,
+    "useVertexAi": true,
+    "projectId": "your-project-id",
+    "location": "your-location",
+    "embeddingLocation": "europe-west1",
+    "apiKey": "your-api-key",
+    "outputTokens": 1024
   }
 }
 ```
@@ -561,9 +552,9 @@ OpenAI API configuration:
 ```json
 {
   "openai": {
-		"model": "gpt-4o-mini",
+    "model": "gpt-4o-mini",
     "embeddingModel": "text-embedding-3-small",
-		"outputTokens": 1024
+    "outputTokens": 1024
   }
 }
 ```
@@ -580,9 +571,9 @@ Requires Docker to be installed. Does not yet support generating embeddings.
 ```json
 {
   "local-llm": {
-		"model": "ggml-org/Qwen2-VL-2B-Instruct-GGUF",
-		"image": "llamacpp",
-		"contextSize": 65536
+    "model": "ggml-org/Qwen2-VL-2B-Instruct-GGUF",
+    "image": "llamacpp",
+    "contextSize": 65536
   }
 }
 ```
@@ -590,6 +581,7 @@ Requires Docker to be installed. Does not yet support generating embeddings.
 - **`model`** (string): Primary model ID on huggingface.com, can also be set at the `llm` level
 - **`image`** (tgi|llamacpp): Which Docker image to use, either TGI (ghcr.io/huggingface/text-generation-inference:2.4.0) or Llama.cpp (ghcr.io/ggml-org/llama.cpp:server-cuda)
 - **`contextSize`** (number, optional): Context size for the model, defaults to 32768
+- **`visionProjector`** (string, optional): Vision projector model ID for multimodal models (Llama.cpp only)
 
 ## Internal
 
@@ -616,8 +608,8 @@ Firestore database settings. Can also be set at the global level:
 ```json
 {
   "firestore": {
-		"databaseId": "your-database",
-		"projectId": "your-project-id"
+    "databaseId": "your-database",
+    "projectId": "your-project-id"
   }
 }
 ```
@@ -654,3 +646,44 @@ Cloud storage settings:
 ```
 
 - **`bucket`** (string): Google Cloud Storage bucket used for storing generated files, e.g. ingested data.
+
+### `vectordb`
+
+Vector database engine selection:
+
+```json
+{
+  "vectordb": {
+    "engine": "lancedb"
+  }
+}
+```
+
+- **`engine`** (string, optional): Vector database engine to use. Options: `"lancedb"`, `"pgvector"`, `"cloudsql"`. Defaults to `"lancedb"`.
+
+### `postback`
+
+Configures a webhook for receiving real-time status updates during invocation.
+
+```json
+{
+  "postback": {
+    "url": "https://your-callback-url.com",
+    "headers": {
+      "Authorization": "Bearer token"
+    }
+  }
+}
+```
+
+**Postback Properties:**
+- **`url`** (string): The webhook URL to receive status updates
+- **`headers`** (object): Additional HTTP headers, e.g. for authentication
+
+**Payload format:**
+```json
+{
+  "status": "Some operation",
+  "isRunning": true
+}
+```

@@ -73,10 +73,10 @@ async function authentication() {
 	try {
 		await Storage.warmUp();
 		activity.done();
-		console.error(`GCS authentication warmup completed in ${Math.floor(performance.now() - startTime)}ms`);
+		console.error(`\nGCS authentication warmup completed in ${Math.floor(performance.now() - startTime)}ms`);
 	} catch (error) {
 		activity.done();
-		console.error('GCS authentication failed:', error.message);
+		console.error('\nGCS authentication failed:', error.message);
 	}
 
 	clearInterval(interval);
