@@ -57,7 +57,7 @@ export default abstract class VectorTargetDataSource extends DataSource {
 		const exists = await VectorDB.tableExists(this.id);
 		
 		if (this.configuration.incremental && exists) {
-			return VectorDB.append(this.id, this.withActivity(this.filteredGenerator()));
+			return VectorDB.append(this.id, this.withActivity(this.generator()));
 		}
 		
 		if (exists) await VectorDB.drop(this.id);
@@ -84,6 +84,20 @@ export default abstract class VectorTargetDataSource extends DataSource {
 	
 	protected abstract generator(): AsyncGenerator<VectorDBRecord>;
 	
+	protected async getIngestedIds(): Promise<Set<string>> {
+		let ingestedIds: Set<string>;
+		
+		if (!await VectorDB.tableExists(this.id)) return new Set();
+		
+		if (this.configuration.externalIngestionTracking) {
+			const doc = await Firestore.getDocument('vectordb', this.id);
+			ingestedIds = new Set((doc?.['ingested'] as string[]) ?? []);
+		} else {
+			ingestedIds = await VectorDB.getIds(this.id);
+		}
+		return ingestedIds;
+	}
+	
 	private async *withActivity(generator: AsyncGenerator<VectorDBRecord>): AsyncGenerator<VectorDBRecord> {
 		const activity = Console.start(`Ingesting vector target data source "${this.id}"`);
 		for await (const item of generator) {
@@ -103,7 +117,7 @@ export default abstract class VectorTargetDataSource extends DataSource {
 			ingestedIds = await VectorDB.getIds(this.id);
 		}
 		
-		for await (const item of this.generator()) {
+		for await (const item of this.withActivity(this.generator())) {
 			if (ingestedIds.has(item._id)) continue;
 			yield item;
 		}

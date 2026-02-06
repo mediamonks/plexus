@@ -38,7 +38,7 @@ export default class InputCatalogField extends CatalogField {
 		let value = fields?.[this.payloadField] as string;
 		
 		if (value === undefined) {
-			if (this.required) throw new CustomError(`Field "${this.payloadField}" must be provided in payload`);
+			if (this.required) throw new CustomError(`Field "${this.payloadField}" must be provided`);
 			
 			return;
 		}

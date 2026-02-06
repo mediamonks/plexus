@@ -30,19 +30,12 @@ export default class GoogleAuthClient {
 	}
 	
 	public static async getCredentials(): Promise<JWTInput> {
-		const { GOOGLE_APPLICATION_CREDENTIALS } = process.env;
-		
-		if (GOOGLE_APPLICATION_CREDENTIALS) {
-			const trimmed = GOOGLE_APPLICATION_CREDENTIALS.trim();
-			if (trimmed.startsWith('{')) {
-				return JSON.parse(trimmed);
-			}
-			const json = await fs.readFile(trimmed, 'utf8');
-			return JSON.parse(json);
+		if (process.env.SERVICE_ACCOUNT_KEY) {
+			return JSON.parse(process.env.SERVICE_ACCOUNT_KEY);
 		}
 		
 		try {
-			const fallbackPath = path.resolve(process.cwd(), 'auth', 'plexus.json');
+			const fallbackPath = path.resolve(process.cwd(), 'auth', 'credentials.json');
 			const json = await fs.readFile(fallbackPath, 'utf8');
 			return JSON.parse(json);
 		} catch {

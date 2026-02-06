@@ -4,6 +4,7 @@ import Plexus from '../Plexus';
 import CustomError from '../entities/error-handling/CustomError';
 import Catalog from '../entities/catalog/Catalog';
 import { JsonObject } from '../types/common';
+import RequestContext from './RequestContext';
 
 export default class Thread {
 	public constructor(private _plexus: Plexus, private _threadId?: string) {}
@@ -20,6 +21,8 @@ export default class Thread {
 		fields: JsonObject;
 	}> {
 		return this._plexus.context(async () => {
+			RequestContext.set('fields', fields);
+			
 			const output = {};
 			
 			this._history = History.create(this._threadId);

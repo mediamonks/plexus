@@ -23,6 +23,10 @@ export default class TextVectorTargetDataSource extends VectorTargetDataSource {
 	
 	protected async *generator(): AsyncGenerator<VectorDBRecord> {
 		const items = await this.origin.getItems();
+		const { incremental } = this.configuration;
+		let ingestedIds: Set<string> = new Set();
+		
+		if (incremental) ingestedIds = await this.getIngestedIds();
 		
 		for (const item of items) {
 			const text = await item.toText();
@@ -37,8 +41,12 @@ export default class TextVectorTargetDataSource extends VectorTargetDataSource {
 			for (const chunk of chunks) {
 				const content = chunk.pageContent;
 				if (!content) continue;
+				
+				const id = hash(content);
+				if (incremental && ingestedIds.has(id)) continue;
+				
 				const vector = await LLM.generateDocumentEmbeddings(content);
-				yield { text: content, _vector: vector, _source: item.id, _id: hash(text) };
+				yield { text: content, _vector: vector, _source: item.id, _id: id };
 			}
 		}
 	}

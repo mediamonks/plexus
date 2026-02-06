@@ -58,6 +58,7 @@ export type ToolCallParameters = Record<string, JsonField>;
 
 export type ToolCallResult = {
 	message?: string;
+	error?: string;
 	data?: JsonObject[];
 	files?: DataSourceItem<string>[];
 };

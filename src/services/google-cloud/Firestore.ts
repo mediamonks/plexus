@@ -3,10 +3,16 @@ import { DocumentReference, Firestore as FirestoreClient, QuerySnapshot, Setting
 import Config from '../../core/Config';
 import { JsonObject } from '../../types/common';
 
-const { projectId, databaseId } = Config.get('firestore', { includeGlobal: true, includeRequest: false }) as Settings;
-
 export default class Firestore {
-	private static _client: FirestoreClient = new FirestoreClient({ projectId, databaseId, ignoreUndefinedProperties: true });
+	private static _client: FirestoreClient;
+	
+	private static get client(): FirestoreClient {
+		if (this._client) return this._client;
+		
+		const { projectId, databaseId } = Config.get('firestore', { includeGlobal: true }) as Settings;
+		
+		return this._client = new FirestoreClient({ projectId, databaseId, ignoreUndefinedProperties: true });
+	}
 	
 	public static async getDocument(collection: string, id: string | number): Promise<JsonObject | undefined> {
 		const doc = await this.getDocRef(collection, id).get();
@@ -26,7 +32,7 @@ export default class Firestore {
 	}
 	
 	public static async getCollection(collection: string): Promise<QuerySnapshot> {
-		return this._client.collection(collection).get();
+		return this.client.collection(collection).get();
 	}
 	
 	public static async createDocument(collection: string, data: any): Promise<DocumentReference> {
@@ -34,6 +40,6 @@ export default class Firestore {
 	}
 	
 	private static getDocRef(collection: string, id: string | number): DocumentReference {
-		return this._client.collection(collection).doc(String(id));
+		return this.client.collection(collection).doc(String(id));
 	}
 };

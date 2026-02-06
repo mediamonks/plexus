@@ -5,6 +5,7 @@ import LLM from '../../../services/llm/LLM';
 import VectorDB from '../../../services/vector-db/VectorDB';
 import { JsonObject, VectorDBRecord } from '../../../types/common';
 import hash from '../../../utils/hash';
+import Firestore from '../../../services/google-cloud/Firestore';
 
 export default class DataVectorTargetDataSource extends VectorTargetDataSource {
 	declare protected readonly _configuration: typeof DataVectorTargetDataSource.Configuration;
@@ -36,6 +37,10 @@ export default class DataVectorTargetDataSource extends VectorTargetDataSource {
 	
 	protected async *generator(): AsyncGenerator<VectorDBRecord> {
 		const items = await this.origin.getItems();
+		const { incremental } = this.configuration;
+		let ingestedIds: Set<string> = new Set();
+		
+		if (incremental) ingestedIds = await this.getIngestedIds();
 		
 		for await (const item of items) {
 			const data = await item.toData();
@@ -43,6 +48,10 @@ export default class DataVectorTargetDataSource extends VectorTargetDataSource {
 			if (!(Symbol.asyncIterator in data)) throw new CustomError('Spreadsheet to vector data not yet supported');
 			
 			for await (const record of data as AsyncGenerator<JsonObject>) {
+				const id = hash(JSON.stringify(record));
+				
+				if (incremental && ingestedIds.has(id)) continue;
+				
 				let vector: number[];
 				if (this.vectorFields.length) {
 					const text = this.vectorFields
@@ -54,7 +63,7 @@ export default class DataVectorTargetDataSource extends VectorTargetDataSource {
 				
 				// TODO check if the source data contains _id, _source, or _vector, catch collision
 
-				yield { ...record, _vector: vector, _source: item.id, _id: hash(JSON.stringify(record)) };
+				yield { ...record, _vector: vector, _source: item.id, _id: id };
 			}
 		}
 	}

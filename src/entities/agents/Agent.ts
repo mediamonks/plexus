@@ -340,9 +340,14 @@ ${JSON.stringify(this._toolCallSchemas[toolName].parameters, undefined, 2)}`);
 				
 				toolCallResults = await Promise.all(toolCalls.map(async toolCall => {
 					Debug.log(`Calling tool "${toolCall.toolName}" for agent "${this.id}"`, 'Agent');
-					const result = await this.tools[toolCall.toolName].toolCall(toolCall.arguments);
-					Debug.dump(`agent ${this.id} tool call result`, result);
-					return result;
+					try {
+						const result = await this.tools[toolCall.toolName].toolCall(toolCall.arguments);
+						Debug.dump(`agent ${this.id} tool call result`, result);
+						return result;
+					} catch (error) {
+						Debug.log(`Tool call "${toolCall.toolName}" failed: ${error.message}`, 'Agent');
+						return { error: error.message };
+					}
 				}));
 				
 				history.add('user', prompt);
