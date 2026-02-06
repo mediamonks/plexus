@@ -8,15 +8,17 @@ class Activity {
 	constructor(private label: string, private max?: number) {}
 	
 	public id: string = uuidv4();
+	public isDone: boolean = false;
+	
 	private value?: number = 0;
 	
 	public get output(): string {
 		let progress: string;
 		if (this.max) {
-			const pips: number = Math.round((this.value / this.max) * MAX_PIPS);
+			const pips: number = this.isDone ? MAX_PIPS : Math.round((this.value / this.max) * MAX_PIPS);
 			progress = '='.repeat(pips) + ' '.repeat(Math.max(MAX_PIPS - pips, 0));
 		} else {
-			progress = this.value ? ['|', '/', '-', '\\'][this.value % 4] : '·';
+			progress = this.isDone ? '✓' : (this.value ? ['|', '/', '-', '\\'][this.value % 4] : '·');
 		}
 		
 		return `[${progress}] ${this.label}`;
@@ -30,7 +32,8 @@ class Activity {
 	}
 	
 	public done(): void {
-		Console.stop(this.id);
+		this.isDone = true;
+		Console.outputActivity();
 	}
 }
 
@@ -67,6 +70,11 @@ export default class Console {
 	}
 	
 	public static start(label: string, max?: number): Activity {
+		if (this._activities.length && !this._activities.filter(activity => !activity.isDone).length) {
+			this._activities = [];
+			this._lastOutputLines = 0;
+		}
+		
 		const activity = new Activity(label, max);
 		
 		this._activities.push(activity);
@@ -74,12 +82,6 @@ export default class Console {
 		this.outputActivity();
 		
 		return activity;
-	}
-	
-	public static stop(id: string): void {
-		this._activities = this._activities.filter(activity => activity.id !== id);
-		
-		this.outputActivity();
 	}
 	
 	public static outputActivity(): void {

@@ -247,7 +247,7 @@ export default class CloudSQL {
 		}
 		
 		if (typeof value === 'number') {
-			if (Number.isInteger(value)) return 'BIGINT';
+			if (key.endsWith('_id')) return 'BIGINT';
 			return 'DOUBLE PRECISION';
 		}
 		
@@ -262,10 +262,14 @@ export default class CloudSQL {
 				return 'BOOLEAN';
 			}
 			
-			if (!isNaN(Number(trimmed))) {
-				const num = Number(trimmed);
-				if (Number.isInteger(num)) return 'BIGINT';
-				return 'DOUBLE PRECISION';
+			const looksLikeIdentifier =
+				/_(id|sku|code|ref|num|no|nr)$/i.test(key) ||
+				/^0\d/.test(trimmed) ||
+				trimmed.length > 15;
+			
+			if (!isNaN(Number(trimmed)) && !looksLikeIdentifier) {
+				if (trimmed.includes('.')) return 'DOUBLE PRECISION';
+				return 'BIGINT';
 			}
 			
 			if (/\bdate(time)?\b/i.test(key)) return 'TIMESTAMP';

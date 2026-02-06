@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { GoogleAuth, GoogleAuthOptions, Impersonated } from 'google-auth-library';
+import { GoogleAuth, GoogleAuthOptions } from 'google-auth-library';
 import { JWTInput } from 'google-auth-library/build/src/auth/credentials';
 import Config from '../../core/Config';
 
@@ -19,7 +19,6 @@ export default class GoogleAuthClient {
 		if (this._client) return this._client;
 		
 		const credentials = await this.getCredentials();
-		const impersonateServiceAccount = process.env.GOOGLE_IMPERSONATE_SERVICE_ACCOUNT;
 		
 		const authOptions: GoogleAuthOptions = {
 			credentials,
@@ -27,28 +26,20 @@ export default class GoogleAuthClient {
 			scopes: SCOPES,
 		};
 		
-		const auth = new GoogleAuth(authOptions);
-		
-		if (impersonateServiceAccount && !credentials) {
-			const sourceClient = await auth.getClient();
-			const impersonatedClient = new Impersonated({
-				sourceClient,
-				targetPrincipal: impersonateServiceAccount,
-				targetScopes: SCOPES,
-				lifetime: 3600,
-			});
-			
-			this._client = new GoogleAuth({ authClient: impersonatedClient });
-		} else {
-			this._client = auth;
-		}
-		
-		return this._client;
+		return this._client = new GoogleAuth(authOptions);
 	}
 	
-	private static async getCredentials(): Promise<JWTInput> {
+	public static async getCredentials(): Promise<JWTInput> {
 		const { GOOGLE_APPLICATION_CREDENTIALS } = process.env;
-		if (GOOGLE_APPLICATION_CREDENTIALS) return JSON.parse(GOOGLE_APPLICATION_CREDENTIALS.trim());
+		
+		if (GOOGLE_APPLICATION_CREDENTIALS) {
+			const trimmed = GOOGLE_APPLICATION_CREDENTIALS.trim();
+			if (trimmed.startsWith('{')) {
+				return JSON.parse(trimmed);
+			}
+			const json = await fs.readFile(trimmed, 'utf8');
+			return JSON.parse(json);
+		}
 		
 		try {
 			const fallbackPath = path.resolve(process.cwd(), 'auth', 'plexus.json');

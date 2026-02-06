@@ -1,9 +1,9 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { Storage, File, Bucket } from '@google-cloud/storage';
-import { JWTInput } from 'google-auth-library/build/src/auth/credentials';
 import IHasLocalFileCache from '../IHasLocalFileCache';
 import LocalFileCache from '../LocalFileCache';
+import GoogleAuthClient from '../google-drive/GoogleAuthClient';
 import Config from '../../core/Config';
 import Profiler from '../../core/Profiler';
 import CustomError from '../../entities/error-handling/CustomError';
@@ -130,7 +130,7 @@ export default class CloudStorage {
 	}
 	
 	public static async getSignedUrl(uri: string): Promise<string> {
-		const client = this._signingClient ??= new Storage({ credentials: await this.getCredentials() });
+		const client = this._signingClient ??= new Storage({ credentials: await GoogleAuthClient.getCredentials() });
 		
 		const [url] = await client.bucket(this.uri(uri).bucket)
 			.file(this.uri(uri).path)
@@ -141,19 +141,6 @@ export default class CloudStorage {
 			});
 		
 		return url;
-	}
-	
-	private static async getCredentials(): Promise<JWTInput> {
-		const { GOOGLE_APPLICATION_CREDENTIALS } = process.env;
-		if (GOOGLE_APPLICATION_CREDENTIALS) return JSON.parse(GOOGLE_APPLICATION_CREDENTIALS.trim());
-		
-		try {
-			const fallbackPath = path.resolve(process.cwd(), 'auth', 'plexus.json');
-			const json = await fs.readFile(fallbackPath, 'utf8');
-			return JSON.parse(json);
-		} catch {
-			return undefined;
-		}
 	}
 	
 	private static get client(): Storage {
