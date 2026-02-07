@@ -120,7 +120,7 @@ plexus.context(async () => {
 		const result = await COMMANDS[command](plexus);
 		const time = Math.floor(performance.now() - startTime);
 		if (result) console.log(JSON.stringify(result, null, 2));
-		console.error(`\n${command} operation completed in ${formatTime(time)}ms`);
+		console.error(`\n${command} operation completed in ${formatTime(time)}`);
 	} catch (error) {
 		ErrorHandler.log(error);
 	}

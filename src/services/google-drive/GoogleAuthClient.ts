@@ -30,9 +30,7 @@ export default class GoogleAuthClient {
 	}
 	
 	public static async getCredentials(): Promise<JWTInput> {
-		if (process.env.SERVICE_ACCOUNT_KEY) {
-			return JSON.parse(process.env.SERVICE_ACCOUNT_KEY);
-		}
+		if (process.env.SERVICE_ACCOUNT_KEY) return JSON.parse(process.env.SERVICE_ACCOUNT_KEY);
 		
 		try {
 			const fallbackPath = path.resolve(process.cwd(), 'auth', 'credentials.json');
