@@ -1,6 +1,7 @@
 import Plexus from '../Plexus';
 import Configuration from '../types/Configuration';
+import { JsonObject } from '../types/common';
 
-export default async (_: void, { config }: { config: Configuration }): Promise<Configuration> => {
-	return new Plexus(config).config;
+export default async (_: void, { config }: { config: Configuration }): Promise<JsonObject> => {
+	return new Plexus(config).config as JsonObject;
 }
