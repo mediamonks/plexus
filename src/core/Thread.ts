@@ -5,6 +5,8 @@ import CustomError from '../entities/error-handling/CustomError';
 import Catalog from '../entities/catalog/Catalog';
 import { JsonObject } from '../types/common';
 import RequestContext from './RequestContext';
+import Profiler, { ProfilerLogEntry } from './Profiler';
+import Debug, { DebugLogEntry } from './Debug';
 
 export default class Thread {
 	public constructor(private _plexus: Plexus, private _threadId?: string) {}
@@ -19,6 +21,8 @@ export default class Thread {
 		output: JsonObject;
 		threadId: string;
 		fields: JsonObject;
+		performance?: ProfilerLogEntry[];
+		debug?: DebugLogEntry[];
 	}> {
 		return this._plexus.context(async () => {
 			RequestContext.set('fields', fields);
@@ -43,6 +47,8 @@ export default class Thread {
 				output,
 				threadId: this._threadId,
 				fields: fields,
+				performance: Config.get('profiling') && Profiler.getReport(),
+				debug: Config.get('debug') && Debug.get(),
 			};
 		});
 	}

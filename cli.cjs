@@ -36,7 +36,7 @@ const COMMANDS = {
 };
 
 function sendHelp() {
-	const help = `Usage: plexus [OPTIONS] <COMMAND> [ARGUMENTS]'
+	const help = `Usage: plexus <COMMAND> [ARGUMENTS] [OPTIONS]'
 
 Command:
   ingest    Ingest data from a set of data sources
@@ -91,6 +91,8 @@ function formatTime(ms) {
 }
 
 if (!COMMANDS[command]) sendHelp();
+
+if (command === 'help' || argv.h || argv.help) sendHelp();
 
 const configFile = argv.config ?? argv.c ?? './config.json';
 const configPath = path.resolve(process.cwd(), configFile);

@@ -336,6 +336,7 @@ ${JSON.stringify(this._toolCallSchemas[toolName].parameters, undefined, 2)}`);
 			hasToolCalls = Boolean(Array.isArray(toolCalls) && toolCalls.length);
 			
 			if (hasToolCalls) {
+				Debug.dump(`agent ${this.id} tool calls`, toolCalls);
 				if (output._status) Status.send(output._status as string);
 				
 				toolCallResults = await Promise.all(toolCalls.map(async toolCall => {

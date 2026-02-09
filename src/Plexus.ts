@@ -6,6 +6,8 @@ import DataSources from './entities/data-sources/DataSources';
 import ErrorHandler from './entities/error-handling/ErrorHandler';
 import { JsonObject } from './types/common';
 import Configuration from './types/Configuration';
+import Profiler, { ProfilerLogEntry } from './core/Profiler';
+import Debug, { DebugLogEntry } from './core/Debug';
 
 export default class Plexus extends EventEmitter {
 	private _config: Configuration;
@@ -37,9 +39,17 @@ export default class Plexus extends EventEmitter {
 		return this.thread().invoke(fields);
 	}
 	
-	public async ingest(namespace?: string): Promise<void> {
-		return this.context(() => DataSources.ingest(namespace));
-	}
+	public async ingest(namespace?: string): Promise<{
+		performance?: ProfilerLogEntry[];
+		debug?: DebugLogEntry[];
+	}> {
+		await this.context(() => DataSources.ingest(namespace));
+		
+		return {
+			performance: Config.get('profiling') && Profiler.getReport(),
+			debug: Config.get('debug') && Debug.get(),
+		}
+	};
 	
 	public context<T>(fn: () => T): T {
 		if (RequestContext.exists()) return fn();
