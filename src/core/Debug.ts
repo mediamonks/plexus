@@ -51,7 +51,9 @@ export default class Debug {
 		
 		void this.writeDumpFile(label, data);
 		
-		Console.output(Console.OUTPUT_TYPE.DUMP, `[${label}]`, ...this._formatData(data));
+		if (process.env['PLEXUS_MODE'] === 'cli') data = this._formatData(data); // TODO this shouldn't be here
+		
+		Console.output(Console.OUTPUT_TYPE.DUMP, `[${label}]`, data);
 	}
 	
 	public static get(): DebugLogEntry[] {

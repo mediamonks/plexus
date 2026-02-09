@@ -1,9 +1,5 @@
 # TODO Items
 
-## High Priority / Architecture
-
-- **Create npm lib** 
-
 ## Data Source Improvements
 
 ### Backwards Compatibility
@@ -34,9 +30,6 @@
 - **Serial processing** - Run each DataSourceItem through the Agent separately
 
 ## Bosch
-- Use regular structured response for custom tool calling (rather than built-in tool calling)
-- Move tool calling to the Agent
-- Wrap tool calls + llm calls with status feedback
 - Support for multiple tables per vector data source
 - Support for no vectorFields in vector data source (so regular structured data source?)
 - Make tool calling generic (any data source)
@@ -44,10 +37,9 @@
 - Support for ingesting documents to data (e.g. pdfs to table)
 -----
 - **GraphRAG** - Support GraphRAG datasources
-- **SDK** - Support using Plexus as an SDK 
 
 ## Ingestion
-- Fix incremental ingestion for vector dbs
+- _id > _hash, __id > _id, _source?
 
 ## Performance
 - LocalFS class

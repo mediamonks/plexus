@@ -262,12 +262,7 @@ export default class CloudSQL {
 				return 'BOOLEAN';
 			}
 			
-			const looksLikeIdentifier =
-				/_(id|sku|code|ref|num|no|nr)$/i.test(key) ||
-				/^0\d/.test(trimmed) ||
-				trimmed.length > 15;
-			
-			if (!isNaN(Number(trimmed)) && !looksLikeIdentifier) {
+			if (!isNaN(Number(trimmed))) {
 				if (trimmed.includes('.')) return 'DOUBLE PRECISION';
 				return 'BIGINT';
 			}
