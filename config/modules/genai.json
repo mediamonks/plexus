@@ -2,5 +2,5 @@
 	"model": "gemini-2.5-flash-lite",
 	"embeddingModel": "gemini-embedding-001",
 	"useVertexAi": false,
-	"quotaDelayMs": 500
+	"quotaDelayMs": 300
 }

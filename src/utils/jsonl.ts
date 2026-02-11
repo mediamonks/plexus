@@ -1,31 +1,43 @@
 import fs from 'node:fs';
 import readline from 'node:readline/promises';
 import CustomError from '../entities/error-handling/CustomError';
-import { JsonArray, JsonObject } from '../types/common';
+import { JsonArray, JsonObject, SOURCE_FORMAT, DataItemGenerator } from '../types/common';
 
-async function* read(filePath: string): AsyncGenerator<JsonObject> {
+function read(filePath: string): DataItemGenerator<JsonObject> {
 	if (!filePath.toLowerCase().endsWith('.jsonl')) throw new CustomError(`Error while opening ${filePath}: Invalid filetype. Must be JSONL.`);
 	
-	const rl = readline.createInterface({
-		input: fs.createReadStream(filePath),
-		crlfDelay: Infinity
-	});
-	
-	for await (const line of rl) {
-		let data;
-		try {
-			data = JSON.parse(line);
-		} catch (error) {
-			throw new CustomError(`Error while reading ${filePath}: Invalid file contents. Must be valid JSONL.`);
+	async function* generator(): AsyncGenerator<JsonObject> {
+		const rl = readline.createInterface({
+			input: fs.createReadStream(filePath),
+			crlfDelay: Infinity
+		});
+		
+		for await (const line of rl) {
+			let data: JsonObject;
+			try {
+				data = JSON.parse(line);
+			} catch (error) {
+				throw new CustomError(`Error while reading ${filePath}: Invalid file contents. Must be valid JSONL.`);
+			}
+			yield data;
 		}
-		yield data;
 	}
+	
+	const gen = generator() as DataItemGenerator<JsonObject>;
+	gen[SOURCE_FORMAT] = 'jsonl';
+	return gen;
 }
 
-async function* readAll(filePaths: string[]): AsyncGenerator<JsonObject> {
-	for await (const filePath of filePaths) {
-		for await (const data of read(filePath)) yield data;
+function readAll(filePaths: string[]): DataItemGenerator<JsonObject> {
+	async function* generator(): AsyncGenerator<JsonObject> {
+		for await (const filePath of filePaths) {
+			for await (const data of read(filePath)) yield data;
+		}
 	}
+	
+	const gen = generator() as DataItemGenerator<JsonObject>;
+	gen[SOURCE_FORMAT] = 'jsonl';
+	return gen;
 }
 
 async function parse(data: string): Promise<JsonArray> {

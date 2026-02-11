@@ -6,6 +6,7 @@ const path = require('node:path');
 const minimist = require('minimist');
 const Plexus = require('./dist/Plexus').default;
 const Console = require('./dist/core/Console').default;
+const Debug = require('./dist/core/Debug').default;
 const ErrorHandler = require('./dist/entities/error-handling/ErrorHandler').default;
 const Storage = require('./dist/entities/storage/Storage').default;
 
@@ -115,6 +116,8 @@ config.dataDumps = argv.dump ?? argv.d ?? false;
 const plexus = new Plexus(config);
 
 plexus.context(async () => {
+	await Debug.cleanUp();
+	
 	await authentication();
 	
 	try {

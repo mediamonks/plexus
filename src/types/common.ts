@@ -27,6 +27,9 @@ export type VectorDBRecord = JsonObject & {
 	_vector: number[];
 };
 
+export const SOURCE_FORMAT = Symbol('sourceFormat');
+export type DataItemGenerator<T> = AsyncGenerator<T> & { [SOURCE_FORMAT]?: 'csv' | 'jsonl' };
+
 type SchemaPrimitive = {
 	type: 'string' | 'number' | 'integer' | 'boolean';
 	description?: string;

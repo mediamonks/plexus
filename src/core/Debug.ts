@@ -43,7 +43,7 @@ export default class Debug {
 	public static log(message: string, topic?: string): void {
 		this._log.push({ ts: Date.now(), type: 'message', topic, message });
 		
-		Console.output(Console.OUTPUT_TYPE.STATUS, topic && `[${topic}]`, message);
+		Console.output(Console.OUTPUT_TYPE.DEBUG, topic && `[${topic}]`, message);
 	}
 	
 	public static dump(label: string, data: any): void {
@@ -58,6 +58,12 @@ export default class Debug {
 	
 	public static get(): DebugLogEntry[] {
 		return this._log;
+	}
+	
+	public static async cleanUp(): Promise<void> {
+		const dumpFilePath: string = path.join(Config.get('tempPath') as string, 'dump');
+		
+		await fs.rm(dumpFilePath, { recursive: true, force: true });
 	}
 	
 	private static async writeDumpFile(label: string, data: string | object): Promise<void> {

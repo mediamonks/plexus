@@ -8,7 +8,7 @@ import DataSourceItem from '../../entities/data-sources/origin/DataSourceItem';
 import GoogleCloudStorageDataSourceItem from '../../entities/data-sources/origin/GoogleCloudStorageDataSourceItem';
 import { staticImplements } from '../../types/common';
 
-const { GOOGLE_GENAI_API_KEY } = process.env;
+const GOOGLE_GENAI_API_KEY = process.env.GOOGLE_GENAI_API_KEY;
 
 @staticImplements<ILLMPlatform>()
 export default class GoogleLLMPlatform extends LLMPlatform {
@@ -217,10 +217,11 @@ export default class GoogleLLMPlatform extends LLMPlatform {
 	private static async quotaDelay(): Promise<void> {
 		if (this._lastQuery) {
 			const delay = this.configuration.quotaDelayMs ?? 0;
-			while (performance.now() < this._lastQuery + delay)
-				await new Promise(resolve =>
-					setTimeout(resolve, this._lastQuery + delay - performance.now())
-				);
+			const waitTime = this._lastQuery + delay - performance.now();
+			if (waitTime > 0) {
+				await new Promise(resolve => setTimeout(resolve, waitTime));
+				return this.quotaDelay();
+			}
 		}
 		this._lastQuery = performance.now();
 	}

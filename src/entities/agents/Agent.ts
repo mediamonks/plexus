@@ -1,3 +1,5 @@
+import debounce from 'lodash.debounce';
+import { v4 as uuid } from 'uuid';
 import IHasInstructions from '../IHasInstructions';
 import Instructions from '../Instructions';
 import Catalog from '../catalog/Catalog';
@@ -19,6 +21,7 @@ import {
 	ToolCallResult,
 	ToolCallSchema
 } from '../../types/common';
+import { escapeUnicodeQuotes } from '../../utils/unicode-quotes';
 
 type ToolCall = {
 	id: string;
@@ -31,6 +34,7 @@ You have access to the following tools. To perform a tool call, use the \`_tool_
 const INPUT_TEMPLATE = `### **Input Format (JSON)**`;
 const OUTPUT_TEMPLATE = `### **Output Format (JSON)**
 Output only JSON. Do **not** use markdown.`;
+const INVALID_JSON_RETRIES = 2;
 
 export default class Agent implements IHasInstructions {
 	public isReady: boolean = false;
@@ -93,10 +97,15 @@ ${JSON.stringify(this._toolCallSchemas[toolName].parameters, undefined, 2)}`);
 			_tool_call_results: [],
 		};
 		for (let fieldId of this.context) {
-			if (this.configuration.serialize && fieldId === this.configuration.serialize[0]) fieldId = this.configuration.serialize[1];
+			let { example } = this.catalog.get(fieldId);
 			
-			const { example } = this.catalog.get(fieldId);
 			if (!example) throw new CustomError(`Missing example for catalog field "${fieldId}"`);
+			
+			if (this.configuration.serialize && fieldId === this.configuration.serialize[0]) {
+				example = example[0];
+				fieldId = this.configuration.serialize[1];
+			}
+			
 			inputSchema[fieldId] = example;
 		}
 		if (Object.keys(inputSchema).length) {
@@ -287,7 +296,9 @@ ${JSON.stringify(this._toolCallSchemas[toolName].parameters, undefined, 2)}`);
 				if (result[key][0] instanceof Array) result[key] = result[key].flat();
 			}
 		} else {
+			const activity = Console.start(`Running agent "${this.id}"`);
 			result = await this.query(this._context as Record<string, JsonField>);
+			activity.done();
 		}
 		
 		// TODO Implement or remove pagination
@@ -300,36 +311,39 @@ ${JSON.stringify(this._toolCallSchemas[toolName].parameters, undefined, 2)}`);
 	private async query(context: Record<string, JsonField>): Promise<JsonObject> {
 		const { useHistory, outputTokens } = this.configuration;
 		const instructions = this.instructions;
+		const traceId = uuid();
 		let files: DataSourceItem<string>[] = [];
 		
 		const mappedContext = this.mapFiles(context, files);
 		
-		Debug.dump(`agent ${this.id} instructions`, instructions);
-		Debug.dump(`agent ${this.id} context`, mappedContext);
-		Debug.dump(`agent ${this.id} files`, files);
-		Debug.log(`Querying model for agent "${this.id}`, 'Agent');
+		debounce(() => Debug.dump(`agent ${this.id} instructions`, instructions), 1000)();
+		Debug.dump(`agent ${this.id} ${traceId} context`, mappedContext);
+		Debug.dump(`agent ${this.id} ${traceId} files`, files);
 		
 		let response: string, hasToolCalls: boolean, toolCallResults: ToolCallResult[] = [], output: JsonObject;
 		let history = useHistory ? History.instance : new History(); // TODO use a local copy of history, we should not modify the global history
-		let prompt = JSON.stringify(mappedContext, undefined, 2);
+		let prompt = escapeUnicodeQuotes(JSON.stringify(mappedContext, undefined, 2));
+		let attempts = 0;
 		do {
-			response = await Status.wrap(`Running agent "${this.id}"`, () =>
-				LLM.query(prompt, {
+			Debug.log(`Querying model for agent "${this.id} (trace ID: ${traceId})"`, 'Agent');
+			response = await LLM.query(prompt, {
 					instructions,
 					temperature: this._temperature,
 					outputTokens,
 					history,
 					structuredResponse: true,
 					files,
-				})
-			);
+			});
 			
-			Debug.dump(`agent ${this.id} response`, response);
+			Debug.dump(`agent ${this.id} ${traceId} response`, response);
 			
 			try {
-				output = JSON.parse(response);
+				output = JSON.parse(escapeUnicodeQuotes(response).replaceAll("\\'", "'"));
+				attempts = 0;
 			} catch (error) {
-				throw new CustomError(`Agent "${this.id}" returned invalid JSON`);
+				attempts++;
+				if (attempts >= INVALID_JSON_RETRIES) throw new CustomError(`Agent "${this.id}" returned invalid JSON after ${attempts} attempts (trace ID: ${traceId})`);
+				continue;
 			}
 			
 			const toolCalls = output._tool_calls as ToolCall[];
@@ -360,7 +374,7 @@ ${JSON.stringify(this._toolCallSchemas[toolName].parameters, undefined, 2)}`);
 				Debug.dump(`agent ${this.id} history`, history);
 			}
 			
-		} while (hasToolCalls);
+		} while (hasToolCalls || attempts);
 		
 		return output;
 	}

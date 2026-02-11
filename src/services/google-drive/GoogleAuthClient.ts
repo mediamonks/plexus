@@ -33,11 +33,15 @@ export default class GoogleAuthClient {
 		if (process.env.SERVICE_ACCOUNT_KEY) return JSON.parse(process.env.SERVICE_ACCOUNT_KEY);
 		
 		try {
-			const fallbackPath = path.resolve(process.cwd(), 'auth', 'credentials.json');
-			const json = await fs.readFile(fallbackPath, 'utf8');
-			return JSON.parse(json);
+			const localAuthPath = path.resolve(process.cwd(), 'auth', 'credentials.json');
+			return JSON.parse(await fs.readFile(localAuthPath, 'utf8'));
 		} catch {
-			return undefined;
+		}
+		
+		try {
+			const plexusNativeAuthPath = path.resolve(__dirname, '..', '..', '..', 'auth', 'plexus.json');
+			return JSON.parse(await fs.readFile(plexusNativeAuthPath, 'utf8'));
+		} catch {
 		}
 	}
 };

@@ -59,7 +59,7 @@ type MethodResponse<TOperation extends OperationType> =
 @staticImplements<IHasLocalFileCache<Metadata>>()
 export default class GoogleDrive {
 	private static _client: drive_v3.Drive;
-	
+
 	public static async upload(filePath: string, folderId: string): Promise<Metadata> {
 		return await this.createFile(
 			path.basename(filePath),
@@ -68,46 +68,46 @@ export default class GoogleDrive {
 			fs.createReadStream(filePath),
 		);
 	}
-	
+
 	public static async download(metadata: Metadata, destination?: string): Promise<string> {
 		Debug.log(`Downloading file "${metadata.name}"`, 'Google Drive');
-		
+
 		try {
 			const fileStream = await this.execute(OPERATION.GET, {
 				fileId: metadata.id,
 				alt: 'media',
 			}, { responseType: 'stream' }) as Readable;
-			
+
 			destination ??= path.join(this.downloadPath, `${metadata.id}${path.extname(metadata.name)}`);
-			
+
 			fs.mkdirSync(path.dirname(destination), { recursive: true });
-			
+
 			await new Promise<void>((resolve, reject) => {
 				const writeStream = fs.createWriteStream(destination, { encoding: null });
-				
+
 				writeStream
 					.on('error', error => {
 						reject(new CustomError(`Error writing file "${destination}": ${error.message}`, 500));
 					})
 					.on('finish', resolve);
-				
+
 				fileStream
 					.on('error', error => {
 						reject(new CustomError(`Error reading file "${metadata.name}": ${error.message}`, 500));
 					})
 					.pipe(writeStream);
 			});
-			
+
 			return destination;
 		} catch (error) {
 			throw new CustomError(`Error downloading file "${metadata.name}":`, error.message);
 		}
 	}
-	
+
 	public static async list(folderId: string): Promise<Metadata[]> {
 		const list = [];
 		let pageToken: string;
-		
+
 		do {
 			const { files, nextPageToken } = await this.execute(OPERATION.LIST, {
 				q: `'${folderId}' in parents and trashed = false`,
@@ -117,35 +117,35 @@ export default class GoogleDrive {
 				pageSize: 1000,
 				pageToken
 			});
-			
+
 			for (const file of files) {
 				if (file.mimeType !== 'application/vnd.google-apps.shortcut') {
 					list.push(file);
 					continue;
 				}
-				
+
 				list.push({
 					id: file.shortcutDetails.targetId,
 					name: file.name,
 					mimeType: file.shortcutDetails.targetMimeType,
 				});
 			}
-			
+
 			pageToken = nextPageToken;
 		} while (pageToken);
-		
+
 		return list;
 	}
-	
+
 	public static async import(metadata: Metadata, allowCache: boolean = false): Promise<Metadata> {
 		const newName = `imported-${metadata.id}`;
 		const cacheContents = await this.list(this.tempFolderId);
 		const existingFile = cacheContents.find(cacheFile => cacheFile.name === newName);
-		
+
 		if (allowCache) Debug.log(`Import "${metadata.name}": cache ${existingFile ? 'hit' : 'miss'}`, 'Google Drive');
 		if (existingFile && allowCache) return existingFile;
 		if (existingFile) await this.trash(existingFile.id);
-		
+
 		const conversionMap = {
 			'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'application/vnd.google-apps.spreadsheet',
 			'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'application/vnd.google-apps.document',
@@ -154,19 +154,19 @@ export default class GoogleDrive {
 			'application/msword': 'application/vnd.google-apps.document',
 			'application/vnd.ms-powerpoint': 'application/vnd.google-apps.presentation',
 		};
-		
+
 		const targetMimeType = conversionMap[metadata.mimeType];
 		if (!targetMimeType) {
 			throw new CustomError(`Cannot import file type ${metadata.mimeType}. Supported types: ${Object.keys(conversionMap).join(', ')}`);
 		}
-		
+
 		Debug.log(`Importing file "${metadata.name}"`, 'Google Drive');
-		
+
 		const fileContent = await this.execute(OPERATION.GET, {
 			fileId: metadata.id,
 			alt: 'media'
 		}, { responseType: 'stream' }) as Readable;
-		
+
 		const importedFile = await this.createFile(
 			newName,
 			this.tempFolderId,
@@ -174,99 +174,104 @@ export default class GoogleDrive {
 			fileContent,
 			metadata.mimeType,
 		);
-		
+
 		return {
 			...importedFile,
 			mimeType: targetMimeType
 		};
 	}
-	
-	public static async export(fileId: string, mimeType: string, destination?: string): Promise<string> {
-		destination ??= path.join(this.downloadPath, `${fileId}.${mime.extension(mimeType)}`);
-		
-		let fileStream: Readable;
-		try {
-			fileStream = await this.execute(OPERATION.EXPORT, {
-				fileId,
-				mimeType,
-			}, { responseType: 'stream' }) as Readable;
-		} catch (error) {
-			throw new CustomError(`Error exporting file with ID "${fileId}": ${error.message}`);
-		}
-		
-		fs.mkdirSync(path.dirname(destination), { recursive: true });
-		
-		const writeStream = fs.createWriteStream(destination);
-		
-		await new Promise((resolve, reject) => {
+
+	public static async export(fileId: string, mimeType: string): Promise<string> {
+		const fileStream = await this.getExportFileStream(fileId, mimeType);
+
+		return new Promise<string>((resolve, reject) => {
+			const buffers: Buffer[] = [];
+
 			fileStream
-				.on('end', resolve)
-				.on('error', reject)
-				.pipe(writeStream);
+				.on('data', chunk => buffers.push(chunk))
+				.on('end', () => resolve(Buffer.concat(buffers).toString()))
+				.on('error', reject);
 		});
-		
+	}
+
+	public static async exportTo(fileId: string, mimeType: string, destination: string): Promise<string> {
+		const fileStream = await this.getExportFileStream(fileId, mimeType);
+
+		fs.mkdirSync(path.dirname(destination), { recursive: true });
+
+		await new Promise<string>((resolve, reject) => {
+			const writeStream = fs.createWriteStream(destination, { encoding: null });
+
+			writeStream
+				.on('error', reject)
+				.on('finish', () => resolve(destination))
+				.on('error', reject);
+
+			fileStream.pipe(writeStream);
+		});
+
 		return destination;
 	}
-	
+
 	public static async exportToPdf(metadata: Metadata, allowCache = false): Promise<string> {
 		const destination = path.join(this.downloadPath, `${metadata.id}.pdf`);
-		
+
 		if (allowCache && fs.existsSync(destination)) return destination;
-		
+
 		Debug.log(`Exporting file "${metadata.name}"`, 'Google Drive');
-		
-		return this.export(metadata.id, mime.lookup('pdf') as string, destination);
+
+		return this.exportTo(metadata.id, mime.lookup('pdf') as string, destination);
 	}
-	
+
 	public static async isFolder(id: string): Promise<boolean> {
 		const { mimeType } = await this.getMetadata(id);
-		
+
 		return (mimeType === 'application/vnd.google-apps.folder');
 	}
-	
+
 	public static async getMetadata(id: string): Promise<Metadata> {
 		return await this.execute(OPERATION.GET, {
 			fileId: id,
 			fields: this.fields,
 		}) as Metadata;
 	}
-	
+
 	public static async cache(metadata: Metadata): Promise<string> {
 		const destination = path.join(this.downloadPath, `${metadata.id}.${mime.extension(metadata.mimeType)}`);
-		
+
 		return LocalFileCache.get(metadata, destination, this);
 	}
-	
+
 	public static async convertToPdf(localPath: string): Promise<string> {
 		// TODO add check for already exported PDFs (need to keep track?)
 		const uploadedFileMetadata = await this.upload(localPath, this.tempFolderId);
-		
+
 		const importedFileMetadata = await this.import(uploadedFileMetadata);
-		
+
 		void this.trash(uploadedFileMetadata.id);
-		
+
 		const pathToPdf = await this.exportToPdf(importedFileMetadata);
-		
+
 		void this.trash(importedFileMetadata.id);
-		
+
 		return pathToPdf;
 	}
-	
+
 	public static async createFile(name: string, folderId: string, mimeType: string, content?: Buffer | Readable | string, mediaMimeType?: string): Promise<Metadata> {
 		let body = content;
-		
+
 		if (content instanceof Buffer) body = new Readable({
 			read() {
 				this.push(content);
 				this.push(null);
 			}
 		});
-		
+
 		const media = body && {
 			mimeType: mediaMimeType || mimeType,
 			body,
 		};
-		
+
 		return await this.execute(OPERATION.CREATE, {
 			requestBody: {
 				name,
@@ -277,58 +282,58 @@ export default class GoogleDrive {
 			fields: this.fields,
 		}) as Metadata;
 	}
-	
+
 	public static async getContent(metadata: Metadata): Promise<Buffer> {
 		const fileContent = await this.execute(OPERATION.GET, {
 			fileId: metadata.id,
 			alt: 'media',
 		}, { responseType: 'stream' }) as Readable;
-		
+
 		return await new Promise<Buffer>((resolve, reject) => {
 			const buffer: Buffer[] = [];
-			
+
 			fileContent
 				.on('data', chunk => buffer.push(chunk))
 				.on('end', () => resolve(Buffer.concat(buffer)))
 				.on('error', reject);
 		});
 	}
-	
+
 	private static get configuration(): Configuration['drive'] {
 		return Config.get('drive', { includeGlobal: true });
 	}
-	
+
 	private static get fields() {
 		return FIELDS.join(', ');
 	}
-	
+
 	private static get downloadPath(): string {
 		return path.join(this.configuration.tempPath, 'download', 'drive');
 	}
-	
+
 	public static get tempFolderId(): string {
 		return this.configuration.tempFolderId;
 	}
-	
+
 	private static async getClient(): Promise<drive_v3.Drive> {
 		if (this._client) return this._client;
 		const auth = await GoogleAuthClient.get();
 		return this._client = google.drive({ version: 'v3', auth });
 	}
-	
+
 	private static async trash(id: string): Promise<void> {
 		await this.execute(OPERATION.UPDATE, {
 			fileId: id,
 			requestBody: { trashed: true }
 		});
 	}
-	
+
 	private static async delete(id: string): Promise<void> {
 		await this.execute(OPERATION.DELETE, {
 			fileId: id,
 		});
 	}
-	
+
 	private static async execute<TOperation extends OperationType>(
 		operation: TOperation,
 		params: MethodParams<TOperation>,
@@ -338,13 +343,13 @@ export default class GoogleDrive {
 			() => GoogleWorkspace.quotaDelay(GoogleWorkspace.SERVICE.GOOGLE_DRIVE, OPERATION_TYPE[operation]),
 			'Google Drive quota delay',
 		);
-		
+
 		return await Profiler.run(
 			() => this._execute(operation, params, options),
 			`Google Drive execute operation "${operation}"`,
 		);
 	}
-	
+
 	private static async _execute<TOperation extends OperationType>(
 		operation: TOperation,
 		params: MethodParams<TOperation>,
@@ -353,7 +358,21 @@ export default class GoogleDrive {
 		const client = await this.getClient();
 		const method = client.files[operation].bind(client.files);
 		const result = await method({ ...params, supportsAllDrives: true }, options);
-		
+
 		return result.data;
+	}
+
+	private static async getExportFileStream(fileId: string, mimeType: string) {
+		let fileStream: Readable;
+		try {
+			fileStream = await this.execute(OPERATION.EXPORT, {
+				fileId,
+				mimeType,
+			}, { responseType: 'stream' }) as Readable;
+		} catch (error) {
+			throw new CustomError(`Error exporting file with ID "${fileId}": ${error.message}`);
+		}
+
+		return fileStream;
 	}
 }

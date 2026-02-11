@@ -1,9 +1,8 @@
 import { performance } from 'node:perf_hooks';
-import lancedb, { Connection, SchemaLike, Table } from '@lancedb/lancedb';
-import Config from '../../core/Config';
+import type { Connection, SchemaLike, Table } from '@lancedb/lancedb';
 import IVectorDBEngine from './IVectorDBEngine';
+import Config from '../../core/Config';
 import { JsonObject, JsonPrimitive, SchemaProperty, staticImplements } from '../../types/common';
-import { Schema } from '@lancedb/lancedb/dist/arrow';
 
 const _tables: Record<string, Table> = {};
 const lastTableWrites: Record<string, number> = {};
@@ -153,6 +152,7 @@ export default class LanceDB {
 			databaseUri = `gs://${bucket}/lancedb`;
 		}
 		
+		const lancedb = await import('@lancedb/lancedb');
 		this._connection = await lancedb.connect(databaseUri);
 		
 		return this._connection;

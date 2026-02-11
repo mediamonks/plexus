@@ -45,15 +45,19 @@ export default class Console {
 		STATUS: 'STATUS',
 		DUMP: 'DUMP',
 		PERF: 'PERF',
+		DEBUG: 'DEBUG',
 	} as const;
 	
 	public static output(type: string, ...args: any[]) {
 		if (type === this.OUTPUT_TYPE.DUMP && !Config.get('dataDumps')) return;
 		if (type === this.OUTPUT_TYPE.PERF && !Config.get('profiling')) return;
+		if (type === this.OUTPUT_TYPE.DEBUG && !Config.get('debug')) return;
 		
 		switch (process.env['PLEXUS_MODE']) {
 			case 'service':
-				console.debug(`[${type}]`, ...args);
+				console.debug(`[${type}]`, ...args.map(arg =>
+					typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+				));
 				break;
 			case 'sdk':
 				Plexus.instance?.emit('message', { type, args });
@@ -91,8 +95,11 @@ export default class Console {
 			process.stderr.write(`\x1b[${this._lastOutputLines}A\r`);
 		}
 		
-		this._lastOutputLines = this._activities.length;
+		const maxLines = (process.stderr.rows || 24) - 1;
+		const activities = this._activities.slice(-maxLines);
 		
-		for (const activity of this._activities) process.stderr.write(activity.output + '\n');
+		this._lastOutputLines = activities.length;
+		
+		for (const activity of activities) process.stderr.write(activity.output + '\x1b[K\n');
 	}
 }

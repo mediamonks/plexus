@@ -6,7 +6,9 @@ import GoogleAuthClient from '../google-drive/GoogleAuthClient';
 import Config from '../../core/Config';
 import Profiler from '../../core/Profiler';
 import ErrorHandler from '../../entities/error-handling/ErrorHandler';
-import { JsonObject, JsonPrimitive, SchemaProperty, staticImplements } from '../../types/common';
+import { JsonObject, JsonPrimitive, SchemaProperty, SOURCE_FORMAT, DataItemGenerator, staticImplements } from '../../types/common';
+
+type SourceFormat = 'csv' | 'jsonl';
 
 @staticImplements<IVectorDBEngine<string>>()
 export default class CloudSQL {
@@ -37,6 +39,7 @@ export default class CloudSQL {
 		const buffer: JsonObject[] = [];
 		const fieldTypes = new Map<string, string>();
 		let allFields: string[];
+		let sourceFormat: SourceFormat = (records as DataItemGenerator<JsonObject>)[SOURCE_FORMAT];
 		
 		while (true) {
 			const { value, done } = await records.next();
@@ -44,10 +47,11 @@ export default class CloudSQL {
 			
 			buffer.push(value);
 			allFields ??= Object.keys(value);
+			sourceFormat ??= this.inferSourceFormat(value);
 			
 			for (const [key, val] of Object.entries(value)) {
 				if (!fieldTypes.has(key) && this.isValidValue(val)) {
-					const type = this.inferFieldType(key, val);
+					const type = this.inferFieldType(key, val, sourceFormat);
 					if (type) fieldTypes.set(key, type);
 				}
 			}
@@ -236,7 +240,13 @@ export default class CloudSQL {
 		return parsed ? parsed.toISOString() : null;
 	}
 	
-	private static inferFieldType(key: string, value: unknown): string | null {
+	private static inferSourceFormat(record: JsonObject): SourceFormat {
+		const values = Object.values(record).filter(v => v !== null && v !== undefined);
+		const allStrings = values.every(v => typeof v === 'string');
+		return allStrings ? 'csv' : 'jsonl';
+	}
+	
+	private static inferFieldType(key: string, value: unknown, sourceFormat: SourceFormat): string | null {
 		if (value === null || value === undefined) return null;
 		
 		if (key === '_vector') {
@@ -246,12 +256,15 @@ export default class CloudSQL {
 			return `vector(${dimensions})`;
 		}
 		
-		if (typeof value === 'number') {
-			if (key.endsWith('_id')) return 'BIGINT';
-			return 'DOUBLE PRECISION';
+		if (sourceFormat === 'jsonl') {
+			if (typeof value === 'number') {
+				return key.endsWith('_id') ? 'BIGINT' : 'DOUBLE PRECISION';
+			}
+			
+			if (typeof value === 'boolean') return 'BOOLEAN';
+			
+			return 'TEXT';
 		}
-		
-		if (typeof value === 'boolean') return 'BOOLEAN';
 		
 		if (typeof value === 'string') {
 			const trimmed = value.trim();

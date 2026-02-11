@@ -43,12 +43,14 @@ export default class Plexus extends EventEmitter {
 		performance?: ProfilerLogEntry[];
 		debug?: DebugLogEntry[];
 	}> {
-		await this.context(() => DataSources.ingest(namespace));
-		
-		return {
-			performance: Config.get('profiling') && Profiler.getReport(),
-			debug: Config.get('debug') && Debug.get(),
-		}
+		return this.context(async () => {
+			await DataSources.ingest(namespace);
+			
+			return {
+				performance: Config.get('profiling') ? Profiler.getReport() : undefined,
+				debug: Config.get('debug') ? Debug.get() : undefined,
+			}
+		});
 	};
 	
 	public context<T>(fn: () => T): T {

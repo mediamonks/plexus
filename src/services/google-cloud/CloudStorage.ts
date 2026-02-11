@@ -7,13 +7,14 @@ import GoogleAuthClient from '../google-drive/GoogleAuthClient';
 import Config from '../../core/Config';
 import Profiler from '../../core/Profiler';
 import CustomError from '../../entities/error-handling/CustomError';
+import hash from '../../utils/hash';
 import { staticImplements } from '../../types/common';
 
 class CloudStorageFile extends File {
 	public uri: string
 }
 
-const GS_URI_PATTERN = /gs:\/\/([^/]+)\/?(.*)/;
+const GS_URI_PATTERN = /^gs:\/\/([^/]+)\/?(((?:.*\/)?)([^/]*?)((?:\.[^./]+)?))$/;
 
 @staticImplements<IHasLocalFileCache<string>>()
 export default class CloudStorage {
@@ -27,7 +28,9 @@ export default class CloudStorage {
 	
 	public static async write(uri: string, contents: string): Promise<string> {
 		return new Promise((resolve, reject) => {
-			const stream = this.file(uri).createWriteStream();
+			const stream = this.file(uri).createWriteStream({
+				contentType: 'text/plain; charset=utf-8',
+			});
 			stream.on('error', reject);
 			stream.on('finish', () => resolve(uri));
 			stream.write(contents);
@@ -53,8 +56,7 @@ export default class CloudStorage {
 	
 	public static async download(uri: string, destination?: string): Promise<string> {
 		return Profiler.run(async () => {
-			// TODO why is there still URI encoding in `destination`?
-			destination ??= path.join(Config.get('tempPath') as string, 'download', 'gcs', this.uri(uri).bucket, this.uri(uri).path);
+			destination ??= this.getLocalPath(uri);
 			
 			await fs.mkdir(path.dirname(destination), { recursive: true });
 			
@@ -74,7 +76,7 @@ export default class CloudStorage {
 	
 	public static async cache(uri: string, destination?: string): Promise<string> {
 		return Profiler.run(() => {
-			destination ??= path.join(this.downloadPath, this.uri(uri).bucket, this.uri(uri).path);
+			destination ??= this.getLocalPath(uri);
 			
 			return LocalFileCache.get(uri, destination, this);
 		}, `gcs.cache "${uri}"`);
@@ -151,11 +153,16 @@ export default class CloudStorage {
 		return path.join(Config.get('tempPath'), 'download', 'gcs');
 	}
 	
-	private static uri(uri: string): { bucket: string; path: string } {
+	private static getLocalPath(uri: string): string {
+		const { bucket, directory, extension } = this.uri(uri);
+		return path.join(this.downloadPath, bucket, directory, `${hash(uri)}${extension}`);
+	}
+	
+	private static uri(uri: string): { bucket: string; path: string; directory: string; filename: string; extension: string } {
 		const components = GS_URI_PATTERN.exec(decodeURIComponent(uri));
 		if (!components) throw new CustomError(`Invalid Google Cloud Storage URI: ${uri}`);
-		const [, bucket, path] = GS_URI_PATTERN.exec(decodeURIComponent(uri));
-		return { bucket, path };
+		const [, bucket, path, directory, filename, extension] = components;
+		return { bucket, path, directory, filename, extension };
 	}
 	
 	private static file(uri: string): File {

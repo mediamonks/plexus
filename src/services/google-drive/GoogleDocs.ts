@@ -1,9 +1,9 @@
 import { google, docs_v1 } from 'googleapis';
+import mime from 'mime-types';
 import TurndownService from 'turndown';
 import GoogleAuthClient from './GoogleAuthClient';
 import GoogleDrive from './GoogleDrive';
 import CustomError from '../../entities/error-handling/CustomError';
-import mime from 'mime-types';
 
 export default class GoogleDocs {
 	private static _client: docs_v1.Docs;

@@ -47,8 +47,8 @@ export default class Thread {
 				output,
 				threadId: this._threadId,
 				fields: fields,
-				performance: Config.get('profiling') && Profiler.getReport(),
-				debug: Config.get('debug') && Debug.get(),
+				performance: Config.get('profiling') ? Profiler.getReport() : undefined,
+				debug: Config.get('debug') ? Debug.get() : undefined,
 			};
 		});
 	}
