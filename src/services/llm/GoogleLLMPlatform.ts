@@ -237,7 +237,16 @@ export default class GoogleLLMPlatform extends LLMPlatform {
 			return await fn();
 		} catch (error) {
 			const maxRetries = this.configuration.retries ?? 2;
-			if (attempt >= maxRetries || !this.TRANSIENT_ERROR_CODES.has(error?.cause?.code)) throw error;
+			if (attempt >= maxRetries) throw error;
+			
+			if (error?.status === 429) {
+				const backoff = (this.configuration.quotaDelayMs ?? 1000) * 2 ** attempt;
+				Debug.log(`Rate limited (429), retrying in ${backoff}ms (${attempt + 1}/${maxRetries})...`, 'GoogleLLMPlatform');
+				await new Promise(resolve => setTimeout(resolve, backoff));
+				return this.retry(fn, attempt + 1);
+			}
+			
+			if (!this.TRANSIENT_ERROR_CODES.has(error?.cause?.code)) throw error;
 			
 			Debug.log(`Transient error (${error.cause.code}), retrying (${attempt + 1}/${maxRetries})...`, 'GoogleLLMPlatform');
 			return this.retry(fn, attempt + 1);
