@@ -1,6 +1,8 @@
 import Configuration from './Configuration';
 import DataSource from '../entities/data-sources/DataSource';
 import DataSourceItem from '../entities/data-sources/origin/DataSourceItem';
+import ICatalogField from '../entities/catalog/ICatalogField';
+import CatalogField from '../entities/catalog/CatalogField';
 
 export function staticImplements<TInterface>() {
 	return <TConstructor extends TInterface>(constructor: TConstructor) => constructor;
@@ -12,6 +14,8 @@ export type JsonPrimitive = string | number | boolean | null;
 export type JsonArray = JsonField[];
 export type JsonField = JsonPrimitive | JsonArray | JsonObject;
 export type JsonObject = { [key: string]: JsonField };
+
+export type CatalogFieldValue = JsonField | DataSourceItem[];
 
 export type SpreadSheetData = { sheets: { title: string; rows: any[] }[] };
 
@@ -40,6 +44,7 @@ type SchemaObject = {
 	properties?: Record<string, SchemaProperty>;
 	required?: string[];
 	description?: string;
+	additionalProperties?: boolean;
 };
 
 type SchemaArray = {
@@ -64,4 +69,15 @@ export type ToolCallResult = {
 	error?: string;
 	data?: JsonObject[];
 	files?: DataSourceItem<string>[];
+};
+
+type AgentOutputSchemaProperty = SchemaProperty & {
+	example: JsonField;
+};
+
+export type AgentOutputSchema = {
+	type: 'object';
+	properties: Record<string, AgentOutputSchemaProperty>;
+	required: string[];
+	additionalProperties: boolean;
 };

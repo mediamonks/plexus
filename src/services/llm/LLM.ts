@@ -8,14 +8,14 @@ import History from '../../core/History';
 import Profiler from '../../core/Profiler';
 import DataSourceItem from '../../entities/data-sources/origin/DataSourceItem';
 import UnsupportedError from '../../entities/error-handling/UnsupportedError';
-import { Tool } from '../../types/common';
+import { AgentOutputSchema, Tool } from '../../types/common';
 
 type QueryOptions = {
 	instructions?: string;
 	history?: History;
 	temperature?: number;
 	outputTokens?: number;
-	structuredResponse?: boolean;
+	schema?: AgentOutputSchema;
 	files?: DataSourceItem<string>[];
 	tools?: Record<string, Tool>;
 };
@@ -35,7 +35,7 @@ export default class LLM {
 		history = new History(),
 		temperature,
 		outputTokens,
-		structuredResponse,
+		schema,
 		files,
 	}: QueryOptions): Promise<string> {
 		temperature ??= this.configuration.temperature ?? 0;
@@ -48,7 +48,7 @@ export default class LLM {
 			temperature,
 			outputTokens,
 			history,
-			structuredResponse,
+			schema,
 			files,
 		});
 	}

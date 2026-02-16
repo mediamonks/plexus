@@ -1,12 +1,12 @@
 import Config from './Config';
+import Debug, { DebugLogEntry } from './Debug';
 import History from './History';
+import RequestContext from './RequestContext';
+import Profiler, { ProfilerLogEntry } from './Profiler';
 import Plexus from '../Plexus';
 import CustomError from '../entities/error-handling/CustomError';
 import Catalog from '../entities/catalog/Catalog';
 import { JsonObject } from '../types/common';
-import RequestContext from './RequestContext';
-import Profiler, { ProfilerLogEntry } from './Profiler';
-import Debug, { DebugLogEntry } from './Debug';
 
 export default class Thread {
 	public constructor(private _plexus: Plexus, private _threadId?: string) {}
@@ -25,6 +25,8 @@ export default class Thread {
 		debug?: DebugLogEntry[];
 	}> {
 		return this._plexus.context(async () => {
+			void Debug.purgeDumpFiles();
+
 			RequestContext.set('fields', fields);
 			
 			const output = {};

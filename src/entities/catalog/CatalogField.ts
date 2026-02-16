@@ -1,5 +1,6 @@
 import Catalog from './Catalog';
 import DataSourceCatalogField from './DataSourceCatalogField';
+import ICatalogField from './ICatalogField';
 import InputCatalogField from './InputCatalogField';
 import OutputCatalogField from './OutputCatalogField';
 import DataSourceItem from '../data-sources/origin/DataSourceItem';
@@ -7,7 +8,7 @@ import CustomError from '../error-handling/CustomError';
 import UnknownError from '../error-handling/UnknownError';
 import { JsonField } from '../../types/common';
 
-export default class CatalogField {
+export default class CatalogField implements ICatalogField {
 	private readonly _id: string;
 	private readonly _catalog: Catalog;
 	private _configuration: typeof CatalogField.Configuration;
@@ -15,7 +16,7 @@ export default class CatalogField {
 
 	static readonly BaseConfiguration: {
 		type: 'input' | 'output' | 'data',
-		example: string,
+		example: JsonField,
 	};
 	
 	static readonly Configuration: typeof DataSourceCatalogField.Configuration
@@ -69,7 +70,7 @@ export default class CatalogField {
 	
 	public async toJSON(): Promise<JsonField> {
 		const value = await this.getValue();
-		if (value instanceof Array && value[0] instanceof DataSourceItem) return value.map(item => item.toString());
+		if (value instanceof Array && value[0] instanceof DataSourceItem) return value.map(item => item.toJSON());
 		return value as JsonField;
 	}
 }

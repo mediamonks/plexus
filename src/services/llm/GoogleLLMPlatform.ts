@@ -23,21 +23,24 @@ export default class GoogleLLMPlatform extends LLMPlatform {
 	]);
 	
 	public static readonly Configuration: {
-		projectId: string;
-		location: string;
-		model: string;
-		embeddingLocation: string;
-		embeddingModel: string;
+		model?: string;
+		embeddingModel?: string;
+		projectId?: string;
+		location?: string;
+		embeddingLocation?: string;
 		outputTokens?: number;
-		quotaDelayMs: number;
-		apiKey: string;
-		useVertexAi: boolean;
+		quotaDelayMs?: number;
+		timeoutMs?: number;
+		retries?: number;
+		apiKey?: string;
+		useVertexAi?: boolean;
 	};
 	
 	private static _client: GoogleGenAI;
 	private static _embeddingClient: GoogleGenAI;
 	private static _lastQuery: number;
 	private static _cachedEmbeddings: Record<string, Record<string, Record<string, number[]>>> = {};
+	private static readonly TRANSIENT_ERROR_CODES: Set<string> = new Set(['UND_ERR_HEADERS_TIMEOUT', 'ECONNRESET', 'ETIMEDOUT']);
 	
 	public static async query(query: string, {
 		instructions,
@@ -45,7 +48,7 @@ export default class GoogleLLMPlatform extends LLMPlatform {
 		model,
 		temperature,
 		outputTokens,
-		structuredResponse,
+		schema,
 		files = [],
 	}: QueryOptions = {}): Promise<string> {
 		const fileParts = await Profiler.run(() => this.createFileParts(files), 'GoogleLLMPlatform.createFileParts');
@@ -66,17 +69,19 @@ export default class GoogleLLMPlatform extends LLMPlatform {
 		await Profiler.run(() => this.quotaDelay(), 'GoogleLLMPlatform.quotaDelay');
 		
 		Debug.dump('google llm call contents', contents);
-
-		const response = await Profiler.run(async () =>  this.client.models.generateContent({
+		
+		const response = await Profiler.run(async () => this.retry(() => this.client.models.generateContent({
 			model,
 			contents,
 			config: {
 				systemInstruction: instructions,
 				temperature,
 				maxOutputTokens: outputTokens,
-				responseMimeType: structuredResponse ? 'application/json' : undefined,
+				responseMimeType: schema ? 'application/json' : undefined,
+				responseSchema: schema,
+				httpOptions: this.configuration.timeoutMs ? { timeout: this.configuration.timeoutMs } : undefined,
 			},
-		}), 'GoogleLLMPlatform.query');
+		})), 'GoogleLLMPlatform.query');
 		
 		const candidate = response.candidates[0];
 		const responseParts = candidate.content.parts;
@@ -121,6 +126,7 @@ export default class GoogleLLMPlatform extends LLMPlatform {
 		
 		if (cachedEmbeddings) return cachedEmbeddings;
 		
+		// TODO quota delay should be per model, or at least separate for embeddings and queries
 		await this.quotaDelay();
 		
 		const result = await Profiler.run(() => this.embeddingClient.models.embedContent({
@@ -224,5 +230,17 @@ export default class GoogleLLMPlatform extends LLMPlatform {
 			}
 		}
 		this._lastQuery = performance.now();
+	}
+	
+	private static async retry<T>(fn: () => Promise<T>, attempt: number = 0): Promise<T> {
+		try {
+			return await fn();
+		} catch (error) {
+			const maxRetries = this.configuration.retries ?? 2;
+			if (attempt >= maxRetries || !this.TRANSIENT_ERROR_CODES.has(error?.cause?.code)) throw error;
+			
+			Debug.log(`Transient error (${error.cause.code}), retrying (${attempt + 1}/${maxRetries})...`, 'GoogleLLMPlatform');
+			return this.retry(fn, attempt + 1);
+		}
 	}
 };

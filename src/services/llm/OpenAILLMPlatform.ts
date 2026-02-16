@@ -38,7 +38,7 @@ export default class OpenAILLMPlatform extends LLMPlatform {
 		model,
 		temperature,
 		outputTokens,
-		structuredResponse,
+		schema,
 		files,
 	}: QueryOptions = {}): Promise<string> {
 		model ??= this.configuration.model;
@@ -53,7 +53,14 @@ export default class OpenAILLMPlatform extends LLMPlatform {
 			model,
 			max_completion_tokens: outputTokens,
 			temperature,
-			response_format: structuredResponse ? { type: 'json_object' } : undefined,
+			response_format: schema ? {
+				type: 'json_schema',
+				json_schema: {
+					name: 'output',
+					strict: true,
+					schema,
+				},
+			} : undefined,
 		}), 'OpenAILLMPlatform.query');
 		
 		return response.choices[0].message.content;

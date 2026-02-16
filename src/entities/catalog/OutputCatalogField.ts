@@ -3,7 +3,7 @@ import Agents from '../agents/Agents';
 import DataSourceItem from '../data-sources/origin/DataSourceItem';
 import CustomError from '../error-handling/CustomError';
 import Debug from '../../core/Debug';
-import { JsonField } from '../../types/common';
+import { CatalogFieldValue, JsonField } from '../../types/common';
 
 export default class OutputCatalogField extends CatalogField {
 	static readonly Configuration: typeof CatalogField.BaseConfiguration & {

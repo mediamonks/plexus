@@ -57,7 +57,7 @@ export default class LocalLLMPlatform extends LLMPlatform {
 		throw new CustomError('Not implemented');
 	}
 	
-	public static async query(query: string, { instructions, history, outputTokens, temperature, files, tools }: QueryOptions): Promise<string> {
+	public static async query(query: string, { instructions, history, outputTokens, temperature, files }: QueryOptions): Promise<string> {
 		outputTokens ??= this.outputTokens;
 		
 		const messages = await this.createMessages(query, instructions, history, files);

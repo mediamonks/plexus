@@ -1,13 +1,13 @@
 import History from '../../core/History';
 import DataSourceItem from '../../entities/data-sources/origin/DataSourceItem';
-import { Tool } from '../../types/common';
+import { AgentOutputSchema, Tool } from '../../types/common';
 
 export type QueryOptions = {
 	instructions?: string;
 	history?: History;
 	temperature?: number;
 	outputTokens?: number;
-	structuredResponse?: boolean;
+	schema?: AgentOutputSchema;
 	model?: string;
 	files?: DataSourceItem<string>[];
 	tools?: Record<string, Tool>;

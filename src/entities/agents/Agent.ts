@@ -1,5 +1,6 @@
 import debounce from 'lodash.debounce';
 import { v4 as uuid } from 'uuid';
+import IAgent from './IAgent';
 import IHasInstructions from '../IHasInstructions';
 import Instructions from '../Instructions';
 import Catalog from '../catalog/Catalog';
@@ -16,6 +17,7 @@ import Profiler from '../../core/Profiler';
 import Status from '../../core/Status';
 import LLM from '../../services/llm/LLM';
 import {
+	AgentOutputSchema,
 	JsonField,
 	JsonObject,
 	ToolCallResult,
@@ -36,7 +38,7 @@ const OUTPUT_TEMPLATE = `### **Output Format (JSON)**
 Output only JSON. Do **not** use markdown.`;
 const INVALID_JSON_RETRIES = 2;
 
-export default class Agent implements IHasInstructions {
+export default class Agent implements IAgent, IHasInstructions {
 	public isReady: boolean = false;
 	private _baseInstructions: Instructions;
 	private _catalog: Catalog;
@@ -48,6 +50,7 @@ export default class Agent implements IHasInstructions {
 	private _ready: Promise<void>;
 	private _temperature: number  = 0;
 	private _toolCallSchemas: Record<string, ToolCallSchema> = {};
+	private _outputSchema: AgentOutputSchema;
 	
 	static readonly Configuration: {
 		readonly instructions: string;
@@ -89,6 +92,7 @@ Name: ${toolName}
 Description: ${this._toolCallSchemas[toolName].description}
 Parameters schema:
 ${JSON.stringify(this._toolCallSchemas[toolName].parameters, undefined, 2)}`);
+		
 		if (tools.length) {
 			instructions.push(`${TOOLS_TEMPLATE}\n${tools.join('\n\n')}`);
 		}
@@ -101,6 +105,8 @@ ${JSON.stringify(this._toolCallSchemas[toolName].parameters, undefined, 2)}`);
 			
 			if (!example) throw new CustomError(`Missing example for catalog field "${fieldId}"`);
 			
+			example = Catalog.resolveExample(example);
+			
 			if (this.configuration.serialize && fieldId === this.configuration.serialize[0]) {
 				example = example[0];
 				fieldId = this.configuration.serialize[1];
@@ -112,9 +118,32 @@ ${JSON.stringify(this._toolCallSchemas[toolName].parameters, undefined, 2)}`);
 			instructions.push(`${INPUT_TEMPLATE}\n${JSON.stringify(inputSchema, undefined, 2)}`);
 		}
 		
-		const outputSchema = this.catalog.getAgentOutputSchema(this.id);
-		if (tools.length) {
-			outputSchema.properties._tool_calls = {
+		const outputSchema = this.outputSchema;
+		
+		instructions.push(`${OUTPUT_TEMPLATE}\n${JSON.stringify(outputSchema, undefined, 2)}`);
+		
+		return instructions.join('\n\n');
+	}
+	
+	public get catalog(): Catalog {
+		return this._catalog;
+	}
+	
+	protected get baseInstructions(): Instructions {
+		return this._baseInstructions ??= new Instructions(this);
+	}
+	
+	private get context(): readonly string[] {
+		return this.configuration.context ?? [];
+	}
+	
+	private get outputSchema(): AgentOutputSchema {
+		if (this._outputSchema) return this._outputSchema;
+		
+		this._outputSchema = this.catalog.getAgentOutputSchema(this.id);
+		
+		if (Object.keys(this._toolCallSchemas).length) {
+			this._outputSchema.properties._tool_calls = {
 				type: 'array',
 				description: 'tool calls go here',
 				items: {
@@ -133,28 +162,14 @@ ${JSON.stringify(this._toolCallSchemas[toolName].parameters, undefined, 2)}`);
 					}
 				]
 			}
-			outputSchema.properties._status = {
+			this._outputSchema.properties._status = {
 				type: 'string',
 				description: 'short description of what the agent is doing',
 				example: 'Looking up relevant documents'
 			};
 		}
 		
-		instructions.push(`${OUTPUT_TEMPLATE}\n${JSON.stringify(outputSchema, undefined, 2)}`);
-		
-		return instructions.join('\n\n');
-	}
-	
-	public get catalog(): Catalog {
-		return this._catalog;
-	}
-	
-	protected get baseInstructions(): Instructions {
-		return this._baseInstructions ??= new Instructions(this);
-	}
-	
-	private get context(): readonly string[] {
-		return this.configuration.context ?? [];
+		return this._outputSchema;
 	}
 	
 	private get dataSources(): DataSource[] {
@@ -264,7 +279,7 @@ ${JSON.stringify(this._toolCallSchemas[toolName].parameters, undefined, 2)}`);
 	}
 	
 	private async _invoke(): Promise<JsonObject> {
-		const { required, serialize } = this.configuration;
+		const { required } = this.configuration;
 		
 		await this._ready;
 		
@@ -272,34 +287,9 @@ ${JSON.stringify(this._toolCallSchemas[toolName].parameters, undefined, 2)}`);
 		
 		if (required) for (const requiredField of required)	if (this._context[requiredField] === undefined) return {};
 		
-		let result: JsonObject = {};
-		if (serialize) {
-			const [collectionName, itemName] = serialize;
-			const collection = this._context[collectionName];
-			
-			if (!(collection instanceof Array)) throw new CustomError(`Serialization context field "${this.configuration.serialize}" of agent "${this.id}" is not an array`);
-			
-			const activity = Console.start(`Serializing agent "${this.id}"`, collection.length);
-			const results = await Promise.all(collection.map(async item => {
-				const context = { ...this._context };
-				delete context[collectionName];
-				context[itemName] = item;
-				const result = await this.query(context as Record<string, JsonField>);
-				activity.progress();
-				return result;
-			}));
-			activity.done();
-			
-			const keys = Object.keys(results[0]);
-			for (const key of keys) {
-				result[key] = results.map((item: JsonObject) => item[key]);
-				if (result[key][0] instanceof Array) result[key] = result[key].flat();
-			}
-		} else {
-			const activity = Console.start(`Running agent "${this.id}"`);
-			result = await this.query(this._context as Record<string, JsonField>);
-			activity.done();
-		}
+		const activity = Console.start(`Running agent "${this.id}"`);
+		const result: JsonObject = await this.query(this._context as Record<string, JsonField>);
+		activity.done();
 		
 		// TODO Implement or remove pagination
 		
@@ -323,7 +313,6 @@ ${JSON.stringify(this._toolCallSchemas[toolName].parameters, undefined, 2)}`);
 		let response: string, hasToolCalls: boolean, toolCallResults: ToolCallResult[] = [], output: JsonObject;
 		let history = useHistory ? History.instance : new History(); // TODO use a local copy of history, we should not modify the global history
 		let prompt = escapeUnicodeQuotes(JSON.stringify(mappedContext, undefined, 2));
-		let attempts = 0;
 		do {
 			Debug.log(`Querying model for agent "${this.id} (trace ID: ${traceId})"`, 'Agent');
 			response = await LLM.query(prompt, {
@@ -331,7 +320,7 @@ ${JSON.stringify(this._toolCallSchemas[toolName].parameters, undefined, 2)}`);
 					temperature: this._temperature,
 					outputTokens,
 					history,
-					structuredResponse: true,
+					schema: this.outputSchema,
 					files,
 			});
 			
@@ -339,11 +328,8 @@ ${JSON.stringify(this._toolCallSchemas[toolName].parameters, undefined, 2)}`);
 			
 			try {
 				output = JSON.parse(escapeUnicodeQuotes(response).replaceAll("\\'", "'"));
-				attempts = 0;
 			} catch (error) {
-				attempts++;
-				if (attempts >= INVALID_JSON_RETRIES) throw new CustomError(`Agent "${this.id}" returned invalid JSON after ${attempts} attempts (trace ID: ${traceId})`);
-				continue;
+				throw new CustomError(`Agent "${this.id}" returned invalid JSON (trace ID: ${traceId})`);
 			}
 			
 			const toolCalls = output._tool_calls as ToolCall[];
@@ -374,7 +360,7 @@ ${JSON.stringify(this._toolCallSchemas[toolName].parameters, undefined, 2)}`);
 				Debug.dump(`agent ${this.id} history`, history);
 			}
 			
-		} while (hasToolCalls || attempts);
+		} while (hasToolCalls);
 		
 		return output;
 	}

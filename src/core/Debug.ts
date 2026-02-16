@@ -66,6 +66,27 @@ export default class Debug {
 		await fs.rm(dumpFilePath, { recursive: true, force: true });
 	}
 	
+	public static async purgeDumpFiles(): Promise<void> {
+		const dumpFilePath: string = path.join(Config.get('tempPath') as string, 'dump');
+		try {
+			await fs.access(dumpFilePath);
+		} catch {
+			return;
+		}
+		
+		const files = await fs.readdir(dumpFilePath);
+		const dumpFileRetentionMinutes = Config.get('dumpFileRetentionMinutes') as number;
+		
+		for (const file of files) {
+			const stats = await fs.stat(path.join(dumpFilePath, file));
+			const created = stats.birthtimeMs;
+			
+			if (Date.now() - created > dumpFileRetentionMinutes * 60000) continue;
+			
+			await fs.unlink(path.join(Config.get('tempPath') as string, 'dump', file));
+		}
+	}
+	
 	private static async writeDumpFile(label: string, data: string | object): Promise<void> {
 		const dumpFilePath: string = path.join(Config.get('tempPath') as string, 'dump');
 		
