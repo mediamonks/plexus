@@ -47,7 +47,7 @@
 	},
 	"dependencies": {
 		"@azure/msal-node": "^3.8.4",
-		"@google-cloud/cloud-sql-connector": "^1.8.5",
+		"@google-cloud/cloud-sql-connector": "^1.9.1",
 		"@google-cloud/firestore": "^7.11.0",
 		"@google-cloud/functions-framework": "^3.4.5",
 		"@google-cloud/storage": "^7.18.0",
@@ -55,8 +55,8 @@
 		"@google/genai": "^1.41.0",
 		"@huggingface/inference": "^2.8.1",
 		"@lancedb/lancedb": "^0.23.0",
-		"@langchain/core": "^0.3.72",
-		"@types/to-json-schema": "^0.2.4",
+		"@langchain/core": "^1.1.27",
+		"@langchain/textsplitters": "^1.0.1",
 		"axios": "^1.12.2",
 		"chrono-node": "^2.9.0",
 		"csv-parse": "^6.1.0",
@@ -64,7 +64,6 @@
 		"dotenv": "^16.4.7",
 		"google-auth-library": "^10.5.0",
 		"googleapis": "^152.0.0",
-		"langchain": "^0.3.19",
 		"lodash.debounce": "^4.0.8",
 		"marked": "^16.1.1",
 		"mime-types": "^2.1.35",
@@ -74,10 +73,9 @@
 		"openai": "^6.9.1",
 		"pdf-parse-debugging-disabled": "^1.1.1",
 		"pg": "^8.16.3",
-		"to-json-schema": "^0.2.5",
 		"turndown": "^7.2.0",
 		"uuid": "^11.1.0",
-		"xlsx": "^0.18.5"
+		"xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
 	},
 	"devDependencies": {
 		"@google-cloud/secret-manager": "^6.0.1",
@@ -91,7 +89,6 @@
 		"express": "^4.21.2",
 		"jest": "^30.2.0",
 		"minimist": "^1.2.8",
-		"ts-jest": "^29.4.5",
 		"ts-node": "^10.9.2",
 		"typescript": "^5.9.2",
 		"yaml": "^2.7.0"

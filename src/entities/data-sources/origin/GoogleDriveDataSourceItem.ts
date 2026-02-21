@@ -53,7 +53,7 @@ export default class GoogleDriveDataSourceItem extends DataSourceItem<string, Sp
 
 		const file = (await this.getLocalFile()) as string;
 
-		if (this.mimeType === 'application/pdf') return await pdf.getPdfText(file);
+		if (this.mimeType === 'application/pdf') return await pdf.getText(file);
 
 		if (this.mimeType === 'text/plain') {
 			const buffer = await fs.readFile(file);

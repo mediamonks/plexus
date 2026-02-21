@@ -59,7 +59,7 @@ export default class GoogleCloudStorageDataSourceItem extends DataSourceItem<str
 		const file = await this.getLocalFile();
 		
 		const mapping = {
-			pdf: () => pdf.getPdfText(file),
+			pdf: () => pdf.getText(file),
 			txt: async () => (await fs.readFile(file)).toString()
 		};
 		

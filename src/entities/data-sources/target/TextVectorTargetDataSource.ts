@@ -1,4 +1,4 @@
-import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
+import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
 import VectorTargetDataSource from './VectorTargetDataSource';
 import DataSourceCatalogField from '../../catalog/DataSourceCatalogField';
 import CustomError from '../../error-handling/CustomError';
