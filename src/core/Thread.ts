@@ -1,9 +1,9 @@
 import Config from './Config';
 import Debug, { DebugLogEntry } from './Debug';
 import History from './History';
-import RequestContext from './RequestContext';
+import Plexus from './Plexus';
 import Profiler, { ProfilerLogEntry } from './Profiler';
-import Plexus from '../Plexus';
+import RequestContext from './RequestContext';
 import CustomError from '../entities/error-handling/CustomError';
 import Catalog from '../entities/catalog/Catalog';
 import { JsonObject } from '../types/common';
@@ -17,7 +17,7 @@ export default class Thread {
 		return this._history ??= new History();
 	}
 	
-	public async invoke(fields: JsonObject): Promise<{
+	public async invoke(fields: JsonObject, outputFields?: string[]): Promise<{
 		output: JsonObject;
 		threadId: string;
 		fields: JsonObject;
@@ -33,7 +33,7 @@ export default class Thread {
 			
 			this._history = History.create(this._threadId);
 			
-			const outputFields = Config.get('output') as string[];
+			outputFields ??= Config.get('output') as string[];
 			
 			if (!outputFields || !outputFields.length) throw new CustomError('No output specified');
 			

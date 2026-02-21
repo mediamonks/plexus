@@ -1,7 +1,7 @@
 import Config from './Config';
 import Console from './Console';
+import Plexus from './Plexus';
 import Configuration from '../types/Configuration';
-import Plexus from '../Plexus';
 
 export default class Status {
 	public static send(message: string, isRunning?: boolean): void {

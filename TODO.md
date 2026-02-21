@@ -13,7 +13,7 @@
 - **Support mixed/unknown data types** - Currently only handles specific data types (`src/entities/data-sources/DataSource.ts:109`)
 - **Add search support for raw text targets** - Currently unclear what should happen for search queries (`src/entities/data-sources/target/RawTextTargetDataSourceBehavior.ts:21`)
 - **Add spreadsheet support for raw data targets** - Currently missing spreadsheet handling (`src/entities/data-sources/target/RawTargetDataSource.ts:17`)
-- **Implement random selection for unsorted data** - Consider random selection when not sorting results (`src/entities/data-sources/target/RawTargetDataSource.ts:54`)
+- **Implement random selection for unsorted data** - Consider random selection when not sorting responses (`src/entities/data-sources/target/RawTargetDataSource.ts:54`)
 
 ## Service Improvements
 

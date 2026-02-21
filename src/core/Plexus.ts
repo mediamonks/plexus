@@ -1,15 +1,13 @@
 import EventEmitter from 'node:events';
-import Config from './core/Config';
-import Debug, { DebugLogEntry } from './core/Debug';
-import Profiler, { ProfilerLogEntry } from './core/Profiler';
-import RequestContext from './core/RequestContext';
-import Thread from './core/Thread';
-import Agents from './entities/agents/Agents';
-import Catalog from './entities/catalog/Catalog';
-import DataSources from './entities/data-sources/DataSources';
-import ErrorHandler from './entities/error-handling/ErrorHandler';
-import { JsonObject } from './types/common';
-import Configuration from './types/Configuration';
+import Config from './Config';
+import Debug, { DebugLogEntry } from './Debug';
+import Profiler, { ProfilerLogEntry } from './Profiler';
+import RequestContext from './RequestContext';
+import Thread from './Thread';
+import DataSources from '../entities/data-sources/DataSources';
+import ErrorHandler from '../entities/error-handling/ErrorHandler';
+import { JsonObject } from '../types/common';
+import Configuration from '../types/Configuration';
 
 export default class Plexus extends EventEmitter {
 	private _config: Configuration;
@@ -37,12 +35,12 @@ export default class Plexus extends EventEmitter {
 		return this._threads[threadId] ??= new Thread(this, threadId);
 	}
 	
-	public async invoke(fields: JsonObject): Promise<{
+	public async invoke(fields: JsonObject, outputFields?: string[]): Promise<{
 		output: JsonObject;
 		threadId: string;
 		fields: JsonObject;
 	}> {
-		return this.thread().invoke(fields);
+		return this.thread().invoke(fields, outputFields);
 	}
 	
 	public async ingest(namespace?: string): Promise<{
@@ -65,8 +63,4 @@ export default class Plexus extends EventEmitter {
 			return fn();
 		});
 	}
-	
-	public Agents = Agents;
-	public Catalog = Catalog;
-	public DataSources = DataSources;
 }

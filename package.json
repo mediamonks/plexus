@@ -3,11 +3,11 @@
 	"version": "1.8.16",
 	"description": "An SDK for building LLM-based agent pipelines",
 	"main": "index.js",
-	"types": "dist/Plexus.d.ts",
+	"types": "dist/index.d.ts",
 	"exports": {
 		".": {
-			"require": "./sdk.js",
-			"types": "./dist/Plexus.d.ts"
+			"require": "./sdk.cjs",
+			"types": "./dist/index.d.ts"
 		}
 	},
 	"bin": {
@@ -19,8 +19,8 @@
 	},
 	"files": [
 		"dist/",
-		"sdk.js",
 		"index.js",
+		"sdk.cjs",
 		"cli.cjs",
 		"plexus",
 		"config/",

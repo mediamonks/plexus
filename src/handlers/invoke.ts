@@ -1,4 +1,4 @@
-import Plexus from '../Plexus';
+import Plexus from '../core/Plexus';
 import { JsonObject, InvokePayload } from '../types/common';
 
 export default async (_: void, { config, threadId, fields }: InvokePayload): Promise<JsonObject> => {

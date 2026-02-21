@@ -1,4 +1,4 @@
-import Plexus from '../Plexus';
+import Plexus from '../core/Plexus';
 import Configuration from '../types/Configuration';
 import { JsonObject } from '../types/common';
 

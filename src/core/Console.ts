@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import Config from './Config';
-import Plexus from '../Plexus';
+import Plexus from './Plexus';
 
 const MAX_PIPS = 20;
 

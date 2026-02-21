@@ -445,7 +445,7 @@ These take their value from a data source.
 - **`query`** (object, optional): Properties that determine if and how the data from the data source should be queried. If not specified, the source data will always be used in its entirety (after `target`-based processing applies).
   - **`input`** (string, optional): Performs a text search against an unstructured data source, using the value of the given catalog field as input.
   - **`filter`** (object, optional): Filter criteria for queries against a structured data source, should consist of key-value pairs, where the key is the field name in the source data set, and the value is the name of a catalog field, which value will be used as the filter value.
-  - **`limit`** (number, optional): Maximum number of results for any type of query.
+  - **`limit`** (number, optional): Maximum number of responses for any type of query.
   - **`fields`** (array, optional): Specific fields to retrieve when querying a structured data source.
   - **`sort`** (string, optional): Which field to sort by when querying a structured data source.
 
