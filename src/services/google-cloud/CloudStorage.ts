@@ -26,11 +26,9 @@ export default class CloudStorage {
 		return buffer.toString();
 	}
 	
-	public static async write(uri: string, contents: string): Promise<string> {
+	public static async write(uri: string, contents: Buffer | string, contentType: string = 'text/plain; charset=utf-8'): Promise<string> {
 		return new Promise((resolve, reject) => {
-			const stream = this.file(uri).createWriteStream({
-				contentType: 'text/plain; charset=utf-8',
-			});
+			const stream = this.file(uri).createWriteStream({ contentType });
 			stream.on('error', reject);
 			stream.on('finish', () => resolve(uri));
 			stream.write(contents);
