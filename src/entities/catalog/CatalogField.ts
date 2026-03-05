@@ -60,6 +60,10 @@ export default class CatalogField implements ICatalogField {
 		return this.configuration.example;
 	}
 	
+	public get inputField(): string {
+		return this.id;
+	}
+	
 	protected async populate(): Promise<JsonField | DataSourceItem[]> {
 		throw new CustomError('Cannot create instance of CatalogField');
 	}

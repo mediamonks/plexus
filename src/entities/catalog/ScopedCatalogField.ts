@@ -20,6 +20,10 @@ export default class ScopedCatalogField implements ICatalogField {
 		return Promise.resolve(this._value);
 	}
 	
+	public get inputField(): string {
+		return this._id;
+	}
+	
 	public async toJSON(): Promise<JsonField> {
 		if (this._value instanceof Array && this._value[0] instanceof DataSourceItem) return this._value.map(item => item.toJSON());
 		return this._value as JsonField;

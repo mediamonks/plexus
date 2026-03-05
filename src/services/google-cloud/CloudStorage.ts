@@ -21,9 +21,9 @@ export default class CloudStorage {
 	private static _client: Storage;
 	private static _signingClient: Storage;
 	
-	public static async read(uri: string): Promise<string> {
+	public static async read(uri: string): Promise<Buffer> {
 		const [buffer] = await this.file(uri).download();
-		return buffer.toString();
+		return buffer;
 	}
 	
 	public static async write(uri: string, contents: Buffer | string, contentType: string = 'text/plain; charset=utf-8'): Promise<string> {

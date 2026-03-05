@@ -16,8 +16,8 @@ const [command, ...args] = argv._;
 
 const COMMANDS = {
 	ingest: plexus => {
-		const [namespace] = args;
-		return plexus.ingest(namespace);
+		const [idOrNamespace] = args;
+		return plexus.ingest(idOrNamespace);
 	},
 	invoke: plexus => {
 		const [fieldsJson, threadId] = args;
@@ -40,9 +40,9 @@ function sendHelp() {
 	const help = `Usage: plexus <COMMAND> [ARGUMENTS] [OPTIONS]'
 
 Command:
-  ingest    Ingest data from a set of data sources
+  ingest    Ingest data from a data source or set of data sources
             arguments:
-              - namespace (optional)
+              - ID or namespace (optional)
             example: \`plexus ingest mynamespace\`
     
   invoke    Invoke the pipeline

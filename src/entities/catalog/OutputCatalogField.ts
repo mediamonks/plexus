@@ -22,6 +22,10 @@ export default class OutputCatalogField extends CatalogField {
 		return this.configuration.field ?? this.id;
 	}
 	
+	public get inputField(): string {
+		return this.configuration.field ?? this.id;
+	}
+	
 	public get agentId(): string {
 		const { agent } = this.configuration;
 		

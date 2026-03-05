@@ -60,7 +60,7 @@ export default class Console {
 				));
 				break;
 			case 'sdk':
-				Plexus.instance?.emit('message', { type, args });
+				Plexus.instance?.emit(type.toLowerCase(), ...args);
 				break;
 			case 'cli':
 				process.stderr.write(`[${type}] ${args.map(arg =>

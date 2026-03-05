@@ -43,12 +43,12 @@ export default class Plexus extends EventEmitter {
 		return this.thread().invoke(fields, outputFields);
 	}
 	
-	public async ingest(namespace?: string): Promise<{
+	public async ingest(idOrNamespace?: string): Promise<{
 		performance?: ProfilerLogEntry[];
 		debug?: DebugLogEntry[];
 	}> {
 		return this.context(async () => {
-			await DataSources.ingest(namespace);
+			await DataSources.ingest(idOrNamespace);
 			
 			return {
 				performance: Config.get('profiling') ? Profiler.getReport() : undefined,

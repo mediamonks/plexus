@@ -1,6 +1,7 @@
 import DataSource from './DataSource';
 import DataVectorTargetDataSource from './target/DataVectorTargetDataSource';
 import DigestTargetDataSource from './target/DigestTargetDataSource';
+import ExtractTargetDataSource from './target/ExtractTargetDataSource';
 import FileTargetDataSource from './target/FileTargetDataSource';
 import RawDataTargetDataSource from './target/RawDataTargetDataSource';
 import RawTextTargetDataSource from './target/RawTextTargetDataSource';
@@ -12,7 +13,6 @@ import Debug from '../../core/Debug';
 import hash from '../../utils/hash';
 import Profiler from '../../core/Profiler';
 import RequestContext from '../../core/RequestContext';
-import { JsonObject } from '../../types/common';
 
 export default class DataSources {
 	static readonly Configuration: Record<string, typeof DataSource.ShorthandConfiguration>;
@@ -27,8 +27,8 @@ export default class DataSources {
 		return RequestContext.get('dataSources', {}) as Record<string, DataSource>;
 	}
 	
-	public static get ids(): string[] {
-		return Object.keys(this.configuration);
+	public static get ids(): Set<string> {
+		return new Set(Object.keys(this.configuration));
 	}
 	
 	public static get(id: string): DataSource {
@@ -45,11 +45,16 @@ export default class DataSources {
 		return this.dataSources[id];
 	}
 	
-	public static async ingest(namespace?: string): Promise<void> {
-		await Promise.all(this.ids.map(id => {
-			if (namespace && this.configuration[id].namespace !== namespace) return;
+	public static async ingest(idOrNamespace?: string): Promise<void> {
+		const run = (id: string) =>
+			Profiler.run(() => this.get(id).ingest(), `ingest data source "${id}"`);
+		
+		if (this.ids.has(idOrNamespace)) return run(idOrNamespace);
+		
+		await Promise.all(Array.from(this.ids).map(id => {
+			if (idOrNamespace && this.configuration[id].namespace !== idOrNamespace) return;
 			
-			return Profiler.run(() => this.get(id).ingest(), `ingest data source "${id}"`);
+			return run(id);
 		}));
 	}
 	
@@ -62,6 +67,7 @@ export default class DataSources {
 		
 		let instance = {
 			[DataSource.TARGET.DIGEST]: new DigestTargetDataSource(id, configuration),
+			[DataSource.TARGET.EXTRACT]: new ExtractTargetDataSource(id, configuration),
 			[DataSource.TARGET.FILE]: new FileTargetDataSource(id, configuration),
 			[DataSource.TARGET.FILES]: new FileTargetDataSource(id, configuration), // TODO for backwards compatibility
 			[DataSource.TARGET.RAW]: {

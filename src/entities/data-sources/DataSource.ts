@@ -48,6 +48,7 @@ export default abstract class DataSource {
 
 	public static readonly TARGET = {
 		DIGEST: 'digest',
+		EXTRACT: 'extract',
 		FILE: 'file',
 		FILES: 'files', // TODO for backwards compatibility
 		VECTOR: 'vector',
@@ -104,6 +105,10 @@ export default abstract class DataSource {
 		if (!originClass) throw new UnsupportedError('data source origin', origin, Object.keys(mapping));
 		
 		return this._origin = new originClass(this, this._configuration);
+	}
+	
+	public get dataType(): ValueOf<typeof DataSource.DATA_TYPE> {
+		return this.configuration.dataType;
 	}
 	
 	public abstract query(parameters?: typeof DataSourceCatalogField.QueryParameters): Promise<JsonField | DataSourceItem[]>;

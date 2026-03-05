@@ -36,7 +36,6 @@ You have access to the following tools. To perform a tool call, use the \`_tool_
 const INPUT_TEMPLATE = `### **Input Format (JSON)**`;
 const OUTPUT_TEMPLATE = `### **Output Format (JSON)**
 Output only JSON. Do **not** use markdown.`;
-const INVALID_JSON_RETRIES = 2;
 
 export default class Agent implements IAgent, IHasInstructions {
 	public isReady: boolean = false;
@@ -92,16 +91,15 @@ Name: ${toolName}
 Description: ${this._toolCallSchemas[toolName].description}
 Parameters schema:
 ${JSON.stringify(this._toolCallSchemas[toolName].parameters, undefined, 2)}`);
-		
+		const inputSchema: JsonObject = {};
+
 		if (tools.length) {
 			instructions.push(`${TOOLS_TEMPLATE}\n${tools.join('\n\n')}`);
+			inputSchema._tool_call_results = [];
 		}
 		
-		const inputSchema = {
-			_tool_call_results: [],
-		};
 		for (let fieldId of this.context) {
-			let { example } = this.catalog.get(fieldId);
+			let { example, inputField } = this.catalog.get(fieldId);
 			
 			if (!example) throw new CustomError(`Missing example for catalog field "${fieldId}"`);
 			
@@ -112,7 +110,7 @@ ${JSON.stringify(this._toolCallSchemas[toolName].parameters, undefined, 2)}`);
 				fieldId = this.configuration.serialize[1];
 			}
 			
-			inputSchema[fieldId] = example;
+			inputSchema[inputField] = example;
 		}
 		if (Object.keys(inputSchema).length) {
 			instructions.push(`${INPUT_TEMPLATE}\n${JSON.stringify(inputSchema, undefined, 2)}`);
@@ -241,7 +239,8 @@ ${JSON.stringify(this._toolCallSchemas[toolName].parameters, undefined, 2)}`);
 		const { context } = this;
 		
 		await Promise.all(context.map(async contextField => {
-			this._context[contextField] = await catalog.get(contextField).getValue();
+			const field = catalog.get(contextField);
+			this._context[field.inputField] = await field.getValue();
 			Debug.log(`Prepared context field "${contextField}" for agent "${this._id}"`, 'Agent');
 		}));
 	}
@@ -288,7 +287,7 @@ ${JSON.stringify(this._toolCallSchemas[toolName].parameters, undefined, 2)}`);
 		if (required) for (const requiredField of required)	if (this._context[requiredField] === undefined) return {};
 		
 		const activity = Console.start(`Running agent "${this.id}"`);
-		const result: JsonObject = await this.query(this._context as Record<string, JsonField>);
+		const result: JsonObject = await Profiler.run(() => this.query(this._context as Record<string, JsonField>), `${this.id} Agent.invoke`);
 		activity.done();
 		
 		// TODO Implement or remove pagination
@@ -315,14 +314,14 @@ ${JSON.stringify(this._toolCallSchemas[toolName].parameters, undefined, 2)}`);
 		let prompt = escapeUnicodeQuotes(JSON.stringify(mappedContext, undefined, 2));
 		do {
 			Debug.log(`Querying model for agent "${this.id} (trace ID: ${traceId})"`, 'Agent');
-			response = await LLM.query(prompt, {
+			response = await Profiler.run(() => LLM.query(prompt, {
 					instructions,
 					temperature: this._temperature,
 					outputTokens,
 					history,
 					schema: this.outputSchema,
 					files,
-			});
+			}), `${this.id} Agent.query`);
 			
 			Debug.dump(`agent ${this.id} ${traceId} response`, response);
 			

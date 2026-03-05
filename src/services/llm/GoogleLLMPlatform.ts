@@ -1,4 +1,5 @@
 import fs from 'node:fs/promises';
+import { performance } from 'node:perf_hooks';
 import { GoogleGenAI, Content, Part } from '@google/genai';
 import ILLMPlatform, { QueryOptions } from './ILLMPlatform';
 import LLMPlatform from './LLMPlatform';
@@ -66,22 +67,25 @@ export default class GoogleLLMPlatform extends LLMPlatform {
 		model ??= this.model;
 		outputTokens ??= this.outputTokens;
 		
-		await Profiler.run(() => this.quotaDelay(), 'GoogleLLMPlatform.quotaDelay');
-		
-		Debug.dump('google llm call contents', contents);
-		
-		const response = await Profiler.run(async () => this.retry(() => this.client.models.generateContent({
-			model,
-			contents,
-			config: {
-				systemInstruction: instructions,
-				temperature,
-				maxOutputTokens: outputTokens,
-				responseMimeType: schema ? 'application/json' : undefined,
-				responseSchema: schema,
-				httpOptions: this.configuration.timeoutMs ? { timeout: this.configuration.timeoutMs } : undefined,
-			},
-		})), 'GoogleLLMPlatform.query');
+		const response = await this.retry(async () => {
+			await this.quotaDelay();
+			Debug.log(`Quota delay passed (${performance.now()})`, 'GoogleLLMPlatform');
+			
+			Debug.dump('google llm call contents', contents);
+			
+			return Profiler.run(async () => this.client.models.generateContent({
+				model,
+				contents,
+				config: {
+					systemInstruction: instructions,
+					temperature,
+					maxOutputTokens: outputTokens,
+					responseMimeType: schema ? 'application/json' : undefined,
+					responseSchema: schema,
+					httpOptions: this.configuration.timeoutMs ? { timeout: this.configuration.timeoutMs } : undefined,
+				},
+			}), 'GoogleLLMPlatform.query');
+		});
 		
 		const candidate = response.candidates[0];
 		const responseParts = candidate.content.parts;

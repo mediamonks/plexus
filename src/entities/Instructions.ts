@@ -29,7 +29,7 @@ export default class Instructions {
 		const { instructions } = this._parent.configuration;
 		
 		if (instructions) {
-			if (instructions.startsWith('gs://')) return await CloudStorage.read(instructions);
+			if (instructions.startsWith('gs://')) return (await CloudStorage.read(instructions)).toString();
 			
 			return instructions;
 		}
@@ -38,7 +38,7 @@ export default class Instructions {
 		if (instructionsPath) {
 			const fullPath = `${instructionsPath}/${this._parent.id}.txt`;
 			
-			if (fullPath.startsWith('gs://')) return CloudStorage.read(fullPath);
+			if (fullPath.startsWith('gs://')) return (await CloudStorage.read(fullPath)).toString();
 			
 			if (await fs.stat(fullPath)) return await fs.readFile(fullPath, 'utf8');
 		}
