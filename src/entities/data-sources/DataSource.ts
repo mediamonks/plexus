@@ -9,6 +9,7 @@ import CustomError from '../error-handling/CustomError';
 import UnsupportedError from '../error-handling/UnsupportedError';
 import RequestContext from '../../core/RequestContext';
 import { JsonField, ValueOf, ToolCallSchema, ToolCallResult } from '../../types/common';
+import ConfigurationError from '../error-handling/ConfigurationError';
 
 export default abstract class DataSource {
 	public constructor(
@@ -94,6 +95,8 @@ export default abstract class DataSource {
 		
 		const origin = this.configuration.origin ?? this.detectOrigin();
 		
+		if (!origin) throw new ConfigurationError(`Could not determine origin based on URI and data source origin not set for data source "${this.id}"`);
+		
 		const mapping = {
 			[DataSource.ORIGIN.GOOGLE_DRIVE]: GoogleDriveDataSourceOrigin,
 			[DataSource.ORIGIN.GOOGLE_CLOUD_STORAGE]: GoogleCloudStorageDataSourceOrigin,
@@ -149,11 +152,7 @@ export default abstract class DataSource {
 			[DataSource.ORIGIN.API]: /^https?:\/\//
 		};
 		
-		const origin = Object.keys(mapping)
+		return Object.keys(mapping)
 			.find(origin => mapping[origin].test(this.configuration.uri)) as ValueOf<typeof DataSource.ORIGIN>;
-		
-		if (!origin) throw new UnsupportedError('data source URI', this.configuration.uri, Object.values(mapping).map(regex => regex.toString()));
-		
-		return origin;
 	}
 };

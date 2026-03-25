@@ -91,30 +91,30 @@ Name: ${toolName}
 Description: ${this._toolCallSchemas[toolName].description}
 Parameters schema:
 ${JSON.stringify(this._toolCallSchemas[toolName].parameters, undefined, 2)}`);
-		const inputSchema: JsonObject = {};
+		// const inputSchema: JsonObject = {};
 
 		if (tools.length) {
 			instructions.push(`${TOOLS_TEMPLATE}\n${tools.join('\n\n')}`);
-			inputSchema._tool_call_results = [];
+			// inputSchema._tool_call_results = [];
 		}
 		
-		for (let fieldId of this.context) {
-			let { example, inputField } = this.catalog.get(fieldId);
-			
-			if (!example) throw new CustomError(`Missing example for catalog field "${fieldId}"`);
-			
-			example = Catalog.resolveExample(example);
-			
-			if (this.configuration.serialize && fieldId === this.configuration.serialize[0]) {
-				example = example[0];
-				fieldId = this.configuration.serialize[1];
-			}
-			
-			inputSchema[inputField] = example;
-		}
-		if (Object.keys(inputSchema).length) {
-			instructions.push(`${INPUT_TEMPLATE}\n${JSON.stringify(inputSchema, undefined, 2)}`);
-		}
+		// for (let fieldId of this.context) {
+		// 	let { example, inputField } = this.catalog.get(fieldId);
+		//
+		// 	if (!example) throw new CustomError(`Missing example for catalog field "${fieldId}"`);
+		//
+		// 	example = Catalog.resolveExample(example);
+		//
+		// 	if (this.configuration.serialize && fieldId === this.configuration.serialize[0]) {
+		// 		example = example[0];
+		// 		fieldId = this.configuration.serialize[1];
+		// 	}
+		//
+		// 	inputSchema[inputField] = example;
+		// }
+		// if (Object.keys(inputSchema).length) {
+		// 	instructions.push(`${INPUT_TEMPLATE}\n${JSON.stringify(inputSchema, undefined, 2)}`);
+		// }
 		
 		const outputSchema = this.outputSchema;
 		
@@ -314,14 +314,19 @@ ${JSON.stringify(this._toolCallSchemas[toolName].parameters, undefined, 2)}`);
 		let prompt = escapeUnicodeQuotes(JSON.stringify(mappedContext, undefined, 2));
 		do {
 			Debug.log(`Querying model for agent "${this.id} (trace ID: ${traceId})"`, 'Agent');
-			response = await Profiler.run(() => LLM.query(prompt, {
-					instructions,
-					temperature: this._temperature,
-					outputTokens,
-					history,
-					schema: this.outputSchema,
-					files,
-			}), `${this.id} Agent.query`);
+			try {
+				response = await Profiler.run(() => LLM.query(prompt, {
+						instructions,
+						temperature: this._temperature,
+						outputTokens,
+						history,
+						schema: this.outputSchema,
+						files,
+				}), `${this.id} Agent.query`);
+			} catch (error) {
+				error.message = `Agent "${this.id}" (trace ID: ${traceId}) - ${error.message}`;
+				throw error;
+			}
 			
 			Debug.dump(`agent ${this.id} ${traceId} response`, response);
 			
