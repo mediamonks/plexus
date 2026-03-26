@@ -4,6 +4,7 @@ import Storage from '../../storage/Storage';
 import StorageFile from '../../storage/StorageFile';
 import IHasInstructions from '../../IHasInstructions';
 import Instructions from '../../Instructions';
+import ConfigurationError from '../../error-handling/ConfigurationError';
 import CustomError from '../../error-handling/CustomError';
 
 export default class DigestTargetDataSource extends DataSource implements IHasInstructions {
@@ -50,9 +51,16 @@ export default class DigestTargetDataSource extends DataSource implements IHasIn
 	
 	private async read(): Promise<string> {
 		const input = await this.origin.getText();
+		let instructions: string;
+		
+		try {
+			instructions = await this.instructions.get();
+		} catch (error) {
+			throw new ConfigurationError(`Missing instructions for digest target data source "${this.id}"`);
+		}
 		
 		return await LLM.query(input, {
-			instructions: await this.instructions.get(),
+			instructions,
 			temperature: 0,
 		});
 	}

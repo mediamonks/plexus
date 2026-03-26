@@ -33,7 +33,7 @@ type ToolCall = {
 
 const TOOLS_TEMPLATE = `### **Tools**
 You have access to the following tools. To perform a tool call, use the \`_tool_calls\` field in your response. When performing one or more tool calls, use the \`_status\` field to provide a short description of what you are doing.`;
-const INPUT_TEMPLATE = `### **Input Format (JSON)**`;
+// const INPUT_TEMPLATE = `### **Input Format (JSON)**`;
 const OUTPUT_TEMPLATE = `### **Output Format (JSON)**
 Output only JSON. Do **not** use markdown.`;
 
@@ -91,34 +91,18 @@ Name: ${toolName}
 Description: ${this._toolCallSchemas[toolName].description}
 Parameters schema:
 ${JSON.stringify(this._toolCallSchemas[toolName].parameters, undefined, 2)}`);
-		// const inputSchema: JsonObject = {};
 
 		if (tools.length) {
 			instructions.push(`${TOOLS_TEMPLATE}\n${tools.join('\n\n')}`);
-			// inputSchema._tool_call_results = [];
 		}
 		
-		// for (let fieldId of this.context) {
-		// 	let { example, inputField } = this.catalog.get(fieldId);
+		// const inputSchema = this.inputSchema;
 		//
-		// 	if (!example) throw new CustomError(`Missing example for catalog field "${fieldId}"`);
-		//
-		// 	example = Catalog.resolveExample(example);
-		//
-		// 	if (this.configuration.serialize && fieldId === this.configuration.serialize[0]) {
-		// 		example = example[0];
-		// 		fieldId = this.configuration.serialize[1];
-		// 	}
-		//
-		// 	inputSchema[inputField] = example;
-		// }
 		// if (Object.keys(inputSchema).length) {
 		// 	instructions.push(`${INPUT_TEMPLATE}\n${JSON.stringify(inputSchema, undefined, 2)}`);
 		// }
 		
-		const outputSchema = this.outputSchema;
-		
-		instructions.push(`${OUTPUT_TEMPLATE}\n${JSON.stringify(outputSchema, undefined, 2)}`);
+		instructions.push(`${OUTPUT_TEMPLATE}\n${JSON.stringify(this.outputSchema, undefined, 2)}`);
 		
 		return instructions.join('\n\n');
 	}
@@ -133,6 +117,31 @@ ${JSON.stringify(this._toolCallSchemas[toolName].parameters, undefined, 2)}`);
 	
 	private get context(): readonly string[] {
 		return this.configuration.context ?? [];
+	}
+	
+	private get inputSchema(): JsonObject {
+		const inputSchema: JsonObject = {};
+		
+		if (Object.keys(this._toolCallSchemas).length) {
+			inputSchema._tool_call_results = [];
+		}
+		
+		for (let fieldId of this.context) {
+			let { example, inputField } = this.catalog.get(fieldId);
+
+			if (!example) throw new CustomError(`Missing example for catalog field "${fieldId}"`);
+
+			example = Catalog.resolveExample(example);
+
+			if (this.configuration.serialize && fieldId === this.configuration.serialize[0]) {
+				example = example[0];
+				fieldId = this.configuration.serialize[1];
+			}
+
+			inputSchema[inputField] = example;
+		}
+
+		return inputSchema;
 	}
 	
 	private get outputSchema(): AgentOutputSchema {

@@ -34,7 +34,7 @@ export default class DataSourceCatalogField extends CatalogField {
 		return source;
 	}
 	
-	public get inputField(): string {
+	public get queryInputField(): string {
 		return this.configuration.query?.input ?? this.configuration.input; // TODO for backwards compatibility
 	}
 	
@@ -60,9 +60,9 @@ export default class DataSourceCatalogField extends CatalogField {
 		const promises = [];
 		
 		let input: string;
-		if (this.inputField) {
+		if (this.queryInputField) {
 			promises.push(
-				this.catalog.get(this.inputField).getValue()
+				this.catalog.get(this.queryInputField).getValue()
 					.then(value => { input = String(value) })
 			);
 		}
