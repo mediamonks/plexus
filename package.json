@@ -1,6 +1,6 @@
 {
 	"name": "plexus",
-	"version": "1.9.5",
+	"version": "1.9.6",
 	"description": "An SDK for building LLM-based agent pipelines",
 	"main": "index.js",
 	"types": "dist/index.d.ts",
