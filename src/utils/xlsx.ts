@@ -1,17 +1,37 @@
-import XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 import { SpreadSheetData } from '../types/common';
 
 async function getData(path: string): Promise<SpreadSheetData> {
-	const workbook = XLSX.readFile(path);
+	const workbook = new ExcelJS.Workbook();
+	await workbook.xlsx.readFile(path);
 	
 	const sheets = [];
 	
-	for (const sheetName of workbook.SheetNames) {
-		const worksheet = workbook.Sheets[sheetName];
-		sheets.push({ title: sheetName, rows: XLSX.utils.sheet_to_json(worksheet) });
-	}
+	workbook.eachSheet((worksheet) => {
+		const rows: any[] = [];
+		const headers: string[] = [];
+		
+		worksheet.eachRow((row, rowNumber) => {
+			if (rowNumber === 1) {
+				row.eachCell((cell) => {
+					headers.push(cell.value?.toString() || '');
+				});
+			} else {
+				const rowData: any = {};
+				row.eachCell((cell, colNumber) => {
+					const header = headers[colNumber - 1];
+					if (header) {
+						rowData[header] = cell.value;
+					}
+				});
+				rows.push(rowData);
+			}
+		});
+		
+		sheets.push({ title: worksheet.name, rows });
+	});
 	
-	return { sheets }
+	return { sheets };
 }
 
 export default { getData };
